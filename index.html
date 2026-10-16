@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GĐPT Minh Quang</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Alpine.js CDN -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Firebase SDK Compat CDN -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Merriweather:wght@400;700&family=Fira+Code:wght@400;600&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        .bg-lam { background-color: #1e3a8a; }
+        .text-lam { color: #1e3a8a; }
+        .font-serif-custom { font-family: 'Merriweather', serif; }
+        .font-mono-custom { font-family: 'Fira Code', monospace; }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 pb-20" x-data="gdptApp()" x-init="initFirebase()">
+
+    <!-- MÀN HÌNH ĐĂNG NHẬP -->
+    <template x-if="!isLoggedIn">
+        <div class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-900 to-blue-700">
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
+                <div class="text-center mb-6">
+                    <div class="inline-block p-3 bg-blue-100 rounded-full text-blue-900 mb-2 font-bold text-xl">🪷</div>
+                    <h1 class="text-2xl font-bold text-gray-900">GĐPT Minh Quang</h1>
+                    <p class="text-sm text-gray-500 mt-1">Đăng nhập tài khoản hệ thống (Online)</p>
+                </div>
+                <form @submit.prevent="login" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Tên đăng nhập</label>
+                        <input type="text" x-model="loginForm.username" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Nhập tên đăng nhập...">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Mật khẩu</label>
+                        <input type="password" x-model="loginForm.password" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="••••••••">
+                    </div>
+                    <p x-show="loginError" class="text-red-500 text-sm text-center" x-text="loginError"></p>
+                    <button type="submit" class="w-full bg-blue-900 text-white py-2.5 rounded-lg font-semibold hover:bg-blue-800 transition">Đăng Nhập</button>
+                </form>
+                <div class="mt-4 text-xs text-center text-gray-400 bg-gray-50 p-2 rounded-lg border">
+                    <b>Tài khoản thử nghiệm mặc định:</b><br>
+                    🔑 Admin: <b>admin / 123</b><br>
+                    📿 Huynh Trưởng: <b>huynhtruong / 123</b><br>
+                    👦 Đoàn Sinh: <b>doansinh / 123</b>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- GIAO DIỆN CHÍNH -->
+    <div x-show="isLoggedIn" class="max-w-md mx-auto min-h-screen bg-white shadow-lg flex flex-col justify-between relative overflow-hidden">
+        
+        <!-- HEADER -->
+        <header class="bg-lam text-white p-4 sticky top-0 z-50 flex justify-between items-center shadow-md">
+            <div>
+                <h1 class="font-bold text-lg">GĐPT Minh Quang</h1>
+                <p class="text-xs text-blue-200" x-text="'Xin chào, ' + currentUser.name + ' (' + getRoleName(currentUser.role) + ')'"></p>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-[10px] bg-emerald-600 text-white px-2 py-0.5 rounded-full font-semibold animate-pulse">● Online</span>
+                <button @click="logout" class="text-xs bg-blue-800 hover:bg-blue-700 px-3 py-1.5 rounded-lg transition">Đăng xuất</button>
+            </div>
+        </header>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="flex-1 overflow-y-auto p-4 mb-16">
+            
+            <!-- TAB 1: TRANG CHỦ -->
+            <div x-show="currentTab === 'home'" class="space-y-4">
+                
+                <div class="border rounded-xl p-4 text-center transition-all shadow-sm relative"
+                    :class="[bannerConfig.fontClass, bannerConfig.bgClass]">
+                    <template x-if="currentUser.role === 'admin'">
+                        <button @click="showBannerConfig = !showBannerConfig" class="absolute top-2 right-2 text-[10px] bg-white/80 hover:bg-white text-gray-700 px-2 py-0.5 rounded border font-sans">
+                            ⚙️ Tùy chỉnh Banner
+                        </button>
+                    </template>
+
+                    <div class="flex items-center justify-center gap-2 mb-1">
+                        <span class="text-2xl" x-text="bannerConfig.icon"></span>
+                        <h2 class="font-bold" :class="[bannerConfig.textColor, bannerConfig.sizeClass]" x-text="bannerConfig.title"></h2>
+                    </div>
+                    <p class="text-xs text-gray-600" x-text="bannerConfig.subtitle"></p>
+                </div>
+
+                <div x-show="showBannerConfig && currentUser.role === 'admin'" class="bg-blue-50/80 border border-blue-200 rounded-xl p-3 text-xs space-y-2">
+                    <p class="font-bold text-blue-900">🎨 Cấu hình Bảng thông tin đầu trang</p>
+                    <div>
+                        <label class="block text-[10px] text-gray-600">Tiêu đề:</label>
+                        <input type="text" x-model="bannerConfig.title" class="w-full px-2 py-1 border rounded bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-gray-600">Mô tả phụ:</label>
+                        <input type="text" x-model="bannerConfig.subtitle" class="w-full px-2 py-1 border rounded bg-white">
+                    </div>
+                    <button @click="saveBannerConfig()" class="w-full bg-blue-900 text-white py-1 rounded font-semibold">Lưu Cấu Hình</button>
+                </div>
+
+                <!-- MỤC THÔNG BÁO -->
+                <div class="bg-white border rounded-xl p-4 shadow-sm space-y-3">
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <h3 class="font-bold text-gray-800 flex items-center gap-1">
+                            <span>📌 Thông báo mới nhất</span>
+                        </h3>
+                        <span class="text-[10px] bg-red-100 text-red-600 font-semibold px-2 py-0.5 rounded-full">Cập nhật</span>
+                    </div>
+
+                    <div class="space-y-2">
+                        <template x-for="(ann, idx) in announcements" :key="idx">
+                            <div class="p-2.5 bg-gray-50 border rounded-lg text-xs space-y-1 relative">
+                                <div class="flex justify-between items-start">
+                                    <p class="font-semibold text-blue-900" x-text="ann.title"></p>
+                                    <span class="text-[10px] text-gray-400" x-text="ann.date"></span>
+                                </div>
+                                <p class="text-gray-600 leading-relaxed" x-text="ann.content"></p>
+                                <template x-if="currentUser.role === 'admin'">
+                                    <button @click="deleteAnnouncement(idx)" class="text-[10px] text-red-500 hover:underline pt-1 block">Xóa thông báo này</button>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+
+                    <template x-if="currentUser.role === 'admin'">
+                        <div class="border-t pt-3 space-y-2 text-xs bg-blue-50/50 p-2.5 rounded-lg">
+                            <p class="font-bold text-blue-900">✍️ Đăng thông báo mới (Admin)</p>
+                            <input type="text" x-model="newAnn.title" placeholder="Tiêu đề thông báo..." class="w-full px-3 py-1.5 border rounded outline-none bg-white">
+                            <textarea x-model="newAnn.content" placeholder="Nội dung thông báo..." class="w-full px-3 py-1.5 border rounded outline-none bg-white h-16"></textarea>
+                            <button @click="addAnnouncement" class="w-full bg-blue-900 text-white py-1.5 rounded font-semibold hover:bg-blue-800">Đăng Thông Báo</button>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- 3 Ô MẠNG XÃ HỘI -->
+                <div class="bg-white border rounded-xl p-3 shadow-sm space-y-2 text-xs">
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-gray-700">🌐 Kênh Mạng Xã Hội GĐPT Minh Quang</span>
+                        <template x-if="currentUser.role === 'admin'">
+                            <button @click="editingSocial = !editingSocial" class="text-[10px] text-blue-600 font-semibold" x-text="editingSocial ? 'Xong' : '✏️ Sửa Link'"></button>
+                        </template>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2 pt-1">
+                        <a :href="socialLinks.facebook" target="_blank" class="p-2 bg-blue-50 hover:bg-blue-100 text-blue-800 font-semibold rounded-lg text-center border border-blue-200 flex flex-col items-center justify-center gap-1 transition">
+                            <span class="text-base">📘</span>
+                            <span>Facebook</span>
+                        </a>
+                        <a :href="socialLinks.groupFb" target="_blank" class="p-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 font-semibold rounded-lg text-center border border-indigo-200 flex flex-col items-center justify-center gap-1 transition">
+                            <span class="text-base">👥</span>
+                            <span>Group FB</span>
+                        </a>
+                        <a :href="socialLinks.tiktok" target="_blank" class="p-2 bg-gray-900 hover:bg-gray-800 text-white font-semibold rounded-lg text-center border border-gray-700 flex flex-col items-center justify-center gap-1 transition">
+                            <span class="text-base">🎵</span>
+                            <span>TikTok</span>
+                        </a>
+                    </div>
+
+                    <template x-if="editingSocial && currentUser.role === 'admin'">
+                        <div class="bg-gray-50 border p-2.5 rounded-lg space-y-2 mt-2">
+                            <p class="font-bold text-gray-700 text-[11px]">Chỉnh sửa liên kết mạng xã hội:</p>
+                            <div>
+                                <label class="text-[10px] text-gray-500">Link Facebook:</label>
+                                <input type="text" x-model="socialLinks.facebook" class="w-full px-2 py-1 border rounded bg-white">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-gray-500">Link Group Facebook:</label>
+                                <input type="text" x-model="socialLinks.groupFb" class="w-full px-2 py-1 border rounded bg-white">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-gray-500">Link TikTok:</label>
+                                <input type="text" x-model="socialLinks.tiktok" class="w-full px-2 py-1 border rounded bg-white">
+                            </div>
+                            <button @click="saveSocialLinks()" class="w-full bg-blue-900 text-white py-1 rounded font-semibold">Lưu Link</button>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- SƠ ĐỒ BHT -->
+                <div class="bg-white border rounded-xl p-4 shadow-sm space-y-3">
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <h3 class="font-bold text-gray-800">🌳 Sơ đồ Ban Huynh Trưởng</h3>
+                        <template x-if="currentUser.role === 'admin'">
+                            <div class="flex gap-2">
+                                <button @click="addNewBHTPosition" class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded font-semibold">+ Thêm vị trí</button>
+                                <button @click="editingBHT = !editingBHT" class="text-xs text-blue-600 font-semibold" x-text="editingBHT ? 'Xong' : '✏️ Chỉnh sửa'"></button>
+                            </div>
+                        </template>
+                    </div>
+
+                    <div x-show="!editingBHT" class="space-y-3 text-sm">
+                        <template x-for="bht in bhtList" :key="bht.id">
+                            <div class="p-3 border-l-4 rounded" :class="bht.colorClass || 'bg-blue-50 border-blue-500'">
+                                <p class="font-semibold text-blue-900" x-text="bht.role + ': ' + bht.dhName + ' - ' + bht.name"></p>
+                                <p class="text-xs text-gray-600" x-text="'SĐT: ' + bht.phone"></p>
+                            </div>
+                        </template>
+                    </div>
+
+                    <div x-show="editingBHT" class="space-y-3 text-xs">
+                        <template x-for="(bht, idx) in bhtList" :key="idx">
+                            <div class="p-2 border rounded space-y-1 bg-gray-50 relative">
+                                <input type="text" x-model="bht.role" placeholder="Chức vụ" class="w-full px-2 py-1 border rounded">
+                                <div class="grid grid-cols-2 gap-1">
+                                    <input type="text" x-model="bht.dhName" placeholder="Pháp danh" class="px-2 py-1 border rounded">
+                                    <input type="text" x-model="bht.name" placeholder="Họ tên" class="px-2 py-1 border rounded">
+                                </div>
+                                <div class="flex gap-1">
+                                    <input type="text" x-model="bht.phone" placeholder="Số điện thoại" class="flex-1 px-2 py-1 border rounded">
+                                    <button @click="removeBHTPosition(idx)" class="bg-red-100 text-red-600 px-2 rounded font-bold">Xóa</button>
+                                </div>
+                            </div>
+                        </template>
+                        <button @click="saveBHTList()" class="w-full bg-green-600 text-white py-1.5 rounded font-semibold">Lưu thay đổi</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: ĐOÀN SINH -->
+            <div x-show="currentTab === 'members'" class="space-y-4">
+                <div class="flex justify-between items-center">
+                    <h2 class="font-bold text-lg text-gray-900">Danh Sách Đoàn Sinh</h2>
+                    <template x-if="currentUser.role !== 'doansinh'">
+                        <button @click="openAddMemberModal" class="bg-blue-600 text-white text-xs px-3 py-1.5 rounded-lg font-semibold">+ Thêm Đoàn Sinh</button>
+                    </template>
+                </div>
+
+                <template x-if="currentUser.role !== 'doansinh'">
+                    <div class="bg-gradient-to-br from-blue-900 to-indigo-900 text-white rounded-xl p-3.5 shadow-md space-y-2.5 text-xs">
+                        <div class="flex justify-between items-center border-b border-blue-700/60 pb-1.5">
+                            <span class="font-bold text-sm text-yellow-300">📊 Thống Kê Nhân Sự Cổng Đoàn</span>
+                            <span class="text-[10px] bg-blue-800 px-2 py-0.5 rounded-full border border-blue-600" x-text="'Tổng số: ' + members.length + ' người'"></span>
+                        </div>
+                        <div class="grid grid-cols-4 gap-1.5 text-center text-[11px]">
+                            <div class="bg-white/10 p-1.5 rounded-lg border border-white/10">
+                                <p class="text-blue-200 text-[9px]">Oanh Vũ</p>
+                                <p class="font-extrabold text-sm text-amber-300" x-text="countMembersByGroup('Oanh Vũ')"></p>
+                            </div>
+                            <div class="bg-white/10 p-1.5 rounded-lg border border-white/10">
+                                <p class="text-blue-200 text-[9px]">Thiếu</p>
+                                <p class="font-extrabold text-sm text-green-300" x-text="countMembersByGroup('Thiếu')"></p>
+                            </div>
+                            <div class="bg-white/10 p-1.5 rounded-lg border border-white/10">
+                                <p class="text-blue-200 text-[9px]">Thanh</p>
+                                <p class="font-extrabold text-sm text-cyan-300" x-text="countMembersByGroup('Thanh')"></p>
+                            </div>
+                            <div class="bg-white/10 p-1.5 rounded-lg border border-white/10">
+                                <p class="text-blue-200 text-[9px]">H.Trưởng</p>
+                                <p class="font-extrabold text-sm text-pink-300" x-text="countMembersByGroup('Huynh Trưởng')"></p>
+                            </div>
+                        </div>
+                        <div class="flex justify-around text-[10px] bg-black/20 p-1.5 rounded-lg text-gray-200">
+                            <span>🟢 Đang sinh hoạt: <b class="text-white" x-text="countMembersByStatus('Đang sinh hoạt')"></b></span>
+                            <span>🟡 Tạm nghỉ: <b class="text-yellow-300" x-text="countMembersByStatus('Tạm nghỉ')"></b></span>
+                            <span>🔴 Nghỉ: <b class="text-red-300" x-text="countMembersByStatus('Nghỉ')"></b></span>
+                        </div>
+                    </div>
+                </template>
+
+                <template x-if="currentUser.role !== 'doansinh'">
+                    <div class="flex gap-2">
+                        <input type="text" x-model="memberSearch" placeholder="Tìm tên, pháp danh..." class="flex-1 text-xs px-3 py-2 border rounded-lg outline-none">
+                        <select x-model="memberFilterGroup" class="text-xs px-2 py-2 border rounded-lg outline-none">
+                            <option value="all">Tất cả các ngành</option>
+                            <option value="Huynh Trưởng">Huynh Trưởng</option>
+                            <option value="Thanh">Đoàn Thanh</option>
+                            <option value="Thiếu">Đoàn Thiếu</option>
+                            <option value="Oanh Vũ">Đoàn Oanh Vũ</option>
+                        </select>
+                    </div>
+                </template>
+
+                <div class="space-y-3">
+                    <template x-for="m in filteredMembers" :key="m.id">
+                        <div class="bg-white border rounded-xl p-3 shadow-sm text-xs space-y-1.5 relative">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <span class="font-bold text-sm text-blue-900" x-text="m.name"></span>
+                                    <span class="text-gray-500 italic" x-text="'(' + m.dhName + ')'"></span>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-semibold"
+                                        :class="{
+                                            'bg-green-100 text-green-800': m.status === 'Đang sinh hoạt',
+                                            'bg-yellow-100 text-yellow-800': m.status === 'Tạm nghỉ',
+                                            'bg-red-100 text-red-800': m.status === 'Nghỉ'
+                                        }" x-text="m.status"></span>
+                                    <template x-if="currentUser.role === 'admin'">
+                                        <button @click="editMemberProfile(m)" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-1.5 py-0.5 rounded text-[10px]">✏️ Sửa</button>
+                                    </template>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-1 text-gray-600">
+                                <div><b class="text-gray-700">Giới tính:</b> <span class="font-semibold text-blue-800" x-text="m.gender || 'Nam'"></span></div>
+                                <div><b class="text-gray-700">Ngày sinh:</b> <span x-text="m.dob"></span></div>
+                                <div><b class="text-gray-700">Ngành/Đoàn:</b> <span x-text="m.group"></span></div>
+                                <div><b class="text-gray-700">SĐT:</b> <span x-text="m.phone"></span></div>
+                                <div><b class="text-gray-700">SĐT PH:</b> <span x-text="m.parentPhone"></span></div>
+                                <div class="col-span-2"><b class="text-gray-700">Địa chỉ:</b> <span x-text="m.address || 'Chưa cập nhật'"></span></div>
+                                <div><b class="text-gray-700">Đã học bậc:</b> <span x-text="m.level"></span></div>
+                                <div><b class="text-gray-700">TK Liên kết:</b> <span class="text-blue-600 font-semibold" x-text="getLinkedUsername(m.id)"></span></div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <!-- TAB 3: ĐIỂM DANH (CÓ NÚT XUẤT BÁO CÁO EXCEL) -->
+            <div x-show="currentTab === 'attendance'" class="space-y-4">
+                <h2 class="font-bold text-lg text-gray-900">Điểm Danh Sinh Hoạt</h2>
+                
+                <div class="bg-white border rounded-xl p-4 shadow-sm space-y-3 text-center">
+                    <div class="bg-blue-50 p-2.5 rounded-lg border border-blue-100 flex justify-between items-center text-xs">
+                        <span class="text-gray-600 font-medium">Chọn ngày sinh hoạt:</span>
+                        <input type="date" x-model="attendanceDate" class="text-xs font-semibold px-2 py-1 border rounded-lg outline-none bg-white">
+                    </div>
+
+                    <div class="py-2 space-y-2">
+                        <p class="text-xs text-gray-500">Xác nhận trạng thái sinh hoạt ngày <b x-text="attendanceDate"></b>:</p>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button @click="submitSelfAttendance('Có mặt')" class="bg-green-600 text-white font-bold py-2.5 rounded-xl shadow-md hover:bg-green-700 transition text-xs">
+                                <span>✅</span> BẤM ĐIỂM DANH
+                            </button>
+                            <button @click="submitSelfAttendance('Vắng có phép')" class="bg-amber-500 text-white font-bold py-2.5 rounded-xl shadow-md hover:bg-amber-600 transition text-xs">
+                                <span>✋</span> XIN VẮNG
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <template x-if="currentUser.role !== 'doansinh'">
+                    <div class="bg-white border rounded-xl p-4 shadow-sm space-y-3 text-xs">
+                        <div class="flex justify-between items-center border-b pb-2">
+                            <h3 class="font-bold text-sm text-blue-900">📊 Báo Cáo & Quản Lý Điểm Danh</h3>
+                            <!-- NÚT XUẤT FILE EXCEL -->
+                            <button @click="exportAttendanceToExcel()" class="bg-emerald-700 hover:bg-emerald-800 text-white font-semibold px-2.5 py-1 rounded shadow text-[11px] flex items-center gap-1 transition">
+                                <span>📥</span> Xuất Báo Cáo Excel
+                            </button>
+                        </div>
+
+                        <div class="bg-gray-50 border p-2.5 rounded-xl space-y-2">
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-[10px] text-gray-500 font-semibold mb-0.5">Lọc thời gian:</label>
+                                    <select x-model="attendanceTimeFilter" class="w-full px-2 py-1 border rounded font-semibold text-xs bg-white outline-none">
+                                        <option value="ngay">Ngày cụ thể</option>
+                                        <option value="tuan">Tuần này</option>
+                                        <option value="thang">Cả tháng này</option>
+                                        <option value="quy">Quý này</option>
+                                        <option value="nam">Năm 2026</option>
+                                    </select>
+                                </div>
+                                <div x-show="attendanceTimeFilter === 'ngay'">
+                                    <label class="block text-[10px] text-gray-500 font-semibold mb-0.5">Chọn ngày xem:</label>
+                                    <input type="date" x-model="selectedFilterDate" class="w-full px-2 py-1 border rounded text-xs bg-white outline-none">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-2 text-center my-2">
+                            <div class="bg-green-50 border border-green-200 p-2 rounded-lg">
+                                <p class="text-[10px] text-gray-500">Có mặt</p>
+                                <p class="font-bold text-base text-green-700" x-text="countAttendance('Có mặt')"></p>
+                            </div>
+                            <div class="bg-amber-50 border border-amber-200 p-2 rounded-lg">
+                                <p class="text-[10px] text-gray-500">Vắng có phép</p>
+                                <p class="font-bold text-base text-amber-700" x-text="countAttendance('Vắng có phép')"></p>
+                            </div>
+                            <div class="bg-red-50 border border-red-200 p-2 rounded-lg">
+                                <p class="text-[10px] text-gray-500">Vắng không phép</p>
+                                <p class="font-bold text-base text-red-700" x-text="countAttendance('Vắng không phép')"></p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2 pt-2">
+                            <div class="flex justify-between items-center font-bold text-gray-700">
+                                <span>Bảng điểm danh chi tiết:</span>
+                            </div>
+                            <div class="space-y-2 max-h-60 overflow-y-auto pr-1 divide-y">
+                                <template x-for="m in members" :key="m.id">
+                                    <div class="pt-2 flex items-center justify-between">
+                                        <div>
+                                            <p class="font-semibold text-gray-800" x-text="m.name"></p>
+                                            <p class="text-[10px] text-gray-400" x-text="m.group"></p>
+                                        </div>
+                                        <select x-model="m.attendanceStatus" @change="saveMembersToFirebase()" class="px-2 py-1 border rounded text-xs outline-none font-semibold"
+                                            :class="{
+                                                'bg-green-50 text-green-700 border-green-300': m.attendanceStatus === 'Có mặt',
+                                                'bg-amber-50 text-amber-700 border-amber-300': m.attendanceStatus === 'Vắng có phép',
+                                                'bg-red-50 text-red-700 border-red-300': m.attendanceStatus === 'Vắng không phép'
+                                            }">
+                                            <option value="Có mặt">Có mặt</option>
+                                            <option value="Vắng có phép">Vắng có phép</option>
+                                            <option value="Vắng không phép">Vắng không phép</option>
+                                        </select>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <!-- TAB 4: BẢNG XẾP HẠNG -->
+            <div x-show="currentTab === 'leaderboard'" class="space-y-4">
+                <h2 class="font-bold text-lg text-gray-900">🏆 Bảng Xếp Hạng</h2>
+                
+                <div class="flex border-b text-xs font-bold text-center">
+                    <button @click="lbTab = 'attendance'" :class="lbTab === 'attendance' ? 'border-b-2 border-blue-900 text-blue-900' : 'text-gray-400'" class="flex-1 py-2">📅 BXH Chuyên Cần</button>
+                    <button @click="lbTab = 'points'" :class="lbTab === 'points' ? 'border-b-2 border-blue-900 text-blue-900' : 'text-gray-400'" class="flex-1 py-2">⭐ Tích Lũy Điểm</button>
+                </div>
+
+                <div x-show="lbTab === 'attendance'" class="space-y-3 text-xs">
+                    <div class="space-y-2">
+                        <template x-for="(rank, i) in attendanceLeaderboard.slice(0, 20)" :key="i">
+                            <div class="p-3 rounded-xl border flex items-center justify-between transition-all"
+                                :class="{
+                                    'bg-gradient-to-r from-amber-100 to-yellow-50 border-amber-300 shadow-md ring-2 ring-amber-400/50': i === 0,
+                                    'bg-gradient-to-r from-slate-100 to-gray-50 border-slate-300 shadow-sm': i === 1,
+                                    'bg-gradient-to-r from-orange-100 to-amber-50 border-orange-300 shadow-sm': i === 2,
+                                    'bg-white border-gray-200': i > 2
+                                }">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full flex items-center justify-center font-extrabold text-sm shadow-sm"
+                                        :class="{
+                                            'bg-amber-400 text-white ring-2 ring-amber-200': i === 0,
+                                            'bg-slate-300 text-slate-800': i === 1,
+                                            'bg-amber-600 text-white': i === 2,
+                                            'bg-gray-100 text-gray-600': i > 2
+                                        }">
+                                        <span x-text="i === 0 ? '👑' : (i + 1)"></span>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-gray-900" x-text="rank.name"></p>
+                                        <p class="text-[10px] text-gray-500" x-text="rank.group"></p>
+                                    </div>
+                                </div>
+                                <span class="font-extrabold text-blue-900 bg-white/80 px-2.5 py-1 rounded-lg border shadow-xs" x-text="rank.rate + '% đi sinh hoạt'"></span>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <div x-show="lbTab === 'points'" class="space-y-3 text-xs">
+                    <div class="relative">
+                        <input type="text" x-model="searchPointMember" placeholder="🔍 Tìm đoàn sinh nhập điểm..." class="w-full px-3 py-2 border rounded-xl outline-none text-xs bg-white shadow-xs">
+                    </div>
+
+                    <div class="space-y-2">
+                        <template x-for="(m, i) in filteredPointMembers.slice(0, 20)" :key="m.id">
+                            <div class="p-3 rounded-xl border flex items-center justify-between transition-all"
+                                :class="{
+                                    'bg-gradient-to-r from-amber-100 to-yellow-50 border-amber-300 shadow-md ring-2 ring-amber-400/50': i === 0,
+                                    'bg-gradient-to-r from-slate-100 to-gray-50 border-slate-300 shadow-sm': i === 1,
+                                    'bg-gradient-to-r from-orange-100 to-amber-50 border-orange-300 shadow-sm': i === 2,
+                                    'bg-white border-gray-200': i > 2
+                                }">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full flex items-center justify-center font-extrabold text-sm shadow-sm"
+                                        :class="{
+                                            'bg-amber-400 text-white ring-2 ring-amber-200': i === 0,
+                                            'bg-slate-300 text-slate-800': i === 1,
+                                            'bg-amber-600 text-white': i === 2,
+                                            'bg-gray-100 text-gray-600': i > 2
+                                        }">
+                                        <span x-text="i === 0 ? '👑' : (i + 1)"></span>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-gray-900" x-text="m.name"></p>
+                                        <p class="text-[10px] text-gray-500" x-text="m.dhName + ' - ' + m.group"></p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-2">
+                                    <span class="font-extrabold text-amber-700 text-sm bg-white/80 px-2 py-0.5 rounded border" x-text="m.points + 'đ'"></span>
+                                    <template x-if="currentUser.role === 'admin'">
+                                        <div class="flex items-center gap-1 bg-white p-1 rounded-lg border shadow-xs">
+                                            <input type="number" x-model.number="m.inputPoint" placeholder="Điểm" class="w-12 px-1 py-0.5 border rounded text-center text-xs outline-none">
+                                            <button @click="applyCustomPoints(m)" class="bg-blue-600 text-white px-1.5 py-0.5 rounded font-bold text-[10px]">Lưu</button>
+                                            <button @click="adjustPoints(m, 5)" class="bg-green-100 text-green-700 font-bold px-1 py-0.5 rounded text-[10px]">+5</button>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 5: TRÒ CHƠI & KỸ NĂNG -->
+            <div x-show="currentTab === 'games'" class="space-y-4">
+                <div class="flex justify-between items-center">
+                    <h2 class="font-bold text-lg text-gray-900">Trò Chơi & Kỹ Năng</h2>
+                    <template x-if="currentUser.role === 'admin'">
+                        <button @click="openAddSkillModal()" class="bg-blue-600 text-white text-xs px-2.5 py-1 rounded font-semibold">+ Thư mục mới</button>
+                    </template>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <template x-for="skill in skillsList" :key="skill.id">
+                        <div class="bg-white border rounded-xl p-3 shadow-sm flex flex-col justify-between">
+                            <div @click="selectedSkill = skill" class="cursor-pointer">
+                                <span class="text-2xl" x-text="skill.icon || '📁'"></span>
+                                <h3 class="font-bold text-sm mt-2 text-gray-800" x-text="skill.title"></h3>
+                                <p class="text-[11px] text-gray-500 mt-1" x-text="skill.desc"></p>
+                            </div>
+                            
+                            <template x-if="currentUser.role === 'admin'">
+                                <div class="flex gap-1 mt-3 pt-2 border-t text-[10px]">
+                                    <button @click="editSkillModal(skill)" class="flex-1 bg-gray-100 hover:bg-gray-200 text-blue-700 py-1 rounded font-semibold">Sửa</button>
+                                    <button @click="deleteSkillCategory(skill.id)" class="flex-1 bg-red-50 hover:bg-red-100 text-red-600 py-1 rounded font-semibold">Xóa</button>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+
+                <template x-if="selectedSkill">
+                    <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                        <div class="bg-white rounded-2xl w-full max-w-sm p-5 space-y-3 max-h-[85vh] overflow-y-auto text-xs">
+                            <div class="flex justify-between items-center">
+                                <h3 class="font-bold text-base text-blue-900" x-text="selectedSkill.title"></h3>
+                                <button @click="selectedSkill = null" class="text-gray-400 font-bold text-lg">&times;</button>
+                            </div>
+                            <p class="text-gray-600 leading-relaxed whitespace-pre-line" x-text="selectedSkill.content"></p>
+                            
+                            <template x-if="selectedSkill.imageUrl">
+                                <div class="rounded-lg overflow-hidden border">
+                                    <img :src="selectedSkill.imageUrl" alt="Hình ảnh minh họa" class="w-full h-32 object-cover">
+                                </div>
+                            </template>
+
+                            <template x-if="selectedSkill.linkUrl">
+                                <a :href="selectedSkill.linkUrl" target="_blank" class="block p-2 bg-blue-50 text-blue-700 font-semibold rounded text-center underline">🔗 Mở liên kết tài liệu / website</a>
+                            </template>
+
+                            <template x-if="selectedSkill.videoUrl">
+                                <div class="rounded-lg overflow-hidden border">
+                                    <iframe :src="selectedSkill.videoUrl" class="w-full h-40" frameborder="0" allowfullscreen></iframe>
+                                </div>
+                            </template>
+
+                            <button @click="selectedSkill = null" class="w-full bg-gray-200 text-gray-800 py-2 rounded-lg font-semibold">Đóng</button>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <!-- TAB 6: QUẢN TRỊ -->
+            <div x-show="currentTab === 'admin' && currentUser.role === 'admin'" class="space-y-4">
+                <h2 class="font-bold text-lg text-gray-900">Quản Trị Hệ Thống</h2>
+                
+                <div class="bg-white border rounded-xl p-3 shadow-sm space-y-2 text-xs">
+                    <h3 class="font-bold text-blue-900 flex items-center gap-1">
+                        <span>🔐 Tạo Tài Khoản & Liên Kết Hồ Sơ</span>
+                    </h3>
+                    <input type="text" x-model="newUser.username" placeholder="Tên đăng nhập" class="w-full px-3 py-2 border rounded-lg outline-none">
+                    <input type="password" x-model="newUser.password" placeholder="Mật khẩu" class="w-full px-3 py-2 border rounded-lg outline-none">
+                    
+                    <label class="block text-[11px] text-gray-600 font-semibold pt-1">Phân quyền sử dụng:</label>
+                    <select x-model="newUser.role" class="w-full px-3 py-2 border rounded-lg outline-none">
+                        <option value="doansinh">Đoàn Sinh</option>
+                        <option value="huynhtruong">Huynh Trưởng</option>
+                        <option value="admin">Quản trị viên</option>
+                    </select>
+
+                    <label class="block text-[11px] text-gray-600 font-semibold pt-1">Liên kết với Hồ sơ Đoàn sinh:</label>
+                    <select x-model="newUser.linkedId" class="w-full px-3 py-2 border rounded-lg outline-none">
+                        <option value="">-- Chọn hồ sơ Đoàn sinh để liên kết --</option>
+                        <template x-for="m in members" :key="m.id">
+                            <option :value="m.id" x-text="m.name + ' (' + m.dhName + ' - ' + m.group + ')'"></option>
+                        </template>
+                    </select>
+
+                    <button @click="createAccount" class="w-full bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700 mt-2">Tạo & Liên Kết Tài Khoản</button>
+                </div>
+
+                <div class="bg-white border rounded-xl p-3 shadow-sm space-y-2 text-xs">
+                    <div class="flex justify-between items-center border-b pb-1">
+                        <h3 class="font-bold text-gray-800">👥 Danh sách & Điều chỉnh tài khoản</h3>
+                        <span class="text-[10px] text-gray-400" x-text="'Tổng: ' + accounts.length"></span>
+                    </div>
+
+                    <div class="relative pt-1">
+                        <input type="text" x-model="searchAccountKeyword" placeholder="🔍 Tìm kiếm tên đăng nhập..." class="w-full px-3 py-2 border rounded-lg outline-none text-xs bg-gray-50 focus:bg-white transition">
+                    </div>
+
+                    <div class="space-y-3 max-h-72 overflow-y-auto pr-1">
+                        <template x-for="(acc, index) in filteredAccounts" :key="index">
+                            <div class="p-2.5 bg-gray-50 rounded border text-[11px] space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <span class="font-bold text-blue-900" x-text="acc.username"></span>
+                                        <span x-show="acc.locked" class="text-[9px] bg-red-600 text-white px-1.5 py-0.5 rounded ml-1">ĐÃ KHÓA</span>
+                                    </div>
+                                    <button @click="toggleLockAccount(acc)" 
+                                        class="px-2 py-0.5 rounded font-bold text-[10px]"
+                                        :class="acc.locked ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'"
+                                        x-text="acc.locked ? 'Mở khóa' : 'Khóa TK'"></button>
+                                </div>
+
+                                <p class="text-gray-500 text-[10px]" x-text="'Hồ sơ liên kết: ' + getMemberNameById(acc.linkedId)"></p>
+
+                                <div class="flex items-center gap-2">
+                                    <span class="text-gray-500">Quyền:</span>
+                                    <select x-model="acc.role" @change="saveAccountsToFirebase()" class="flex-1 px-2 py-1 border rounded bg-white text-xs">
+                                        <option value="doansinh">Đoàn Sinh</option>
+                                        <option value="huynhtruong">Huynh Trưởng</option>
+                                        <option value="admin">Quản trị viên</option>
+                                    </select>
+                                </div>
+
+                                <div class="flex items-center gap-1 pt-1 border-t">
+                                    <input type="password" x-model="acc.newPasswordInput" placeholder="Mật khẩu mới..." class="flex-1 px-2 py-1 border rounded bg-white text-xs outline-none">
+                                    <button @click="changeAccountPassword(acc)" class="bg-blue-600 text-white px-2 py-1 rounded font-bold text-[10px]">Đổi mật khẩu</button>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- NAVIGATION -->
+        <nav class="bg-white border-t border-gray-200 fixed bottom-0 left-0 right-0 max-w-md mx-auto flex justify-around py-2 z-50 text-[10px]">
+            <button @click="currentTab = 'home'" :class="currentTab === 'home' ? 'text-blue-900 font-bold' : 'text-gray-500'" class="flex flex-col items-center flex-1">
+                <span class="text-base">🏠</span>
+                <span>Trang chủ</span>
+            </button>
+            <button @click="currentTab = 'members'" :class="currentTab === 'members' ? 'text-blue-900 font-bold' : 'text-gray-500'" class="flex flex-col items-center flex-1">
+                <span class="text-base">👥</span>
+                <span>Đoàn Sinh</span>
+            </button>
+            <button @click="currentTab = 'attendance'" :class="currentTab === 'attendance' ? 'text-blue-900 font-bold' : 'text-gray-500'" class="flex flex-col items-center flex-1">
+                <span class="text-base">📝</span>
+                <span>Điểm danh</span>
+            </button>
+            <button @click="currentTab = 'leaderboard'" :class="currentTab === 'leaderboard' ? 'text-blue-900 font-bold' : 'text-gray-500'" class="flex flex-col items-center flex-1">
+                <span class="text-base">🏆</span>
+                <span>Xếp hạng</span>
+            </button>
+            <button @click="currentTab = 'games'" :class="currentTab === 'games' ? 'text-blue-900 font-bold' : 'text-gray-500'" class="flex flex-col items-center flex-1">
+                <span class="text-base">🎮</span>
+                <span>Trò chơi</span>
+            </button>
+            <template x-if="currentUser && currentUser.role === 'admin'">
+                <button @click="currentTab = 'admin'" :class="currentTab === 'admin' ? 'text-blue-900 font-bold' : 'text-gray-500'" class="flex flex-col items-center flex-1">
+                    <span class="text-base">⚙️</span>
+                    <span>Quản trị</span>
+                </button>
+            </template>
+        </nav>
+
+        <!-- MODAL THÊM / SỬA ĐOÀN SINH -->
+        <template x-if="showAddModal">
+            <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                <div class="bg-white rounded-2xl w-full max-w-sm p-4 space-y-3 max-h-[85vh] overflow-y-auto text-xs">
+                    <h3 class="font-bold text-sm text-blue-900" x-text="isEditMode ? 'Chỉnh Sửa Hồ Sơ' : 'Thêm Đoàn Sinh Mới'"></h3>
+                    
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-[10px] text-gray-500 font-semibold mb-1">Họ và tên:</label>
+                            <input type="text" x-model="newMember.name" placeholder="Họ tên" class="w-full px-2 py-1.5 border rounded outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-gray-500 font-semibold mb-1">Giới tính:</label>
+                            <select x-model="newMember.gender" class="w-full px-2 py-1.5 border rounded outline-none">
+                                <option value="Nam">Nam</option>
+                                <option value="Nữ">Nữ</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <input type="text" x-model="newMember.dhName" placeholder="Pháp danh" class="w-full px-3 py-2 border rounded outline-none">
+                    <input type="text" x-model="newMember.dob" placeholder="Ngày sinh (DD/MM/YYYY)" class="w-full px-3 py-2 border rounded outline-none">
+                    
+                    <label class="block text-[10px] text-gray-500 font-semibold mb-0.5">Thuộc Ngành / Đoàn:</label>
+                    <select x-model="newMember.group" class="w-full px-3 py-2 border rounded outline-none">
+                        <option value="Oanh Vũ">Đoàn Oanh Vũ</option>
+                        <option value="Thiếu">Đoàn Thiếu</option>
+                        <option value="Thanh">Đoàn Thanh</option>
+                        <option value="Huynh Trưởng">Ban Huynh Trưởng</option>
+                    </select>
+
+                    <input type="text" x-model="newMember.phone" placeholder="SĐT cá nhân" class="w-full px-3 py-2 border rounded outline-none">
+                    <input type="text" x-model="newMember.parentPhone" placeholder="SĐT phụ huynh" class="w-full px-3 py-2 border rounded outline-none">
+                    <input type="text" x-model="newMember.address" placeholder="Địa chỉ cư trú" class="w-full px-3 py-2 border rounded outline-none">
+                    <input type="text" x-model="newMember.level" placeholder="Đã học bậc" class="w-full px-3 py-2 border rounded outline-none">
+                    
+                    <div class="flex gap-2 pt-2">
+                        <button @click="showAddModal = false" class="flex-1 bg-gray-200 py-2 rounded font-semibold">Hủy</button>
+                        <button @click="saveMember" class="flex-1 bg-blue-900 text-white py-2 rounded font-semibold">Lưu</button>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <!-- MODAL THƯ MỤC KỸ NĂNG -->
+        <template x-if="showAddSkillModalState">
+            <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                <div class="bg-white rounded-2xl w-full max-w-sm p-4 space-y-3 text-xs max-h-[90vh] overflow-y-auto">
+                    <h3 class="font-bold text-sm text-blue-900" x-text="isEditSkillMode ? 'Chỉnh Sửa Thư Mục Kỹ Năng' : 'Tạo Thư Mục Kỹ Năng Mới'"></h3>
+                    <input type="text" x-model="skillForm.title" placeholder="Tên chuyên đề..." class="w-full px-2 py-1.5 border rounded">
+                    <input type="text" x-model="skillForm.desc" placeholder="Mô tả ngắn..." class="w-full px-2 py-1.5 border rounded">
+                    <textarea x-model="skillForm.content" placeholder="Nội dung chi tiết..." class="w-full px-2 py-1.5 border rounded h-20"></textarea>
+                    <input type="text" x-model="skillForm.imageUrl" placeholder="URL Hình ảnh (nếu có)" class="w-full px-2 py-1.5 border rounded">
+                    <input type="text" x-model="skillForm.linkUrl" placeholder="URL Link liên kết (nếu có)" class="w-full px-2 py-1.5 border rounded">
+                    <input type="text" x-model="skillForm.videoUrl" placeholder="URL Video nhúng (nếu có)" class="w-full px-2 py-1.5 border rounded">
+                    <div class="flex gap-2 pt-1">
+                        <button @click="showAddSkillModalState = false" class="flex-1 bg-gray-200 py-2 rounded font-semibold">Hủy</button>
+                        <button @click="saveSkillCategory" class="flex-1 bg-blue-900 text-white py-2 rounded font-semibold">Lưu Chuyên Đề</button>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+    </div>
+
+    <!-- SCRIPT CHÍNH & TÍNH NĂNG XUẤT FILE EXCEL -->
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAxqXcW89jhTXGvQpghrKAG7Pr_-jVMamc",
+  authDomain: "gdpt-minhquang.firebaseapp.com",
+  projectId: "gdpt-minhquang",
+  storageBucket: "gdpt-minhquang.firebasestorage.app",
+  messagingSenderId: "76510997863",
+  appId: "1:76510997863:web:7a7d3f04342fcdb55d53c2"
+        };
+
+        function gdptApp() {
+            return {
+                isLoggedIn: false,
+                loginForm: { username: '', password: '' },
+                loginError: '',
+                currentUser: null,
+                currentTab: 'home',
+                lbTab: 'attendance',
+                attendanceTimeFilter: 'ngay',
+                selectedFilterDate: new Date().toISOString().split('T')[0],
+                searchPointMember: '',
+                searchAccountKeyword: '',
+                editingSocial: false,
+
+                showBannerConfig: false,
+                showAddModal: false,
+                showAddSkillModalState: false,
+                isEditMode: false,
+                isEditSkillMode: false,
+
+                bannerConfig: {
+                    title: 'Nam Mô Bổn Sư Thích Ca Mâu Ni Phật',
+                    subtitle: 'Cổng thông tin nội bộ Gia Đình Phật Tử Minh Quang.',
+                    icon: '🪷',
+                    textColor: 'text-blue-900',
+                    fontClass: '',
+                    sizeClass: 'text-lg',
+                    bgClass: 'bg-blue-50 border-blue-200'
+                },
+
+                socialLinks: {
+                    facebook: 'https://facebook.com',
+                    groupFb: 'https://facebook.com/groups',
+                    tiktok: 'https://tiktok.com'
+                },
+
+                accounts: [],
+                members: [],
+                announcements: [],
+                bhtList: [],
+                skillsList: [],
+
+                newUser: { username: '', password: '', role: 'doansinh', linkedId: '' },
+                editingBHT: false,
+                newAnn: { title: '', content: '' },
+                newMember: { id: null, name: '', dhName: '', gender: 'Nam', dob: '', group: 'Thiếu', phone: '', parentPhone: '', address: '', level: 'Kiên', status: 'Đang sinh hoạt', consecutiveAbsences: 0, points: 100 },
+                myAttendanceHistory: [{ date: '11/10/2026', status: 'Có mặt' }],
+                attendanceDate: new Date().toISOString().split('T')[0],
+                selectedSkill: null,
+                skillForm: { id: null, title: '', desc: '', content: '', imageUrl: '', linkUrl: '', videoUrl: '' },
+
+                initFirebase() {
+                    if (!firebase.apps.length) {
+                        firebase.initializeApp(firebaseConfig);
+                    }
+                    const db = firebase.database();
+
+                    db.ref('members').on('value', (snapshot) => {
+                        const data = snapshot.val();
+                        if (data) {
+                            this.members = Object.values(data);
+                        } else {
+                            this.members = [
+                                { id: 1, name: 'Huỳnh Văn A', dhName: 'Quảng Tâm', gender: 'Nam', dob: '10/02/1980', group: 'Huynh Trưởng', phone: '0905123456', parentPhone: 'Không', address: 'Hội An', level: 'Tấn', status: 'Đang sinh hoạt', attendanceStatus: 'Có mặt', attendanceRate: 100, points: 250 },
+                                { id: 2, name: 'Trần Văn An', dhName: 'Tâm Định', gender: 'Nam', dob: '15/05/2010', group: 'Thiếu', phone: '0905111222', parentPhone: '0905333444', address: 'Đà Nẵng', level: 'Kiên', status: 'Đang sinh hoạt', attendanceStatus: 'Có mặt', attendanceRate: 98, points: 180 }
+                            ];
+                            this.saveMembersToFirebase();
+                        }
+                    });
+
+                    db.ref('accounts').on('value', (snapshot) => {
+                        const data = snapshot.val();
+                        if (data) {
+                            this.accounts = Object.values(data);
+                        } else {
+                            this.accounts = [
+                                { username: 'admin', password: '123', name: 'Quảng Tâm', role: 'admin', locked: false, linkedId: 1 },
+                                { username: 'huynhtruong', password: '123', name: 'Nguyên Định', role: 'huynhtruong', locked: false, linkedId: 3 },
+                                { username: 'doansinh', password: '123', name: 'Trần Văn An', role: 'doansinh', locked: false, linkedId: 2 }
+                            ];
+                            this.saveAccountsToFirebase();
+                        }
+                    });
+
+                    db.ref('announcements').on('value', (snapshot) => {
+                        const data = snapshot.val();
+                        this.announcements = data ? Object.values(data) : [{ title: 'Thông báo khai mạc', content: 'Chào mừng đến với cổng thông tin GĐPT Minh Quang online.', date: '15/10/2026' }];
+                    });
+
+                    db.ref('settings').on('value', (snapshot) => {
+                        const data = snapshot.val();
+                        if (data) {
+                            if (data.socialLinks) this.socialLinks = data.socialLinks;
+                            if (data.bannerConfig) this.bannerConfig = data.bannerConfig;
+                        }
+                    });
+                },
+
+                // XUẤT BÁO CÁO ĐIỂM DANH RA FILE EXCEL (CSV UTF-8 BOM)
+                exportAttendanceToExcel() {
+                    if (!this.members || this.members.length === 0) {
+                        alert('Không có dữ liệu đoàn sinh để xuất!');
+                        return;
+                    }
+
+                    const timeLabel = this.attendanceTimeFilter === 'ngay' ? this.selectedFilterDate : this.attendanceTimeFilter;
+                    
+                    // Tiêu đề các cột
+                    let csvContent = "\uFEFF"; // Thêm Byte Order Mark (BOM) để Excel hiển thị đúng tiếng Việt
+                    csvContent += "STT,Họ và tên,Pháp danh,Giới tính,Đoàn/Ngành,Trạng thái điểm danh,Tỷ lệ đi sinh hoạt (%),Địa chỉ\n";
+
+                    // Duyệt từng đoàn sinh
+                    this.members.forEach((m, index) => {
+                        const name = `"${(m.name || '').replace(/"/g, '""')}"`;
+                        const dhName = `"${(m.dhName || '').replace(/"/g, '""')}"`;
+                        const gender = `"${(m.gender || 'Nam').replace(/"/g, '""')}"`;
+                        const group = `"${(m.group || '').replace(/"/g, '""')}"`;
+                        const status = `"${(m.attendanceStatus || 'Chưa điểm danh').replace(/"/g, '""')}"`;
+                        const rate = `"${m.attendanceRate || 100}%"`;
+                        const address = `"${(m.address || '').replace(/"/g, '""')}"`;
+
+                        csvContent += `${index + 1},${name},${dhName},${gender},${group},${status},${rate},${address}\n`;
+                    });
+
+                    // Tạo liên kết tải về
+                    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.setAttribute('href', url);
+                    link.setAttribute('download', `Bao_Cao_Diem_Danh_GDPT_MinhQuang_${timeLabel}.csv`);
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                },
+
+                get filteredAccounts() {
+                    if (!this.searchAccountKeyword) return this.accounts;
+                    return this.accounts.filter(acc => acc.username.toLowerCase().includes(this.searchAccountKeyword.toLowerCase()));
+                },
+
+                saveMembersToFirebase() {
+                    firebase.database().ref('members').set(this.members);
+                },
+
+                saveAccountsToFirebase() {
+                    firebase.database().ref('accounts').set(this.accounts);
+                },
+
+                saveAnnouncementsToFirebase() {
+                    firebase.database().ref('announcements').set(this.announcements);
+                },
+
+                saveSocialLinks() {
+                    this.editingSocial = false;
+                    firebase.database().ref('settings/socialLinks').set(this.socialLinks);
+                    alert('Đã lưu link mạng xã hội lên đám mây!');
+                },
+
+                saveBannerConfig() {
+                    this.showBannerConfig = false;
+                    firebase.database().ref('settings/bannerConfig').set(this.bannerConfig);
+                    alert('Đã lưu cấu hình Banner!');
+                },
+
+                get filteredPointMembers() {
+                    let sorted = [...this.members].sort((a, b) => b.points - a.points);
+                    if (this.searchPointMember) {
+                        return sorted.filter(m => m.name.toLowerCase().includes(this.searchPointMember.toLowerCase()) || m.dhName.toLowerCase().includes(this.searchPointMember.toLowerCase()));
+                    }
+                    return sorted;
+                },
+
+                get attendanceLeaderboard() {
+                    return [...this.members].sort((a, b) => (b.attendanceRate || 90) - (a.attendanceRate || 90));
+                },
+
+                getRoleName(role) {
+                    if (role === 'admin') return 'Quản trị viên';
+                    if (role === 'huynhtruong') return 'Huynh Trưởng';
+                    return 'Đoàn Sinh';
+                },
+
+                getMemberNameById(id) {
+                    if (!id) return 'Chưa liên kết';
+                    const found = this.members.find(m => m.id == id);
+                    return found ? found.name + ' (' + found.dhName + ')' : 'Không tìm thấy';
+                },
+
+                getLinkedUsername(memberId) {
+                    const acc = this.accounts.find(a => a.linkedId == memberId);
+                    return acc ? acc.username : 'Chưa liên kết';
+                },
+
+                countMembersByGroup(groupName) {
+                    return this.members.filter(m => m.group === groupName).length;
+                },
+
+                countMembersByStatus(statusName) {
+                    return this.members.filter(m => m.status === statusName).length;
+                },
+
+                countAttendance(status) {
+                    return this.members.filter(m => m.attendanceStatus === status).length;
+                },
+
+                login() {
+                    const found = this.accounts.find(a => a.username === this.loginForm.username && a.password === this.loginForm.password);
+                    if (found) {
+                        if (found.locked) {
+                            this.loginError = 'Tài khoản đã bị KHÓA!';
+                            return;
+                        }
+                        this.currentUser = found;
+                        this.isLoggedIn = true;
+                        this.loginError = '';
+                    } else {
+                        this.loginError = 'Sai tên đăng nhập hoặc mật khẩu!';
+                    }
+                },
+
+                logout() {
+                    this.isLoggedIn = false;
+                    this.loginForm = { username: '', password: '' };
+                },
+
+                get filteredMembers() {
+                    if (this.currentUser && this.currentUser.role === 'doansinh') {
+                        return this.members.filter(m => m.id === this.currentUser.linkedId);
+                    }
+                    return this.members.filter(m => {
+                        const matchText = m.name.toLowerCase().includes(this.memberSearch.toLowerCase()) || m.dhName.toLowerCase().includes(this.memberSearch.toLowerCase());
+                        const matchGroup = this.memberFilterGroup === 'all' || m.group === this.memberFilterGroup;
+                        return matchText && matchGroup;
+                    });
+                },
+
+                changeAccountPassword(acc) {
+                    if (!acc.newPasswordInput) return alert('Nhập mật khẩu mới!');
+                    acc.password = acc.newPasswordInput;
+                    acc.newPasswordInput = '';
+                    this.saveAccountsToFirebase();
+                    alert('Đã đổi mật khẩu thành công!');
+                },
+
+                applyCustomPoints(member) {
+                    if (member.inputPoint !== undefined && member.inputPoint !== null) {
+                        member.points = Number(member.inputPoint);
+                        member.inputPoint = null;
+                        this.saveMembersToFirebase();
+                        alert('Đã cập nhật điểm thành công!');
+                    }
+                },
+
+                adjustPoints(member, delta) {
+                    member.points += delta;
+                    this.saveMembersToFirebase();
+                },
+
+                createAccount() {
+                    if(!this.newUser.username || !this.newUser.password) return alert('Nhập tên đăng nhập và mật khẩu!');
+                    this.accounts.push({
+                        username: this.newUser.username,
+                        password: this.newUser.password,
+                        name: this.newUser.username,
+                        role: this.newUser.role,
+                        locked: false,
+                        linkedId: this.newUser.linkedId
+                    });
+                    this.saveAccountsToFirebase();
+                    this.newUser = { username: '', password: '', role: 'doansinh', linkedId: '' };
+                    alert('Tạo tài khoản thành công!');
+                },
+
+                submitSelfAttendance(status) {
+                    this.myAttendanceHistory.unshift({ date: this.attendanceDate, status: status });
+                    alert('Đã ghi nhận điểm danh online!');
+                },
+
+                openAddMemberModal() {
+                    this.isEditMode = false;
+                    this.newMember = { id: Date.now(), name: '', dhName: '', gender: 'Nam', dob: '', group: 'Thiếu', phone: '', parentPhone: '', address: '', level: 'Kiên', status: 'Đang sinh hoạt', attendanceStatus: 'Có mặt', attendanceRate: 100, points: 100 };
+                    this.showAddModal = true;
+                },
+
+                editMemberProfile(m) {
+                    this.isEditMode = true;
+                    this.newMember = { ...m };
+                    this.showAddModal = true;
+                },
+
+                saveMember() {
+                    if(!this.newMember.name) return alert('Nhập họ tên!');
+                    if (this.isEditMode) {
+                        const idx = this.members.findIndex(m => m.id === this.newMember.id);
+                        if (idx !== -1) this.members[idx] = { ...this.newMember };
+                    } else {
+                        this.members.push({ ...this.newMember });
+                    }
+                    this.saveMembersToFirebase();
+                    this.showAddModal = false;
+                    alert('Đã lưu hồ sơ lên đám mây!');
+                },
+
+                toggleLockAccount(acc) {
+                    acc.locked = !acc.locked;
+                    this.saveAccountsToFirebase();
+                },
+
+                addAnnouncement() {
+                    if (!this.newAnn.title) return;
+                    this.announcements.unshift({ ...this.newAnn, date: new Date().toLocaleDateString('vi-VN') });
+                    this.saveAnnouncementsToFirebase();
+                    this.newAnn = { title: '', content: '' };
+                },
+
+                deleteAnnouncement(idx) {
+                    this.announcements.splice(idx, 1);
+                    this.saveAnnouncementsToFirebase();
+                }
+            }
+        }
+    </script>
+</body>
+</html>

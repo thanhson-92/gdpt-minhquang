@@ -220,7 +220,7 @@
             <!-- TAB 2: ĐOÀN SINH -->
             <div x-show="currentTab === 'members'" class="space-y-4">
                 <div class="flex justify-between items-center">
-                    <h2 class="font-bold text-lg text-gray-900">Danh Sách Đoàn Sinh</h2>
+                    <h2 class="font-bold text-lg text-gray-900" x-text="currentUser.role === 'doansinh' ? 'Thông Tin Cá Nhân' : 'Danh Sách Đoàn Sinh'"></h2>
                     <template x-if="currentUser.role !== 'doansinh'">
                         <button @click="openAddMemberModal" class="bg-blue-600 text-white text-xs px-3 py-1.5 rounded-lg font-semibold">+ Thêm Đoàn Sinh</button>
                     </template>
@@ -287,7 +287,10 @@
                                             'bg-red-100 text-red-800': m.status === 'Nghỉ'
                                         }" x-text="m.status"></span>
                                     <template x-if="currentUser.role === 'admin'">
-                                        <button @click="editMemberProfile(m)" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-1.5 py-0.5 rounded text-[10px]">✏️ Sửa</button>
+                                        <div class="flex gap-1">
+                                            <button @click="editMemberProfile(m)" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-1.5 py-0.5 rounded text-[10px]">✏️ Sửa</button>
+                                            <button @click="deleteMember(m.id)" class="bg-red-100 hover:bg-red-200 text-red-700 px-1.5 py-0.5 rounded text-[10px]">🗑️ Xóa</button>
+                                        </div>
                                     </template>
                                 </div>
                             </div>
@@ -395,10 +398,10 @@
 
                         <div class="space-y-2 pt-2">
                             <div class="flex justify-between items-center font-bold text-gray-700">
-                                <span>Bảng điểm danh chi tiết:</span>
+                                <span>Bảng điểm danh chi tiết (Chỉ hiển thị người đã điểm danh/báo vắng):</span>
                             </div>
                             <div class="space-y-2 max-h-60 overflow-y-auto pr-1 divide-y">
-                                <template x-for="m in members" :key="m.id">
+                                <template x-for="m in attendanceReportList" :key="m.id">
                                     <div class="pt-2 flex items-center justify-between">
                                         <div>
                                             <p class="font-semibold text-gray-800" x-text="m.name"></p>
@@ -415,6 +418,9 @@
                                             <option value="Vắng không phép">Vắng không phép</option>
                                         </select>
                                     </div>
+                                </template>
+                                <template x-if="attendanceReportList.length === 0">
+                                    <p class="text-gray-400 text-center py-2 italic text-[11px]">Chưa có dữ liệu điểm danh hoặc báo vắng nào.</p>
                                 </template>
                             </div>
                         </div>
@@ -456,7 +462,7 @@
                                         <p class="text-[10px] text-gray-500" x-text="rank.group"></p>
                                     </div>
                                 </div>
-                                <span class="font-extrabold text-blue-900 bg-white/80 px-2.5 py-1 rounded-lg border shadow-xs" x-text="(rank.rate !== undefined ? rank.rate : 95) + '% đi sinh hoạt'"></span>
+                                <span class="font-extrabold text-blue-900 bg-white/80 px-2.5 py-1 rounded-lg border shadow-xs" x-text="(rank.attendanceRate !== undefined ? rank.attendanceRate : 100) + '% đi sinh hoạt'"></span>
                             </div>
                         </template>
                     </div>
@@ -651,7 +657,7 @@
             </button>
             <button @click="currentTab = 'members'" :class="currentTab === 'members' ? 'text-blue-900 font-bold' : 'text-gray-500'" class="flex flex-col items-center flex-1">
                 <span class="text-base">👥</span>
-                <span>Đoàn Sinh</span>
+                <span x-text="currentUser && currentUser.role === 'doansinh' ? 'Hồ sơ' : 'Đoàn Sinh'"></span>
             </button>
             <button @click="currentTab = 'attendance'" :class="currentTab === 'attendance' ? 'text-blue-900 font-bold' : 'text-gray-500'" class="flex flex-col items-center flex-1">
                 <span class="text-base">📝</span>
@@ -738,7 +744,7 @@
 
     </div>
 
-    <!-- SCRIPT CHÍNH & TÍNH NĂNG ĐÃ KHẮC PHỤC HOÀN CHỈNH -->
+    <!-- SCRIPT CHÍNH -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyAxqXcW89jhTXGvQpghrKAG7Pr_-jVMamc",
@@ -762,8 +768,8 @@
                 selectedFilterDate: new Date().toISOString().split('T')[0],
                 searchPointMember: '',
                 searchAccountKeyword: '',
-                memberSearch: '',          // Đã khắc phục lỗi tìm kiếm đoàn sinh
-                memberFilterGroup: 'all',  // Đã khắc phục lỗi lọc ngành đoàn sinh
+                memberSearch: '',
+                memberFilterGroup: 'all',
                 editingSocial: false,
 
                 showBannerConfig: false,
@@ -797,7 +803,7 @@
                 newUser: { username: '', password: '', role: 'doansinh', linkedId: '' },
                 editingBHT: false,
                 newAnn: { title: '', content: '' },
-                newMember: { id: null, name: '', dhName: '', gender: 'Nam', dob: '', group: 'Thiếu', phone: '', parentPhone: '', address: '', level: '', status: 'Đang sinh hoạt', attendanceStatus: 'Có mặt', attendanceRate: 100, points: 100 },
+                newMember: { id: null, name: '', dhName: '', gender: 'Nam', dob: '', group: 'Thiếu', phone: '', parentPhone: '', address: '', level: '', status: 'Đang sinh hoạt', attendanceStatus: 'Chưa điểm danh', attendanceRate: 100, points: 100 },
                 myAttendanceHistory: [],
                 attendanceDate: new Date().toISOString().split('T')[0],
                 selectedSkill: null,
@@ -814,23 +820,18 @@
                         if (data) {
                             this.members = Object.values(data);
                         } else {
-                            this.members = [
-                                { id: 1, name: 'Huỳnh Văn A', dhName: 'Quảng Tâm', gender: 'Nam', dob: '10/02/1980', group: 'Huynh Trưởng', phone: '0905123456', parentPhone: 'Không', address: 'Hội An', level: 'Tấn', status: 'Đang sinh hoạt', attendanceStatus: 'Có mặt', attendanceRate: 100, points: 250 },
-                                { id: 2, name: 'Trần Văn An', dhName: 'Tâm Định', gender: 'Nam', dob: '15/05/2010', group: 'Thiếu', phone: '0905111222', parentPhone: '0905333444', address: 'Đà Nẵng', level: 'Kiên', status: 'Đang sinh hoạt', attendanceStatus: 'Có mặt', attendanceRate: 98, points: 180 }
-                            ];
+                            this.members = [];
                             this.saveMembersToFirebase();
                         }
                     });
 
+                    // Ẩn thông tin admin cứng khỏi code tĩnh để bảo mật
                     db.ref('accounts').on('value', (snapshot) => {
                         const data = snapshot.val();
                         if (data) {
                             this.accounts = Object.values(data);
                         } else {
-                            this.accounts = [
-                                { username: 'admin', password: '41292', name: 'Thiện Tấn', role: 'admin', locked: false, linkedId: 1 }
-                            ];
-                            this.saveAccountsToFirebase();
+                            this.accounts = [];
                         }
                     });
 
@@ -874,7 +875,6 @@
                     });
                 },
 
-                // Đã khắc phục: Thêm & Lưu Sơ đồ BHT
                 addNewBHTPosition() {
                     this.bhtList.push({
                         id: Date.now(),
@@ -894,7 +894,6 @@
                     alert('Đã lưu sơ đồ Ban Huynh Trưởng lên đám mây!');
                 },
 
-                // Đã khắc phục: Thêm, Sửa, Xóa chuyên đề Trò chơi & Kỹ năng
                 openAddSkillModal() {
                     this.isEditSkillMode = false;
                     this.skillForm = { id: Date.now(), title: '', desc: '', content: '', icon: '📁', imageUrl: '', linkUrl: '', videoUrl: '' };
@@ -927,7 +926,6 @@
                     firebase.database().ref('skillsList').set(this.skillsList);
                 },
 
-                // XUẤT BÁO CÁO ĐIỂM DANH RA FILE EXCEL (CSV UTF-8 BOM)
                 exportAttendanceToExcel() {
                     if (!this.members || this.members.length === 0) {
                         alert('Không có dữ liệu đoàn sinh để xuất!');
@@ -943,7 +941,7 @@
                         const gender = `"${(m.gender || 'Nam').replace(/"/g, '""')}"`;
                         const group = `"${(m.group || '').replace(/"/g, '""')}"`;
                         const status = `"${(m.attendanceStatus || 'Chưa điểm danh').replace(/"/g, '""')}"`;
-                        const rate = `"${(m.attendanceRate !== undefined ? m.attendanceRate : 95)}%"`;
+                        const rate = `"${(m.attendanceRate !== undefined ? m.attendanceRate : 100)}%"`;
                         const address = `"${(m.address || '').replace(/"/g, '""')}"`;
                         csvContent += `${index + 1},${name},${dhName},${gender},${group},${status},${rate},${address}\n`;
                     });
@@ -995,8 +993,14 @@
                     return sorted;
                 },
 
+                // BXH chuyên cần dựa theo dữ liệu thực tế đã bấm điểm danh
                 get attendanceLeaderboard() {
-                    return [...this.members].sort((a, b) => (b.attendanceRate || 95) - (a.attendanceRate || 95));
+                    return [...this.members].sort((a, b) => (b.attendanceRate || 100) - (a.attendanceRate || 100));
+                },
+
+                // Bảng điểm danh chi tiết chỉ hiển thị khi có người điểm danh hoặc báo vắng
+                get attendanceReportList() {
+                    return this.members.filter(m => m.attendanceStatus && m.attendanceStatus !== 'Chưa điểm danh');
                 },
 
                 getRoleName(role) {
@@ -1057,10 +1061,10 @@
                     this.myAttendanceHistory = [];
                 },
 
-                // Đã khắc phục: Phân quyền hiển thị đoàn sinh đúng theo vai trò
+                // Tài khoản Đoàn Sinh chỉ hiển thị thông tin của chính mình
                 get filteredMembers() {
                     if (this.currentUser && this.currentUser.role === 'doansinh') {
-                        return this.members.filter(m => m.id === this.currentUser.linkedId);
+                        return this.members.filter(m => m.id == this.currentUser.linkedId);
                     }
                     return this.members.filter(m => {
                         const search = (this.memberSearch || '').toLowerCase();
@@ -1107,7 +1111,6 @@
                     alert('Tạo tài khoản thành công!');
                 },
 
-                // Đã khắc phục: Kiểm tra chống điểm danh trùng trong ngày & lưu lịch sử lên Firebase
                 submitSelfAttendance(status) {
                     if (!this.currentUser) return;
                     const alreadyChecked = this.myAttendanceHistory.some(h => h.date === this.attendanceDate);
@@ -1121,12 +1124,25 @@
                     
                     // Lưu lên Firebase theo tài khoản
                     firebase.database().ref('attendanceHistory/' + this.currentUser.username).set(this.myAttendanceHistory);
+
+                    // Cập nhật trạng thái và tỷ lệ chuyên cần thực tế cho hồ sơ đoàn sinh liên kết
+                    if (this.currentUser.linkedId) {
+                        const member = this.members.find(m => m.id == this.currentUser.linkedId);
+                        if (member) {
+                            member.attendanceStatus = status;
+                            const totalSessions = this.myAttendanceHistory.length;
+                            const presentSessions = this.myAttendanceHistory.filter(h => h.status === 'Có mặt').length;
+                            member.attendanceRate = totalSessions > 0 ? Math.round((presentSessions / totalSessions) * 100) : 100;
+                            this.saveMembersToFirebase();
+                        }
+                    }
+
                     alert('Đã ghi nhận điểm danh online ngày ' + this.attendanceDate + ' thành công!');
                 },
 
                 openAddMemberModal() {
                     this.isEditMode = false;
-                    this.newMember = { id: Date.now(), name: '', dhName: '', gender: 'Nam', dob: '', group: 'Thiếu', phone: '', parentPhone: '', address: '', level: 'Kiên', status: 'Đang sinh hoạt', attendanceStatus: 'Có mặt', attendanceRate: 95, points: 100 };
+                    this.newMember = { id: Date.now(), name: '', dhName: '', gender: 'Nam', dob: '', group: 'Thiếu', phone: '', parentPhone: '', address: '', level: '', status: 'Đang sinh hoạt', attendanceStatus: 'Chưa điểm danh', attendanceRate: 100, points: 100 };
                     this.showAddModal = true;
                 },
 
@@ -1134,6 +1150,15 @@
                     this.isEditMode = true;
                     this.newMember = { ...m };
                     this.showAddModal = true;
+                },
+
+                // Thêm tính năng xóa hồ sơ dành riêng cho Admin
+                deleteMember(id) {
+                    if (confirm('Bạn có chắc chắn muốn xóa hồ sơ đoàn sinh này không?')) {
+                        this.members = this.members.filter(m => m.id !== id);
+                        this.saveMembersToFirebase();
+                        alert('Đã xóa hồ sơ thành công!');
+                    }
                 },
 
                 saveMember() {
@@ -1146,7 +1171,7 @@
                     }
                     this.saveMembersToFirebase();
                     this.showAddModal = false;
-                    alert('Đã lưu hồ sơ !');
+                    alert('Đã lưu hồ sơ!');
                 },
 
                 toggleLockAccount(acc) {

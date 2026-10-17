@@ -18,6 +18,13 @@
         .text-lam { color: #1e3a8a; }
         .font-serif-custom { font-family: 'Merriweather', serif; }
         .font-mono-custom { font-family: 'Fira Code', monospace; }
+        @keyframes spinWheel {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(var(--spin-deg, 1800deg)); }
+        }
+        .spinning {
+            transition: transform 6s cubic-bezier(0.15, 0.85, 0.15, 1);
+        }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800 pb-20" x-data="gdptApp()" x-init="initFirebase()">
@@ -538,16 +545,91 @@
                 </div>
             </div>
 
-            <!-- TAB 5: TRÒ CHƠI & KỸ NĂNG -->
+            <!-- TAB 5: TRÒ CHƠI & KỸ NĂNG (ĐÃ TÍCH HỢP VÒNG QUAY 6 GIÂY) -->
             <div x-show="currentTab === 'games'" class="space-y-4">
                 <div class="flex justify-between items-center">
                     <h2 class="font-bold text-lg text-gray-900">Trò Chơi & Kỹ Năng</h2>
-                    <template x-if="currentUser.role === 'admin'">
-                        <button @click="openAddSkillModal()" class="bg-blue-600 text-white text-xs px-2.5 py-1 rounded font-semibold">+ Thư mục mới</button>
-                    </template>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full font-bold">✨ Lượt quay: <span x-text="mySpinTurns"></span></span>
+                        <template x-if="currentUser.role === 'admin'">
+                            <button @click="openAddSkillModal()" class="bg-blue-600 text-white text-xs px-2.5 py-1 rounded font-semibold">+ Thư mục mới</button>
+                        </template>
+                    </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-3">
+                <!-- BỔ SUNG: VÒNG QUAY TINH TẤN 6 GIÂY CHUẨN MẪU -->
+                <div class="bg-white border rounded-xl p-4 shadow-sm space-y-3 text-xs">
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <h3 class="font-bold text-sm text-blue-900">🎡 Vòng Quay Tinh Tấn May Mắn</h3>
+                        <template x-if="currentUser.role === 'admin'">
+                            <button @click="showWheelConfig = !showWheelConfig" class="text-[10px] bg-blue-100 text-blue-800 px-2 py-1 rounded font-semibold">⚙️ Cài đặt 10 ô</button>
+                        </template>
+                    </div>
+
+                    <template x-if="showWheelConfig && currentUser.role === 'admin'">
+                        <div class="bg-blue-50 border p-3 rounded-lg space-y-2">
+                            <p class="font-bold text-blue-900">Thiết lập 10 ô phần thưởng & Tỉ lệ %:</p>
+                            <template x-for="(item, idx) in wheelItems" :key="idx">
+                                <div class="grid grid-cols-3 gap-1">
+                                    <input type="text" x-model="item.name" placeholder="Tên phần thưởng" class="px-2 py-1 border rounded bg-white">
+                                    <input type="number" x-model.number="item.rate" placeholder="Tỉ lệ %" class="px-2 py-1 border rounded bg-white">
+                                    <input type="number" x-model.number="item.points" placeholder="Điểm" class="px-2 py-1 border rounded bg-white">
+                                </div>
+                            </template>
+                            <button @click="saveWheelConfig()" class="w-full bg-blue-900 text-white py-1.5 rounded font-semibold">Lưu Cấu Hình</button>
+                        </div>
+                    </template>
+
+                    <!-- Vòng tròn quay mô phỏng mẫu -->
+                    <div class="relative w-64 h-64 mx-auto my-4 flex items-center justify-center">
+                        <div class="absolute -top-3 left-1/2 -translate-x-1/2 z-20 w-6 h-8 bg-amber-500 clip-triangle shadow-md border border-yellow-200"></div>
+                        <div class="w-full h-full rounded-full border-8 border-amber-400 shadow-xl overflow-hidden relative bg-amber-200 flex items-center justify-center">
+                            <div class="w-full h-full rounded-full relative spinning"
+                                :style="{ transform: 'rotate(' + wheelRotation + 'deg)' }"
+                                id="wheelDisk">
+                                <template x-for="(item, idx) in wheelItems" :key="idx">
+                                    <div class="absolute w-1/2 h-1/2 top-0 left-1/2 origin-bottom-left flex items-center justify-center font-bold text-[10px] text-white p-2"
+                                        :style="{
+                                            transform: 'rotate(' + (idx * 36) + 'deg) skewY(-50deg)',
+                                            backgroundColor: wheelColors[idx % wheelColors.length]
+                                        }">
+                                        <span class="transform skewY(50deg) rotate(18deg) block text-center truncate max-w-[60px]" x-text="item.name"></span>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                        <div class="absolute w-10 h-10 bg-gradient-to-tr from-yellow-500 to-amber-300 rounded-full border-2 border-white shadow-md z-10 flex items-center justify-center text-[10px] font-extrabold text-blue-900">☸️</div>
+                    </div>
+
+                    <div class="text-center space-y-2">
+                        <p class="font-bold text-gray-700">Lượt quay hiện có: <b class="text-red-600 text-sm" x-text="mySpinTurns"></b></p>
+                        <button @click="spinWheel()" :disabled="isSpinning" class="bg-gradient-to-r from-amber-500 to-red-600 text-white font-extrabold px-6 py-2.5 rounded-full shadow-lg hover:opacity-95 transition disabled:opacity-50">
+                            <span x-text="isSpinning ? 'Đang quay (6s)...' : '🎯 QUAY NGAY'"></span>
+                        </button>
+                    </div>
+
+                    <template x-if="lastSpinResult">
+                        <div class="p-3 bg-green-50 border border-green-300 rounded-xl text-center space-y-1">
+                            <p class="font-bold text-green-800 text-sm">🎉 Chúc mừng bạn đã quay trúng:</p>
+                            <p class="text-base font-extrabold text-blue-900" x-text="lastSpinResult.name"></p>
+                            <p class="text-gray-600 text-[11px]" x-text="'+ ' + lastSpinResult.points + ' Điểm Tinh Tấn'"></p>
+                        </div>
+                    </template>
+
+                    <div class="border-t pt-2 space-y-1">
+                        <p class="font-bold text-gray-700">📜 Lịch sử quay thưởng:</p>
+                        <div class="space-y-1 max-h-32 overflow-y-auto">
+                            <template x-for="(h, idx) in wheelHistory" :key="idx">
+                                <div class="bg-gray-50 p-2 rounded border flex justify-between">
+                                    <span class="text-gray-600" x-text="h.date"></span>
+                                    <span class="font-bold text-blue-900" x-text="h.reward"></span>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 pt-2">
                     <template x-for="skill in skillsList" :key="skill.id">
                         <div class="bg-white border rounded-xl p-3 shadow-sm flex flex-col justify-between">
                             <div @click="selectedSkill = skill" class="cursor-pointer">
@@ -824,7 +906,7 @@
                 announcements: [],
                 bhtList: [],
                 skillsList: [],
-                dailyAttendanceData: {}, // Lưu toàn bộ dữ liệu điểm danh theo ngày
+                dailyAttendanceData: {},
 
                 newUser: { username: '', password: '', role: 'doansinh', linkedId: '' },
                 editingBHT: false,
@@ -834,6 +916,27 @@
                 attendanceDate: new Date().toISOString().split('T')[0],
                 selectedSkill: null,
                 skillForm: { id: null, title: '', desc: '', content: '', imageUrl: '', linkUrl: '', videoUrl: '' },
+
+                // Biến bổ sung cho Vòng Quay 6 Giây
+                mySpinTurns: 0,
+                showWheelConfig: false,
+                wheelRotation: 0,
+                isSpinning: false,
+                wheelColors: ['#f59e0b', '#ef4444', '#ec4899', '#8b5cf6', '#3b82f6', '#10b981', '#84cc16', '#eab308', '#f97316', '#06b6d4'],
+                wheelItems: [
+                    { name: '10 Điểm', rate: 20, points: 10 },
+                    { name: '20 Điểm', rate: 15, points: 20 },
+                    { name: '50 Điểm', rate: 10, points: 50 },
+                    { name: '100 Điểm', rate: 5, points: 100 },
+                    { name: 'May Mắn Lại', rate: 15, points: 0 },
+                    { name: '15 Điểm', rate: 10, points: 15 },
+                    { name: '30 Điểm', rate: 10, points: 30 },
+                    { name: 'Thêm Lượt', rate: 5, points: 0 },
+                    { name: '5 Điểm', rate: 5, points: 5 },
+                    { name: 'Phật Pháp', rate: 5, points: 25 }
+                ],
+                lastSpinResult: null,
+                wheelHistory: [],
 
                 initFirebase() {
                     if (!firebase.apps.length) {
@@ -860,7 +963,6 @@
                         }
                     });
 
-                    // Tải dữ liệu điểm danh theo ngày
                     db.ref('dailyAttendance').on('value', (snapshot) => {
                         const data = snapshot.val();
                         this.dailyAttendanceData = data || {};
@@ -904,6 +1006,64 @@
                             if (data.bannerConfig) this.bannerConfig = data.bannerConfig;
                         }
                     });
+                },
+
+                // Logic Vòng Quay Mượt Mà 6 Giây
+                spinWheel() {
+                    if (this.isSpinning) return;
+                    if (this.mySpinTurns <= 0) {
+                        alert('Bạn đã hết lượt quay! Hãy điểm danh sinh hoạt vào Chủ Nhật để nhận thêm lượt.');
+                        return;
+                    }
+                    this.isSpinning = true;
+                    this.mySpinTurns--;
+
+                    let rand = Math.random() * 100;
+                    let cumulative = 0;
+                    let selectedIdx = 0;
+                    for (let i = 0; i < this.wheelItems.length; i++) {
+                        cumulative += this.wheelItems[i].rate;
+                        if (rand <= cumulative) {
+                            selectedIdx = i;
+                            break;
+                        }
+                    }
+                    const selected = this.wheelItems[selectedIdx];
+                    const extraRounds = 5;
+                    const targetAngle = 360 * extraRounds + (360 - (selectedIdx * 36 + 18));
+                    this.wheelRotation = targetAngle;
+
+                    const disk = document.getElementById('wheelDisk');
+                    if (disk) {
+                        disk.style.transition = 'transform 6s cubic-bezier(0.15, 0.85, 0.15, 1)';
+                        disk.style.transform = `rotate(${targetAngle}deg)`;
+                    }
+
+                    setTimeout(() => {
+                        this.isSpinning = false;
+                        this.lastSpinResult = selected;
+                        const record = { date: new Date().toLocaleDateString('vi-VN'), reward: selected.name };
+                        this.wheelHistory.unshift(record);
+
+                        if (selected.points > 0 && this.currentUser.linkedId) {
+                            const member = this.members.find(m => m.id == this.currentUser.linkedId);
+                            if (member) {
+                                member.tinhTanPoints = (member.tinhTanPoints || 0) + selected.points;
+                                this.saveMembersToFirebase();
+                            }
+                        }
+
+                        firebase.database().ref('userGameData/' + this.currentUser.username).update({
+                            spinTurns: this.mySpinTurns,
+                            wheelHistory: this.wheelHistory
+                        });
+                    }, 6000);
+                },
+
+                saveWheelConfig() {
+                    firebase.database().ref('gamesData/wheelItems').set(this.wheelItems);
+                    alert('Đã lưu cấu hình vòng quay!');
+                    this.showWheelConfig = false;
                 },
 
                 addNewBHTPosition() {
@@ -1025,12 +1185,10 @@
                     return sorted;
                 },
 
-                // BXH chuyên cần
                 get attendanceLeaderboard() {
                     return [...this.members].sort((a, b) => (b.attendanceRate || 100) - (a.attendanceRate || 100));
                 },
 
-                // Lấy danh sách điểm danh theo đúng ngày chọn lọc (hoặc kết quả tìm kiếm)
                 get attendanceReportList() {
                     const targetDate = this.selectedFilterDate;
                     const dateRecords = this.dailyAttendanceData[targetDate] || {};
@@ -1043,7 +1201,6 @@
                         if (search) {
                             return matchSearch;
                         }
-                        // Nếu không tìm kiếm, chỉ hiển thị những ai đã có dữ liệu điểm danh/báo vắng của ngày đó
                         return status && status !== 'Chưa điểm danh';
                     });
                 },
@@ -1073,20 +1230,17 @@
                     return this.members.filter(m => m.status === statusName).length;
                 },
 
-                // Đếm số lượng theo ngày cụ thể đang chọn
                 countAttendanceByDate(status) {
                     const targetDate = this.selectedFilterDate;
                     const dateRecords = this.dailyAttendanceData[targetDate] || {};
                     return Object.values(dateRecords).filter(s => s === status).length;
                 },
 
-                // Lấy trạng thái điểm danh của đoàn sinh theo ngày chọn
                 getMemberStatusForSelectedDate(memberId) {
                     const targetDate = this.selectedFilterDate;
                     return (this.dailyAttendanceData[targetDate] && this.dailyAttendanceData[targetDate][memberId]) || 'Chưa điểm danh';
                 },
 
-                // Cập nhật điểm danh ngày cụ thể (Dành cho Huynh trưởng / Admin)
                 updateMemberAttendanceForSelectedDate(memberId, status) {
                     const targetDate = this.selectedFilterDate;
                     if (!this.dailyAttendanceData[targetDate]) {
@@ -1094,10 +1248,8 @@
                     }
                     this.dailyAttendanceData[targetDate][memberId] = status;
 
-                    // Lưu vào Firebase
                     firebase.database().ref('dailyAttendance/' + targetDate + '/' + memberId).set(status);
 
-                    // Cập nhật trạng thái hiển thị hiện tại nếu trùng ngày
                     if (targetDate === this.attendanceDate) {
                         const member = this.members.find(m => m.id == memberId);
                         if (member) {
@@ -1118,11 +1270,15 @@
                         this.isLoggedIn = true;
                         this.loginError = '';
                         
-                        // Tải lịch sử điểm danh cá nhân
-                        const dbRef = firebase.database().ref('attendanceHistory/' + found.username);
-                        dbRef.once('value', (snapshot) => {
+                        firebase.database().ref('attendanceHistory/' + found.username).once('value', (snapshot) => {
                             const data = snapshot.val();
                             this.myAttendanceHistory = data ? Object.values(data) : [];
+                        });
+
+                        firebase.database().ref('userGameData/' + found.username).once('value', (snapshot) => {
+                            const data = snapshot.val();
+                            this.mySpinTurns = data ? (data.spinTurns || 0) : 0;
+                            this.wheelHistory = data ? (data.wheelHistory || []) : [];
                         });
                     } else {
                         this.loginError = 'Sai tên đăng nhập hoặc mật khẩu!';
@@ -1185,28 +1341,24 @@
                     alert('Tạo tài khoản thành công!');
                 },
 
-                // Xử lý điểm danh cá nhân kèm giới hạn ngày Chủ Nhật & thời gian
                 submitSelfAttendance(status) {
                     if (!this.currentUser) return;
 
                     const now = new Date();
-                    const dayOfWeek = now.getDay(); // 0 là Chủ Nhật
+                    const dayOfWeek = now.getDay();
                     const currentHour = now.getHours();
 
-                    // Kiểm tra nếu ngày chọn không phải là hôm nay
                     const todayStr = now.toISOString().split('T')[0];
                     if (this.attendanceDate !== todayStr) {
                         alert('Bạn chỉ có thể thực hiện điểm danh hoặc xin vắng cho ngày hôm nay (' + todayStr + ')!');
                         return;
                     }
 
-                    // 1. Kiểm tra ngày Chủ Nhật
                     if (dayOfWeek !== 0) {
                         alert('Hệ thống chỉ mở điểm danh vào ngày Chủ Nhật hàng tuần!');
                         return;
                     }
 
-                    // 2. Kiểm tra khung giờ điểm danh
                     if (status === 'Có mặt') {
                         if (currentHour < 14 || currentHour >= 17) {
                             alert('Chức năng "BẤM ĐIỂM DANH" chỉ mở trong khoảng thời gian từ 14h00 đến 17h00 ngày Chủ Nhật!');
@@ -1228,8 +1380,11 @@
                     const newRecord = { date: this.attendanceDate, status: status };
                     this.myAttendanceHistory.unshift(newRecord);
                     
-                    // Lưu lên Firebase
                     firebase.database().ref('attendanceHistory/' + this.currentUser.username).set(this.myAttendanceHistory);
+
+                    // Cộng +1 lượt quay khi điểm danh thành công
+                    this.mySpinTurns++;
+                    firebase.database().ref('userGameData/' + this.currentUser.username).update({ spinTurns: this.mySpinTurns });
 
                     if (this.currentUser.linkedId) {
                         const member = this.members.find(m => m.id == this.currentUser.linkedId);
@@ -1240,12 +1395,11 @@
                             member.attendanceRate = totalSessions > 0 ? Math.round((presentSessions / totalSessions) * 100) : 100;
                             this.saveMembersToFirebase();
 
-                            // Cập nhật vào danh sách điểm danh theo ngày
                             this.updateMemberAttendanceForSelectedDate(member.id, status);
                         }
                     }
 
-                    alert('Đã ghi nhận điểm danh online ngày ' + this.attendanceDate + ' thành công!');
+                    alert('Đã ghi nhận điểm danh online ngày ' + this.attendanceDate + ' thành công! Bạn nhận được +1 lượt quay vòng quay.');
                 },
 
                 openAddMemberModal() {

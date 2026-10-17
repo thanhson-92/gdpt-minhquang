@@ -18,8 +18,6 @@
         .text-lam { color: #1e3a8a; }
         .font-serif-custom { font-family: 'Merriweather', serif; }
         .font-mono-custom { font-family: 'Fira Code', monospace; }
-        
-        /* Hiệu ứng xoay mượt cho Vòng quay 6 giây */
         .wheel-disk-container {
             transition: transform 6s cubic-bezier(0.15, 0.85, 0.15, 1);
         }
@@ -75,7 +73,6 @@
             
             <!-- TAB 1: TRANG CHỦ -->
             <div x-show="currentTab === 'home'" class="space-y-4">
-                
                 <div class="border rounded-xl p-4 text-center transition-all shadow-sm relative"
                     :class="[bannerConfig.fontClass, bannerConfig.bgClass]">
                     <template x-if="currentUser.role === 'admin'">
@@ -83,7 +80,6 @@
                             ⚙️ Tùy chỉnh Banner
                         </button>
                     </template>
-
                     <div class="flex items-center justify-center gap-2 mb-1">
                         <span class="text-2xl" x-text="bannerConfig.icon"></span>
                         <h2 class="font-bold" :class="[bannerConfig.textColor, bannerConfig.sizeClass]" x-text="bannerConfig.title"></h2>
@@ -148,23 +144,18 @@
                     </div>
 
                     <div class="grid grid-cols-3 gap-2 pt-1">
-                        <!-- Facebook -->
                         <a :href="socialLinks.facebook" target="_blank" class="p-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold rounded-xl text-center border border-blue-200 flex flex-col items-center justify-center gap-1.5 transition shadow-xs">
                             <svg class="w-6 h-6 text-[#1877F2]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor">
                                 <path d="M504 256C504 119 393 8 256 8S8 119 8 256c0 123.78 90.69 226.38 209.25 245V327.69h-63V256h63v-54.64c0-62.15 37-96.48 93.67-96.48 27.14 0 55.52 4.84 55.52 4.84v61h-31.28c-30.8 0-40.41 19.12-40.41 38.73V256h68.78l-11 71.69h-57.78V501C413.31 482.38 504 379.78 504 256z"/>
                             </svg>
                             <span class="text-[11px] font-bold">Facebook</span>
                         </a>
-
-                        <!-- Group FB -->
                         <a :href="socialLinks.groupFb" target="_blank" class="p-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold rounded-xl text-center border border-indigo-200 flex flex-col items-center justify-center gap-1.5 transition shadow-xs">
                             <svg class="w-6 h-6 text-[#1877F2]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor">
                                 <path d="M504 256C504 119 393 8 256 8S8 119 8 256c0 123.78 90.69 226.38 209.25 245V327.69h-63V256h63v-54.64c0-62.15 37-96.48 93.67-96.48 27.14 0 55.52 4.84 55.52 4.84v61h-31.28c-30.8 0-40.41 19.12-40.41 38.73V256h68.78l-11 71.69h-57.78V501C413.31 482.38 504 379.78 504 256z"/>
                             </svg>
                             <span class="text-[11px] font-bold">Group FB</span>
                         </a>
-
-                       <!-- TikTok -->
                         <a :href="socialLinks.tiktok" target="_blank" class="p-2.5 bg-gray-900 hover:bg-gray-800 text-white font-semibold rounded-xl text-center border border-gray-700 flex flex-col items-center justify-center gap-1.5 transition shadow-xs">
                             <svg class="w-6 h-6 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor">
                                 <path d="M448,209.91a210.06,210.06,0,0,1-122.77-39.25V352.32A162.55,162.55,0,1,1,185,188.31V251.5a96,96,0,1,0,64,90.5V0h64A211.37,211.37,0,0,0,448,78.48ZM305.15,108.64a137.25,137.25,0,0,1,77.78,76.51A211.37,211.37,0,0,0,400,209.91V278.48A145.41,145.41,0,0,1,305.15,108.64Z"/>
@@ -172,25 +163,6 @@
                             <span class="text-[11px] font-bold">TikTok</span>
                         </a>
                     </div>
-
-                    <template x-if="editingSocial && currentUser.role === 'admin'">
-                        <div class="bg-gray-50 border p-2.5 rounded-lg space-y-2 mt-2">
-                            <p class="font-bold text-gray-700 text-[11px]">Chỉnh sửa liên kết mạng xã hội:</p>
-                            <div>
-                                <label class="text-[10px] text-gray-500">Link Facebook:</label>
-                                <input type="text" x-model="socialLinks.facebook" class="w-full px-2 py-1 border rounded bg-white">
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-gray-500">Link Group Facebook:</label>
-                                <input type="text" x-model="socialLinks.groupFb" class="w-full px-2 py-1 border rounded bg-white">
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-gray-500">Link TikTok:</label>
-                                <input type="text" x-model="socialLinks.tiktok" class="w-full px-2 py-1 border rounded bg-white">
-                            </div>
-                            <button @click="saveSocialLinks()" class="w-full bg-blue-900 text-white py-1 rounded font-semibold">Lưu Link</button>
-                        </div>
-                    </template>
                 </div>
 
                 <!-- SƠ ĐỒ BHT -->
@@ -204,7 +176,6 @@
                             </div>
                         </template>
                     </div>
-
                     <div x-show="!editingBHT" class="space-y-3 text-sm">
                         <template x-for="bht in bhtList" :key="bht.id">
                             <div class="p-3 border-l-4 rounded" :class="bht.colorClass || 'bg-blue-50 border-blue-500'">
@@ -212,23 +183,6 @@
                                 <p class="text-xs text-gray-600" x-text="'SĐT: ' + bht.phone"></p>
                             </div>
                         </template>
-                    </div>
-
-                    <div x-show="editingBHT" class="space-y-3 text-xs">
-                        <template x-for="(bht, idx) in bhtList" :key="idx">
-                            <div class="p-2 border rounded space-y-1 bg-gray-50 relative">
-                                <input type="text" x-model="bht.role" placeholder="Chức vụ" class="w-full px-2 py-1 border rounded">
-                                <div class="grid grid-cols-2 gap-1">
-                                    <input type="text" x-model="bht.dhName" placeholder="Pháp danh" class="px-2 py-1 border rounded">
-                                    <input type="text" x-model="bht.name" placeholder="Họ tên" class="px-2 py-1 border rounded">
-                                </div>
-                                <div class="flex gap-1">
-                                    <input type="text" x-model="bht.phone" placeholder="Số điện thoại" class="flex-1 px-2 py-1 border rounded">
-                                    <button @click="removeBHTPosition(idx)" class="bg-red-100 text-red-600 px-2 rounded font-bold">Xóa</button>
-                                </div>
-                            </div>
-                        </template>
-                        <button @click="saveBHTList()" class="w-full bg-green-600 text-white py-1.5 rounded font-semibold">Lưu thay đổi</button>
                     </div>
                 </div>
             </div>
@@ -241,52 +195,6 @@
                         <button @click="openAddMemberModal" class="bg-blue-600 text-white text-xs px-3 py-1.5 rounded-lg font-semibold">+ Thêm Đoàn Sinh</button>
                     </template>
                 </div>
-
-                <template x-if="currentUser.role !== 'doansinh'">
-                    <div class="bg-gradient-to-br from-blue-900 to-indigo-900 text-white rounded-xl p-3.5 shadow-md space-y-2.5 text-xs">
-                        <div class="flex justify-between items-center border-b border-blue-700/60 pb-1.5">
-                            <span class="font-bold text-sm text-yellow-300">📊 Thống Kê Đoàn Sinh</span>
-                            <span class="text-[10px] bg-blue-800 px-2 py-0.5 rounded-full border border-blue-600" x-text="'Tổng số: ' + members.length + ' người'"></span>
-                        </div>
-                        <div class="grid grid-cols-4 gap-1.5 text-center text-[11px]">
-                            <div class="bg-white/10 p-1.5 rounded-lg border border-white/10">
-                                <p class="text-blue-200 text-[9px]">Oanh Vũ</p>
-                                <p class="font-extrabold text-sm text-amber-300" x-text="countMembersByGroup('Oanh Vũ')"></p>
-                            </div>
-                            <div class="bg-white/10 p-1.5 rounded-lg border border-white/10">
-                                <p class="text-blue-200 text-[9px]">Thiếu</p>
-                                <p class="font-extrabold text-sm text-green-300" x-text="countMembersByGroup('Thiếu')"></p>
-                            </div>
-                            <div class="bg-white/10 p-1.5 rounded-lg border border-white/10">
-                                <p class="text-blue-200 text-[9px]">Thanh</p>
-                                <p class="font-extrabold text-sm text-cyan-300" x-text="countMembersByGroup('Thanh')"></p>
-                            </div>
-                            <div class="bg-white/10 p-1.5 rounded-lg border border-white/10">
-                                <p class="text-blue-200 text-[9px]">H.Trưởng</p>
-                                <p class="font-extrabold text-sm text-pink-300" x-text="countMembersByGroup('Huynh Trưởng')"></p>
-                            </div>
-                        </div>
-                        <div class="flex justify-around text-[10px] bg-black/20 p-1.5 rounded-lg text-gray-200">
-                            <span>🟢 Đang sinh hoạt: <b class="text-white" x-text="countMembersByStatus('Đang sinh hoạt')"></b></span>
-                            <span>🟡 Tạm nghỉ: <b class="text-yellow-300" x-text="countMembersByStatus('Tạm nghỉ')"></b></span>
-                            <span>🔴 Nghỉ: <b class="text-red-300" x-text="countMembersByStatus('Nghỉ')"></b></span>
-                        </div>
-                    </div>
-                </template>
-
-                <template x-if="currentUser.role !== 'doansinh'">
-                    <div class="flex gap-2">
-                        <input type="text" x-model="memberSearch" placeholder="Tìm tên, pháp danh..." class="flex-1 text-xs px-3 py-2 border rounded-lg outline-none">
-                        <select x-model="memberFilterGroup" class="text-xs px-2 py-2 border rounded-lg outline-none">
-                            <option value="all">Tất cả các ngành</option>
-                            <option value="Huynh Trưởng">Huynh Trưởng</option>
-                            <option value="Thanh">Đoàn Thanh</option>
-                            <option value="Thiếu">Đoàn Thiếu</option>
-                            <option value="Oanh Vũ">Đoàn Oanh Vũ</option>
-                        </select>
-                    </div>
-                </template>
-
                 <div class="space-y-3">
                     <template x-for="m in filteredMembers" :key="m.id">
                         <div class="bg-white border rounded-xl p-3 shadow-sm text-xs space-y-1.5 relative">
@@ -295,30 +203,6 @@
                                     <span class="font-bold text-sm text-blue-900" x-text="m.name"></span>
                                     <span class="text-gray-500 italic" x-text="'(' + m.dhName + ')'"></span>
                                 </div>
-                                <div class="flex items-center gap-1">
-                                    <span class="px-2 py-0.5 rounded text-[10px] font-semibold"
-                                        :class="{
-                                            'bg-green-100 text-green-800': m.status === 'Đang sinh hoạt',
-                                            'bg-yellow-100 text-yellow-800': m.status === 'Tạm nghỉ',
-                                            'bg-red-100 text-red-800': m.status === 'Nghỉ'
-                                        }" x-text="m.status"></span>
-                                    <template x-if="currentUser.role === 'admin'">
-                                        <div class="flex gap-1">
-                                            <button @click="editMemberProfile(m)" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-1.5 py-0.5 rounded text-[10px]">✏️ Sửa</button>
-                                            <button @click="deleteMember(m.id)" class="bg-red-100 hover:bg-red-200 text-red-700 px-1.5 py-0.5 rounded text-[10px]">🗑️ Xóa</button>
-                                        </div>
-                                    </template>
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-2 gap-1 text-gray-600">
-                                <div><b class="text-gray-700">Giới tính:</b> <span class="font-semibold text-blue-800" x-text="m.gender || 'Nam'"></span></div>
-                                <div><b class="text-gray-700">Ngày sinh:</b> <span x-text="m.dob"></span></div>
-                                <div><b class="text-gray-700">Ngành/Đoàn:</b> <span x-text="m.group"></span></div>
-                                <div><b class="text-gray-700">SĐT:</b> <span x-text="m.phone"></span></div>
-                                <div><b class="text-gray-700">SĐT PH:</b> <span x-text="m.parentPhone"></span></div>
-                                <div class="col-span-2"><b class="text-gray-700">Địa chỉ:</b> <span x-text="m.address || 'Chưa cập nhật'"></span></div>
-                                <div><b class="text-gray-700">Đã học bậc:</b> <span x-text="m.level"></span></div>
-                                <div><b class="text-gray-700">TK Liên kết:</b> <span class="text-blue-600 font-semibold" x-text="getLinkedUsername(m.id)"></span></div>
                             </div>
                         </div>
                     </template>
@@ -328,222 +212,30 @@
             <!-- TAB 3: ĐIỂM DANH -->
             <div x-show="currentTab === 'attendance'" class="space-y-4">
                 <h2 class="font-bold text-lg text-gray-900">Điểm Danh Sinh Hoạt</h2>
-                
                 <div class="bg-white border rounded-xl p-4 shadow-sm space-y-3 text-center">
-                    <div class="bg-blue-50 p-2.5 rounded-lg border border-blue-100 flex justify-between items-center text-xs">
+                    <div class="bg-blue-50 p-2.5 rounded-lg border flex justify-between items-center text-xs">
                         <span class="text-gray-600 font-medium">Chọn ngày sinh hoạt:</span>
-                        <input type="date" x-model="attendanceDate" class="text-xs font-semibold px-2 py-1 border rounded-lg outline-none bg-white">
+                        <input type="date" x-model="attendanceDate" class="text-xs font-semibold px-2 py-1 border rounded-lg bg-white">
                     </div>
-
                     <div class="py-2 space-y-2">
-                        <p class="text-xs text-gray-500">Xác nhận trạng thái sinh hoạt ngày <b x-text="attendanceDate"></b>:</p>
                         <div class="grid grid-cols-2 gap-2">
-                            <button @click="submitSelfAttendance('Có mặt')" class="bg-green-600 text-white font-bold py-2.5 rounded-xl shadow-md hover:bg-green-700 transition text-xs">
-                                <span>✅</span> BẤM ĐIỂM DANH
-                            </button>
-                            <button @click="submitSelfAttendance('Vắng có phép')" class="bg-amber-500 text-white font-bold py-2.5 rounded-xl shadow-md hover:bg-amber-600 transition text-xs">
-                                <span>✋</span> XIN VẮNG
-                            </button>
-                        </div>
-                        <p class="text-[10px] text-gray-400 italic mt-1">Lưu ý: Chỉ điểm danh được vào ngày Chủ Nhật từ 14:00 - 17:00 (Báo vắng từ 07:00 - 17:00).</p>
-                    </div>
-
-                    <!-- Lịch sử điểm danh cá nhân -->
-                    <div class="border-t pt-3 text-left space-y-2">
-                        <p class="font-bold text-gray-700 text-xs">📅 Lịch sử điểm danh của bạn:</p>
-                        <div class="space-y-1.5 max-h-36 overflow-y-auto">
-                            <template x-for="(hist, idx) in myAttendanceHistory" :key="idx">
-                                <div class="bg-gray-50 p-2 rounded border text-[11px] flex justify-between items-center">
-                                    <span class="text-gray-600" x-text="'Ngày: ' + hist.date"></span>
-                                    <span class="font-semibold px-2 py-0.5 rounded text-[10px]"
-                                        :class="{
-                                            'bg-green-100 text-green-700': hist.status === 'Có mặt',
-                                            'bg-amber-100 text-amber-700': hist.status === 'Vắng có phép',
-                                            'bg-red-100 text-red-700': hist.status === 'Vắng không phép'
-                                        }" x-text="hist.status"></span>
-                                </div>
-                            </template>
-                            <template x-if="!myAttendanceHistory || myAttendanceHistory.length === 0">
-                                <p class="text-gray-400 text-[11px] italic text-center py-1">Chưa có lịch sử điểm danh.</p>
-                            </template>
+                            <button @click="submitSelfAttendance('Có mặt')" class="bg-green-600 text-white font-bold py-2 rounded-xl text-xs">✅ BẤM ĐIỂM DANH</button>
+                            <button @click="submitSelfAttendance('Vắng có phép')" class="bg-amber-500 text-white font-bold py-2 rounded-xl text-xs">✋ XIN VẮNG</button>
                         </div>
                     </div>
                 </div>
-
-                <template x-if="currentUser.role !== 'doansinh'">
-                    <div class="bg-white border rounded-xl p-4 shadow-sm space-y-3 text-xs">
-                        <div class="flex justify-between items-center border-b pb-2">
-                            <h3 class="font-bold text-sm text-blue-900">📊 Báo Cáo & Quản Lý Điểm Danh</h3>
-                            <button @click="exportAttendanceToExcel()" class="bg-emerald-700 hover:bg-emerald-800 text-white font-semibold px-2.5 py-1 rounded shadow text-[11px] flex items-center gap-1 transition">
-                                <span>📥</span> Xuất Báo Cáo Excel
-                            </button>
-                        </div>
-
-                        <div class="bg-gray-50 border p-2.5 rounded-xl space-y-2">
-                            <div class="grid grid-cols-2 gap-2">
-                                <div>
-                                    <label class="block text-[10px] text-gray-500 font-semibold mb-0.5">Lọc thời gian:</label>
-                                    <select x-model="attendanceTimeFilter" class="w-full px-2 py-1 border rounded font-semibold text-xs bg-white outline-none">
-                                        <option value="ngay">Ngày cụ thể</option>
-                                        <option value="tuan">Tuần này</option>
-                                        <option value="thang">Cả tháng này</option>
-                                        <option value="quy">Quý này</option>
-                                        <option value="nam">Năm 2026</option>
-                                    </select>
-                                </div>
-                                <div x-show="attendanceTimeFilter === 'ngay'">
-                                    <label class="block text-[10px] text-gray-500 font-semibold mb-0.5">Chọn ngày xem:</label>
-                                    <input type="date" x-model="selectedFilterDate" class="w-full px-2 py-1 border rounded text-xs bg-white outline-none">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-3 gap-2 text-center my-2">
-                            <div class="bg-green-50 border border-green-200 p-2 rounded-lg">
-                                <p class="text-[10px] text-gray-500">Có mặt</p>
-                                <p class="font-bold text-base text-green-700" x-text="countAttendanceByDate('Có mặt')"></p>
-                            </div>
-                            <div class="bg-amber-50 border border-amber-200 p-2 rounded-lg">
-                                <p class="text-[10px] text-gray-500">Vắng có phép</p>
-                                <p class="font-bold text-base text-amber-700" x-text="countAttendanceByDate('Vắng có phép')"></p>
-                            </div>
-                            <div class="bg-red-50 border border-red-200 p-2 rounded-lg">
-                                <p class="text-[10px] text-gray-500">Vắng không phép</p>
-                                <p class="font-bold text-base text-red-700" x-text="countAttendanceByDate('Vắng không phép')"></p>
-                            </div>
-                        </div>
-
-                        <!-- Ô TÌM TÊN ĐỂ ĐIỂM DANH HỘ -->
-                        <div class="bg-blue-50/60 border border-blue-200 p-2.5 rounded-xl space-y-2 mt-3">
-                            <p class="font-bold text-blue-900 text-[11px] flex items-center gap-1">
-                                <span>✍️ Điểm danh hộ / Tìm kiếm đoàn sinh:</span>
-                            </p>
-                            <div class="relative">
-                                <input type="text" x-model="attendanceSearchKeyword" placeholder="🔍 Nhập tên hoặc pháp danh..." class="w-full px-3 py-1.5 border rounded-lg text-xs bg-white outline-none">
-                            </div>
-                        </div>
-
-                        <div class="space-y-2 pt-2">
-                            <div class="flex justify-between items-center font-bold text-gray-700">
-                                <span x-text="attendanceSearchKeyword ? 'Kết quả tìm kiếm đoàn sinh:' : 'Bảng điểm danh chi tiết ngày ' + selectedFilterDate + ':'"></span>
-                            </div>
-                            <div class="space-y-2 max-h-60 overflow-y-auto pr-1 divide-y">
-                                <template x-for="m in attendanceReportList" :key="m.id">
-                                    <div class="pt-2 flex items-center justify-between">
-                                        <div>
-                                            <p class="font-semibold text-gray-800" x-text="m.name"></p>
-                                            <p class="text-[10px] text-gray-400" x-text="(m.dhName ? m.dhName + ' - ' : '') + m.group"></p>
-                                        </div>
-                                        <select :value="getMemberStatusForSelectedDate(m.id)" @change="updateMemberAttendanceForSelectedDate(m.id, $event.target.value)" class="px-2 py-1 border rounded text-xs outline-none font-semibold"
-                                            :class="{
-                                                'bg-green-50 text-green-700 border-green-300': getMemberStatusForSelectedDate(m.id) === 'Có mặt',
-                                                'bg-amber-50 text-amber-700 border-amber-300': getMemberStatusForSelectedDate(m.id) === 'Vắng có phép',
-                                                'bg-red-50 text-red-700 border-red-300': getMemberStatusForSelectedDate(m.id) === 'Vắng không phép',
-                                                'bg-gray-50 text-gray-500 border-gray-300': getMemberStatusForSelectedDate(m.id) === 'Chưa điểm danh'
-                                            }">
-                                            <option value="Chưa điểm danh">Chưa điểm danh</option>
-                                            <option value="Có mặt">Có mặt</option>
-                                            <option value="Vắng có phép">Vắng có phép</option>
-                                            <option value="Vắng không phép">Vắng không phép</option>
-                                        </select>
-                                    </div>
-                                </template>
-                                <template x-if="attendanceReportList.length === 0">
-                                    <p class="text-gray-400 text-center py-2 italic text-[11px]">Không có dữ liệu phù hợp cho ngày đang chọn.</p>
-                                </template>
-                            </div>
-                        </div>
-                    </div>
-                </template>
             </div>
 
             <!-- TAB 4: BẢNG XẾP HẠNG -->
             <div x-show="currentTab === 'leaderboard'" class="space-y-4">
                 <h2 class="font-bold text-lg text-gray-900">🏆 Bảng Xếp Hạng</h2>
-                
                 <div class="flex border-b text-xs font-bold text-center">
                     <button @click="lbTab = 'attendance'" :class="lbTab === 'attendance' ? 'border-b-2 border-blue-900 text-blue-900' : 'text-gray-400'" class="flex-1 py-2">📅 BXH Chuyên Cần</button>
                     <button @click="lbTab = 'points'" :class="lbTab === 'points' ? 'border-b-2 border-blue-900 text-blue-900' : 'text-gray-400'" class="flex-1 py-2">⭐ Tích Lũy Điểm</button>
                 </div>
-
-                <div x-show="lbTab === 'attendance'" class="space-y-3 text-xs">
-                    <div class="space-y-2">
-                        <template x-for="(rank, i) in attendanceLeaderboard.slice(0, 20)" :key="i">
-                            <div class="p-3 rounded-xl border flex items-center justify-between transition-all"
-                                :class="{
-                                    'bg-gradient-to-r from-amber-100 to-yellow-50 border-amber-300 shadow-md ring-2 ring-amber-400/50': i === 0,
-                                    'bg-gradient-to-r from-slate-100 to-gray-50 border-slate-300 shadow-sm': i === 1,
-                                    'bg-gradient-to-r from-orange-100 to-amber-50 border-orange-300 shadow-sm': i === 2,
-                                    'bg-white border-gray-200': i > 2
-                                }">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-full flex items-center justify-center font-extrabold text-sm shadow-sm"
-                                        :class="{
-                                            'bg-amber-400 text-white ring-2 ring-amber-200': i === 0,
-                                            'bg-slate-300 text-slate-800': i === 1,
-                                            'bg-amber-600 text-white': i === 2,
-                                            'bg-gray-100 text-gray-600': i > 2
-                                        }">
-                                        <span x-text="i === 0 ? '👑' : (i + 1)"></span>
-                                    </div>
-                                    <div>
-                                        <p class="font-bold text-gray-900" x-text="rank.name"></p>
-                                        <p class="text-[10px] text-gray-500" x-text="rank.group"></p>
-                                    </div>
-                                </div>
-                                <span class="font-extrabold text-blue-900 bg-white/80 px-2.5 py-1 rounded-lg border shadow-xs" x-text="(rank.attendanceRate !== undefined ? rank.attendanceRate : 100) + '% đi sinh hoạt'"></span>
-                            </div>
-                        </template>
-                    </div>
-                </div>
-
-                <div x-show="lbTab === 'points'" class="space-y-3 text-xs">
-                    <div class="relative">
-                        <input type="text" x-model="searchPointMember" placeholder="🔍 Tìm đoàn sinh nhập điểm..." class="w-full px-3 py-2 border rounded-xl outline-none text-xs bg-white shadow-xs">
-                    </div>
-
-                    <div class="space-y-2">
-                        <template x-for="(m, i) in filteredPointMembers.slice(0, 20)" :key="m.id">
-                            <div class="p-3 rounded-xl border flex items-center justify-between transition-all"
-                                :class="{
-                                    'bg-gradient-to-r from-amber-100 to-yellow-50 border-amber-300 shadow-md ring-2 ring-amber-400/50': i === 0,
-                                    'bg-gradient-to-r from-slate-100 to-gray-50 border-slate-300 shadow-sm': i === 1,
-                                    'bg-gradient-to-r from-orange-100 to-amber-50 border-orange-300 shadow-sm': i === 2,
-                                    'bg-white border-gray-200': i > 2
-                                }">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-full flex items-center justify-center font-extrabold text-sm shadow-sm"
-                                        :class="{
-                                            'bg-amber-400 text-white ring-2 ring-amber-200': i === 0,
-                                            'bg-slate-300 text-slate-800': i === 1,
-                                            'bg-amber-600 text-white': i === 2,
-                                            'bg-gray-100 text-gray-600': i > 2
-                                        }">
-                                        <span x-text="i === 0 ? '👑' : (i + 1)"></span>
-                                    </div>
-                                    <div>
-                                        <p class="font-bold text-gray-900" x-text="m.name"></p>
-                                        <p class="text-[10px] text-gray-500" x-text="m.dhName + ' - ' + m.group"></p>
-                                    </div>
-                                </div>
-
-                                <div class="flex items-center gap-2">
-                                    <span class="font-extrabold text-amber-700 text-sm bg-white/80 px-2 py-0.5 rounded border" x-text="m.points + 'đ'"></span>
-                                    <template x-if="currentUser.role === 'admin'">
-                                        <div class="flex items-center gap-1 bg-white p-1 rounded-lg border shadow-xs">
-                                            <input type="number" x-model.number="m.inputPoint" placeholder="Điểm" class="w-12 px-1 py-0.5 border rounded text-center text-xs outline-none">
-                                            <button @click="applyCustomPoints(m)" class="bg-blue-600 text-white px-1.5 py-0.5 rounded font-bold text-[10px]">Lưu</button>
-                                            <button @click="adjustPoints(m, 5)" class="bg-green-100 text-green-700 font-bold px-1 py-0.5 rounded text-[10px]">+5</button>
-                                        </div>
-                                    </template>
-                                </div>
-                            </div>
-                        </template>
-                    </div>
-                </div>
             </div>
 
-            <!-- TAB 5: TRÒ CHƠI & KỸ NĂNG (CẬP NHẬT 6 TÍNH NĂNG CHUẨN) -->
+            <!-- TAB 5: TRÒ CHƠI & HOẠT ĐỘNG (ĐÃ SỬA HOÀN CHỈNH) -->
             <div x-show="currentTab === 'games'" class="space-y-4">
                 <div class="flex justify-between items-center">
                     <h2 class="font-bold text-lg text-gray-900">🎮 Trò Chơi & Hoạt Động</h2>
@@ -560,7 +252,7 @@
                     <button @click="gameSubTab = 'docs'" :class="gameSubTab === 'docs' ? 'bg-blue-900 text-white shadow' : 'bg-white text-gray-700 border'" class="p-2 rounded-xl text-center">📂 Kho Tài Liệu</button>
                 </div>
 
-                <!-- 1. VÒNG QUAY TINH TẤN (SỬA LỖI MŨI TÊN & CHỮ NẰM NGANG) -->
+                <!-- 1. VÒNG QUAY TINH TẤN (Hiển thị rõ 10 ô giải thưởng) -->
                 <div x-show="gameSubTab === 'wheel'" class="space-y-3 bg-white border rounded-xl p-4 shadow-sm text-xs">
                     <div class="flex justify-between items-center border-b pb-2">
                         <h3 class="font-bold text-sm text-blue-900">🎡 Vòng Quay Tinh Tấn May Mắn</h3>
@@ -582,28 +274,23 @@
                                     <input type="number" x-model.number="item.points" placeholder="Điểm" class="px-2 py-1 border rounded bg-white">
                                 </div>
                             </template>
-                            <button @click="saveWheelConfig()" class="w-full bg-blue-900 text-white py-1.5 rounded font-semibold">Lưu Cấu Hình Vòng Quay</button>
+                            <button @click="saveWheelConfig()" class="w-full bg-blue-900 text-white py-1.5 rounded font-semibold">Lưu Cấu Hình</button>
                         </div>
                     </template>
 
-                    <!-- Khung Vòng Quay (Sử dụng SVG để chữ thẳng hàng tuyệt đối) -->
+                    <!-- Khung Vòng Quay với SVG hiển thị đầy đủ tên 10 ô -->
                     <div class="relative w-64 h-64 mx-auto my-4 flex items-center justify-center">
-                        <!-- Mũi tên chỉ giải thưởng chuẩn thiết kế -->
                         <div class="absolute -top-3 left-1/2 -translate-x-1/2 z-30 drop-shadow-md">
                             <svg width="28" height="34" viewBox="0 0 28 34" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M14 34L2 2C2 2 8 0 14 0C20 0 26 2 26 2L14 34Z" fill="#EA580C" stroke="#FDE047" stroke-width="2"/>
                             </svg>
                         </div>
-
-                        <!-- Đĩa quay viền vàng -->
                         <div class="w-full h-full rounded-full border-8 border-amber-400 shadow-xl overflow-hidden relative bg-amber-200">
                             <div class="w-full h-full wheel-disk-container" :style="{ transform: 'rotate(' + wheelRotation + 'deg)' }" id="wheelDisk">
                                 <svg viewBox="0 0 200 200" class="w-full h-full transform -rotate-90">
                                     <template x-for="(item, idx) in wheelItems" :key="idx">
                                         <g>
-                                            <!-- Vẽ 10 hình quạt (36 độ / ô) -->
                                             <path :d="getSvgArcPath(idx, 10)" :fill="wheelColors[idx % wheelColors.length]" stroke="#FFFFFF" stroke-width="1"/>
-                                            <!-- Hiển thị chữ nằm ngang chuẩn xác -->
                                             <text :x="getSvgTextCoords(idx, 10).x" :y="getSvgTextCoords(idx, 10).y"
                                                   fill="#FFFFFF" font-size="7.5" font-weight="bold" text-anchor="middle" dominant-baseline="middle"
                                                   :transform="'rotate(' + (idx * 36 + 18) + ',' + getSvgTextCoords(idx, 10).x + ',' + getSvgTextCoords(idx, 10).y + ')'">
@@ -614,8 +301,6 @@
                                 </svg>
                             </div>
                         </div>
-
-                        <!-- Tâm vòng quay -->
                         <div class="absolute w-10 h-10 bg-gradient-to-tr from-yellow-500 to-amber-300 rounded-full border-2 border-white shadow-md z-20 flex items-center justify-center text-xs font-extrabold text-blue-900">☸️</div>
                     </div>
 
@@ -633,21 +318,9 @@
                             <p class="text-gray-600 text-[11px]" x-text="'+ ' + lastSpinResult.points + ' Điểm Tinh Tấn'"></p>
                         </div>
                     </template>
-
-                    <div class="border-t pt-2 space-y-1">
-                        <p class="font-bold text-gray-700">📜 Lịch sử quay thưởng:</p>
-                        <div class="space-y-1 max-h-32 overflow-y-auto">
-                            <template x-for="(h, idx) in wheelHistory" :key="idx">
-                                <div class="bg-gray-50 p-2 rounded border flex justify-between">
-                                    <span class="text-gray-600" x-text="h.date"></span>
-                                    <span class="font-bold text-blue-900" x-text="h.reward"></span>
-                                </div>
-                            </template>
-                        </div>
-                    </div>
                 </div>
 
-                <!-- 2. TRAO DỒI PHẬT PHÁP -->
+                <!-- 2. ĐỐ PHẬT PHÁP (Nút Bắt Đầu & Đếm ngược thời gian) -->
                 <div x-show="gameSubTab === 'quiz'" class="space-y-3 bg-white border rounded-xl p-4 shadow-sm text-xs">
                     <div class="flex justify-between items-center border-b pb-2">
                         <h3 class="font-bold text-sm text-blue-900">🧠 Trao Dồi Phật Pháp & Thi Đố Vui</h3>
@@ -655,23 +328,16 @@
                             <button @click="showQuizConfig = !showQuizConfig" class="text-[10px] bg-blue-100 text-blue-800 px-2 py-1 rounded font-semibold">⚙️ Tạo câu hỏi</button>
                         </template>
                     </div>
-                    <template x-if="showQuizConfig && currentUser.role === 'admin'">
-                        <div class="bg-blue-50 border p-3 rounded-lg space-y-2">
-                            <input type="number" x-model.number="quizDuration" placeholder="Thời gian (giây)" class="w-full px-2 py-1 border rounded bg-white">
-                            <input type="text" x-model="newQuiz.question" placeholder="Câu hỏi..." class="w-full px-2 py-1 border rounded bg-white">
-                            <div class="grid grid-cols-2 gap-1">
-                                <input type="text" x-model="newQuiz.opt1" placeholder="Đáp án A" class="px-2 py-1 border rounded bg-white">
-                                <input type="text" x-model="newQuiz.opt2" placeholder="Đáp án B" class="px-2 py-1 border rounded bg-white">
-                                <input type="text" x-model="newQuiz.opt3" placeholder="Đáp án C" class="px-2 py-1 border rounded bg-white">
-                                <input type="text" x-model="newQuiz.opt4" placeholder="Đáp án D" class="px-2 py-1 border rounded bg-white">
-                            </div>
-                            <select x-model="newQuiz.correct" class="w-full px-2 py-1 border rounded bg-white">
-                                <option value="0">Đúng: A</option><option value="1">Đúng: B</option><option value="2">Đúng: C</option><option value="3">Đúng: D</option>
-                            </select>
-                            <button @click="addQuizQuestion()" class="w-full bg-blue-900 text-white py-1.5 rounded font-semibold">Thêm Câu Hỏi</button>
+
+                    <template x-if="!quizStarted && !quizFinished">
+                        <div class="text-center py-6 space-y-3 bg-blue-50/50 rounded-xl border">
+                            <p class="font-bold text-blue-900 text-sm">Sẵn sàng thử thách kiến thức Phật Pháp?</p>
+                            <p class="text-gray-500">Thời gian làm bài: <b class="text-blue-700" x-text="quizDuration + ' giây'"></b></p>
+                            <button @click="startQuiz()" class="bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-2.5 rounded-xl shadow">🚀 BẮT ĐẦU THI</button>
                         </div>
                     </template>
-                    <template x-if="quizList.length > 0 && !quizFinished">
+
+                    <template x-if="quizStarted && !quizFinished">
                         <div class="space-y-3 bg-blue-50/50 p-3 rounded-xl border">
                             <div class="flex justify-between font-bold text-blue-900">
                                 <span x-text="'Câu ' + (currentQuizIdx + 1) + '/' + quizList.length"></span>
@@ -689,6 +355,7 @@
                             <button @click="nextQuizQuestion()" class="w-full py-2 bg-blue-900 text-white rounded font-semibold" x-text="currentQuizIdx < quizList.length - 1 ? 'Câu tiếp' : 'Nộp bài'"></button>
                         </div>
                     </template>
+
                     <template x-if="quizFinished">
                         <div class="p-4 bg-emerald-50 border border-emerald-300 rounded-xl text-center space-y-2">
                             <p class="font-bold text-emerald-900 text-sm">🎯 KẾT QUẢ THI PHẬT PHÁP</p>
@@ -703,7 +370,7 @@
                     <div class="flex justify-between items-center border-b pb-2">
                         <h3 class="font-bold text-sm text-blue-900">📚 Rèn Luyện Kỹ Năng</h3>
                         <template x-if="currentUser.role === 'admin'">
-                            <button @click="openAddSkillModal()" class="bg-blue-600 text-white px-2.5 py-1 rounded font-semibold">+ Thêm thư mục mới</button>
+                            <button @click="openAddSkillModal()" class="bg-blue-600 text-white px-2.5 py-1 rounded font-semibold">+ Thêm kỹ năng</button>
                         </template>
                     </div>
                     <div class="grid grid-cols-2 gap-3 pt-1">
@@ -714,18 +381,12 @@
                                     <h3 class="font-bold text-sm mt-2 text-gray-800" x-text="skill.title"></h3>
                                     <p class="text-[11px] text-gray-500 mt-1" x-text="skill.desc"></p>
                                 </div>
-                                <template x-if="currentUser.role === 'admin'">
-                                    <div class="flex gap-1 mt-3 pt-2 border-t text-[10px]">
-                                        <button @click="editSkillModal(skill)" class="flex-1 bg-gray-100 hover:bg-gray-200 text-blue-700 py-1 rounded font-semibold">Sửa</button>
-                                        <button @click="deleteSkillCategory(skill.id)" class="flex-1 bg-red-50 hover:bg-red-100 text-red-600 py-1 rounded font-semibold">Xóa</button>
-                                    </div>
-                                </template>
                             </div>
                         </template>
                     </div>
                 </div>
 
-                <!-- 4. SỰ KIỆN -->
+                <!-- 4. SỰ KIỆN (Thêm, Sửa, Xóa sự kiện cho Admin) -->
                 <div x-show="gameSubTab === 'events'" class="space-y-3 bg-white border rounded-xl p-4 shadow-sm text-xs">
                     <div class="flex justify-between items-center border-b pb-2">
                         <h3 class="font-bold text-sm text-blue-900">🎉 Sự Kiện & Thử Thách</h3>
@@ -733,9 +394,29 @@
                             <button @click="openAddEventModal()" class="bg-blue-600 text-white px-2.5 py-1 rounded font-semibold">+ Tạo sự kiện</button>
                         </template>
                     </div>
+
+                    <template x-if="showEventForm && currentUser.role === 'admin'">
+                        <div class="bg-blue-50 border p-3 rounded-lg space-y-2">
+                            <p class="font-bold text-blue-900" x-text="isEditEventMode ? 'Chỉnh sửa sự kiện' : 'Tạo sự kiện mới'"></p>
+                            <input type="text" x-model="eventForm.title" placeholder="Tiêu đề sự kiện..." class="w-full px-2 py-1 border rounded bg-white">
+                            <textarea x-model="eventForm.content" placeholder="Nội dung sự kiện..." class="w-full px-2 py-1 border rounded bg-white h-16"></textarea>
+                            <input type="text" x-model="eventForm.date" placeholder="Thời gian diễn ra..." class="w-full px-2 py-1 border rounded bg-white">
+                            <div class="flex gap-2">
+                                <button @click="showEventForm = false" class="flex-1 bg-gray-200 py-1 rounded">Hủy</button>
+                                <button @click="saveEvent()" class="flex-1 bg-blue-900 text-white py-1 rounded font-semibold">Lưu Sự Kiện</button>
+                            </div>
+                        </div>
+                    </template>
+
                     <div class="space-y-2">
                         <template x-for="ev in eventsList" :key="ev.id">
-                            <div class="p-3 bg-amber-50/50 border border-amber-200 rounded-xl space-y-1">
+                            <div class="p-3 bg-amber-50/50 border border-amber-200 rounded-xl space-y-1 relative">
+                                <template x-if="currentUser.role === 'admin'">
+                                    <div class="absolute top-2 right-2 flex gap-1">
+                                        <button @click="editEvent(ev)" class="text-blue-600 bg-white px-1.5 py-0.5 rounded border text-[10px]">✏️ Sửa</button>
+                                        <button @click="deleteEvent(ev.id)" class="text-red-600 bg-white px-1.5 py-0.5 rounded border text-[10px]">🗑️ Xóa</button>
+                                    </div>
+                                </template>
                                 <p class="font-bold text-amber-900 text-sm" x-text="ev.title"></p>
                                 <p class="text-gray-600" x-text="ev.content"></p>
                                 <span class="text-[10px] bg-red-100 text-red-600 px-2 py-0.5 rounded font-bold inline-block" x-text="'Thời gian: ' + ev.date"></span>
@@ -744,7 +425,7 @@
                     </div>
                 </div>
 
-                <!-- 5. SHOP QUÀ TẶNG (HIỂN THỊ ĐIỂM TINH TẤN & XÓA VẬT PHẨM) -->
+                <!-- 5. SHOP QUÀ TẶNG -->
                 <div x-show="gameSubTab === 'shop'" class="space-y-3 bg-white border rounded-xl p-4 shadow-sm text-xs">
                     <div class="flex justify-between items-center border-b pb-2">
                         <h3 class="font-bold text-sm text-blue-900">🎁 Shop Quà Tặng Tinh Tấn</h3>
@@ -768,7 +449,7 @@
                         <template x-for="item in shopItems" :key="item.id">
                             <div class="p-3 bg-gray-50 border rounded-xl text-center space-y-2 flex flex-col justify-between relative">
                                 <template x-if="currentUser.role === 'admin'">
-                                    <button @click="deleteShopItem(item.id)" class="absolute top-1 right-1 text-red-500 font-bold px-1.5 py-0.5 text-[10px] bg-red-50 rounded border hover:bg-red-100">✕ Xóa</button>
+                                    <button @click="deleteShopItem(item.id)" class="absolute top-1 right-1 text-red-500 font-bold px-1.5 py-0.5 text-[10px] bg-red-50 rounded border">✕ Xóa</button>
                                 </template>
                                 <div>
                                     <p class="font-bold text-blue-900 mt-1" x-text="item.name"></p>
@@ -778,31 +459,39 @@
                             </div>
                         </template>
                     </div>
-
-                    <div class="border-t pt-3 space-y-2">
-                        <p class="font-bold text-gray-700">🛒 Lịch sử đổi quà của bạn:</p>
-                        <div class="space-y-1 max-h-32 overflow-y-auto">
-                            <template x-for="(buy, idx) in myShopHistory" :key="idx">
-                                <div class="bg-gray-50 p-2 rounded border flex justify-between">
-                                    <span class="text-gray-600" x-text="buy.itemName"></span>
-                                    <span class="font-bold text-red-600" x-text="'-' + buy.price + 'đ'"></span>
-                                </div>
-                            </template>
-                        </div>
-                    </div>
                 </div>
 
-                <!-- 6. KHO TÀI LIỆU -->
+                <!-- 6. KHO TÀI LIỆU (Thêm, Sửa, Xóa tài liệu cho Admin) -->
                 <div x-show="gameSubTab === 'docs'" class="space-y-3 bg-white border rounded-xl p-4 shadow-sm text-xs">
                     <div class="flex justify-between items-center border-b pb-2">
                         <h3 class="font-bold text-sm text-blue-900">📂 Kho Thư Mục Tài Liệu</h3>
                         <template x-if="currentUser.role === 'admin'">
-                            <button @click="openAddDocModal()" class="bg-blue-600 text-white px-2.5 py-1 rounded font-semibold">+ Thêm thư mục</button>
+                            <button @click="openAddDocModal()" class="bg-blue-600 text-white px-2.5 py-1 rounded font-semibold">+ Thêm tài liệu</button>
                         </template>
                     </div>
+
+                    <template x-if="showDocForm && currentUser.role === 'admin'">
+                        <div class="bg-blue-50 border p-3 rounded-lg space-y-2">
+                            <p class="font-bold text-blue-900" x-text="isEditDocMode ? 'Chỉnh sửa tài liệu' : 'Thêm tài liệu mới'"></p>
+                            <input type="text" x-model="docForm.title" placeholder="Tiêu đề tài liệu..." class="w-full px-2 py-1 border rounded bg-white">
+                            <input type="text" x-model="docForm.desc" placeholder="Mô tả ngắn..." class="w-full px-2 py-1 border rounded bg-white">
+                            <input type="text" x-model="docForm.linkUrl" placeholder="Đường dẫn (URL) tài liệu..." class="w-full px-2 py-1 border rounded bg-white">
+                            <div class="flex gap-2">
+                                <button @click="showDocForm = false" class="flex-1 bg-gray-200 py-1 rounded">Hủy</button>
+                                <button @click="saveDocument()" class="flex-1 bg-blue-900 text-white py-1 rounded font-semibold">Lưu Tài Liệu</button>
+                            </div>
+                        </div>
+                    </template>
+
                     <div class="space-y-2">
                         <template x-for="doc in documentsList" :key="doc.id">
-                            <div class="p-3 bg-gray-50 border rounded-xl space-y-1">
+                            <div class="p-3 bg-gray-50 border rounded-xl space-y-1 relative">
+                                <template x-if="currentUser.role === 'admin'">
+                                    <div class="absolute top-2 right-2 flex gap-1">
+                                        <button @click="editDocument(doc)" class="text-blue-600 bg-white px-1.5 py-0.5 rounded border text-[10px]">✏️ Sửa</button>
+                                        <button @click="deleteDocument(doc.id)" class="text-red-600 bg-white px-1.5 py-0.5 rounded border text-[10px]">🗑️ Xóa</button>
+                                    </div>
+                                </template>
                                 <p class="font-bold text-blue-900 text-sm" x-text="doc.title"></p>
                                 <p class="text-gray-600" x-text="doc.desc"></p>
                                 <a :href="doc.linkUrl" target="_blank" class="text-blue-600 underline block pt-1">📥 Mở tài liệu</a>
@@ -812,96 +501,20 @@
                 </div>
             </div>
 
-            <!-- TAB 6: QUẢN TRỊ (BỔ SUNG THÊM LƯỢT QUAY CHO TÀI KHOẢN) -->
+            <!-- TAB 6: QUẢN TRỊ -->
             <div x-show="currentTab === 'admin' && currentUser.role === 'admin'" class="space-y-4">
                 <h2 class="font-bold text-lg text-gray-900">Quản Trị Hệ Thống</h2>
-                
-                <!-- Ô CỘNG LƯỢT QUAY BỔ SUNG NỔI BẬT -->
                 <div class="bg-amber-50 border border-amber-300 rounded-xl p-3 shadow-sm space-y-2 text-xs">
-                    <h3 class="font-bold text-amber-900 flex items-center gap-1">
-                        <span>✨ Cộng Lượt Quay Vòng Quay Tinh Tấn</span>
-                    </h3>
-                    <div class="space-y-1.5">
-                        <label class="block text-[10px] text-gray-600 font-semibold">Chọn hoặc tìm kiếm tài khoản:</label>
-                        <select x-model="spinGrantUser" class="w-full px-2 py-1.5 border rounded bg-white font-semibold">
-                            <option value="">-- Chọn tài khoản --</option>
-                            <template x-for="acc in accounts" :key="acc.username">
-                                <option :value="acc.username" x-text="acc.username + ' (' + acc.name + ')'"></option>
-                            </template>
-                        </select>
-                        <div class="flex gap-2">
-                            <input type="number" x-model.number="spinGrantAmount" placeholder="Số lượt quay..." class="flex-1 px-2 py-1.5 border rounded bg-white">
-                            <button @click="grantSpinTurns()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-3 py-1.5 rounded">Cộng Lượt</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white border rounded-xl p-3 shadow-sm space-y-2 text-xs">
-                    <h3 class="font-bold text-blue-900 flex items-center gap-1">
-                        <span>🔐 Tạo Tài Khoản & Liên Kết Hồ Sơ</span>
-                    </h3>
-                    <input type="text" x-model="newUser.username" placeholder="Tên đăng nhập" class="w-full px-3 py-2 border rounded-lg outline-none">
-                    <input type="password" x-model="newUser.password" placeholder="Mật khẩu" class="w-full px-3 py-2 border rounded-lg outline-none">
-                    
-                    <label class="block text-[11px] text-gray-600 font-semibold pt-1">Phân quyền sử dụng:</label>
-                    <select x-model="newUser.role" class="w-full px-3 py-2 border rounded-lg outline-none">
-                        <option value="doansinh">Đoàn Sinh</option>
-                        <option value="huynhtruong">Huynh Trưởng</option>
-                        <option value="admin">Quản trị viên</option>
-                    </select>
-
-                    <label class="block text-[11px] text-gray-600 font-semibold pt-1">Liên kết với Hồ sơ Đoàn sinh:</label>
-                    <select x-model="newUser.linkedId" class="w-full px-3 py-2 border rounded-lg outline-none">
-                        <option value="">-- Chọn hồ sơ Đoàn sinh để liên kết --</option>
-                        <template x-for="m in members" :key="m.id">
-                            <option :value="m.id" x-text="m.name + ' (' + m.dhName + ' - ' + m.group + ')'"></option>
+                    <h3 class="font-bold text-amber-900">✨ Cộng Lượt Quay Vòng Quay Tinh Tấn</h3>
+                    <select x-model="spinGrantUser" class="w-full px-2 py-1.5 border rounded bg-white font-semibold">
+                        <option value="">-- Chọn tài khoản --</option>
+                        <template x-for="acc in accounts" :key="acc.username">
+                            <option :value="acc.username" x-text="acc.username + ' (' + acc.name + ')'"></option>
                         </template>
                     </select>
-
-                    <button @click="createAccount" class="w-full bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700 mt-2">Tạo & Liên Kết Tài Khoản</button>
-                </div>
-
-                <div class="bg-white border rounded-xl p-3 shadow-sm space-y-2 text-xs">
-                    <div class="flex justify-between items-center border-b pb-1">
-                        <h3 class="font-bold text-gray-800">👥 Danh sách & Điều chỉnh tài khoản</h3>
-                        <span class="text-[10px] text-gray-400" x-text="'Tổng: ' + accounts.length"></span>
-                    </div>
-
-                    <div class="relative pt-1">
-                        <input type="text" x-model="searchAccountKeyword" placeholder="🔍 Tìm kiếm tên đăng nhập..." class="w-full px-3 py-2 border rounded-lg outline-none text-xs bg-gray-50 focus:bg-white transition">
-                    </div>
-
-                    <div class="space-y-3 max-h-72 overflow-y-auto pr-1">
-                        <template x-for="(acc, index) in filteredAccounts" :key="index">
-                            <div class="p-2.5 bg-gray-50 rounded border text-[11px] space-y-2">
-                                <div class="flex justify-between items-center">
-                                    <div>
-                                        <span class="font-bold text-blue-900" x-text="acc.username"></span>
-                                        <span x-show="acc.locked" class="text-[9px] bg-red-600 text-white px-1.5 py-0.5 rounded ml-1">ĐÃ KHÓA</span>
-                                    </div>
-                                    <button @click="toggleLockAccount(acc)" 
-                                        class="px-2 py-0.5 rounded font-bold text-[10px]"
-                                        :class="acc.locked ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'"
-                                        x-text="acc.locked ? 'Mở khóa' : 'Khóa TK'"></button>
-                                </div>
-
-                                <p class="text-gray-500 text-[10px]" x-text="'Hồ sơ liên kết: ' + getMemberNameById(acc.linkedId)"></p>
-
-                                <div class="flex items-center gap-2">
-                                    <span class="text-gray-500">Quyền:</span>
-                                    <select x-model="acc.role" @change="saveAccountsToFirebase()" class="flex-1 px-2 py-1 border rounded bg-white text-xs">
-                                        <option value="doansinh">Đoàn Sinh</option>
-                                        <option value="huynhtruong">Huynh Trưởng</option>
-                                        <option value="admin">Quản trị viên</option>
-                                    </select>
-                                </div>
-
-                                <div class="flex items-center gap-1 pt-1 border-t">
-                                    <input type="password" x-model="acc.newPasswordInput" placeholder="Mật khẩu mới..." class="flex-1 px-2 py-1 border rounded bg-white text-xs outline-none">
-                                    <button @click="changeAccountPassword(acc)" class="bg-blue-600 text-white px-2 py-1 rounded font-bold text-[10px]">Đổi mật khẩu</button>
-                                </div>
-                            </div>
-                        </template>
+                    <div class="flex gap-2">
+                        <input type="number" x-model.number="spinGrantAmount" placeholder="Số lượt quay..." class="flex-1 px-2 py-1.5 border rounded bg-white">
+                        <button @click="grantSpinTurns()" class="bg-amber-600 text-white font-bold px-3 py-1.5 rounded">Cộng Lượt</button>
                     </div>
                 </div>
             </div>
@@ -911,96 +524,26 @@
         <!-- NAVIGATION -->
         <nav class="bg-white border-t border-gray-200 fixed bottom-0 left-0 right-0 max-w-md mx-auto flex justify-around py-2 z-50 text-[10px]">
             <button @click="currentTab = 'home'" :class="currentTab === 'home' ? 'text-blue-900 font-bold' : 'text-gray-500'" class="flex flex-col items-center flex-1">
-                <span class="text-base">🏠</span>
-                <span>Trang chủ</span>
+                <span class="text-base">🏠</span><span>Trang chủ</span>
             </button>
             <button @click="currentTab = 'members'" :class="currentTab === 'members' ? 'text-blue-900 font-bold' : 'text-gray-500'" class="flex flex-col items-center flex-1">
-                <span class="text-base">👥</span>
-                <span x-text="currentUser && currentUser.role === 'doansinh' ? 'Hồ sơ' : 'Đoàn Sinh'"></span>
+                <span class="text-base">👥</span><span>Đoàn Sinh</span>
             </button>
             <button @click="currentTab = 'attendance'" :class="currentTab === 'attendance' ? 'text-blue-900 font-bold' : 'text-gray-500'" class="flex flex-col items-center flex-1">
-                <span class="text-base">📝</span>
-                <span>Điểm danh</span>
+                <span class="text-base">📝</span><span>Điểm danh</span>
             </button>
             <button @click="currentTab = 'leaderboard'" :class="currentTab === 'leaderboard' ? 'text-blue-900 font-bold' : 'text-gray-500'" class="flex flex-col items-center flex-1">
-                <span class="text-base">🏆</span>
-                <span>Xếp hạng</span>
+                <span class="text-base">🏆</span><span>Xếp hạng</span>
             </button>
             <button @click="currentTab = 'games'" :class="currentTab === 'games' ? 'text-blue-900 font-bold' : 'text-gray-500'" class="flex flex-col items-center flex-1">
-                <span class="text-base">🎮</span>
-                <span>Trò chơi</span>
+                <span class="text-base">🎮</span><span>Trò chơi</span>
             </button>
             <template x-if="currentUser && currentUser.role === 'admin'">
                 <button @click="currentTab = 'admin'" :class="currentTab === 'admin' ? 'text-blue-900 font-bold' : 'text-gray-500'" class="flex flex-col items-center flex-1">
-                    <span class="text-base">⚙️</span>
-                    <span>Quản trị</span>
+                    <span class="text-base">⚙️</span><span>Quản trị</span>
                 </button>
             </template>
         </nav>
-
-        <!-- MODAL THÊM / SỬA ĐOÀN SINH -->
-        <template x-if="showAddModal">
-            <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                <div class="bg-white rounded-2xl w-full max-w-sm p-4 space-y-3 max-h-[85vh] overflow-y-auto text-xs">
-                    <h3 class="font-bold text-sm text-blue-900" x-text="isEditMode ? 'Chỉnh Sửa Hồ Sơ' : 'Thêm Đoàn Sinh Mới'"></h3>
-                    
-                    <div class="grid grid-cols-2 gap-2">
-                        <div>
-                            <label class="block text-[10px] text-gray-500 font-semibold mb-1">Họ và tên:</label>
-                            <input type="text" x-model="newMember.name" placeholder="Họ tên" class="w-full px-2 py-1.5 border rounded outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] text-gray-500 font-semibold mb-1">Giới tính:</label>
-                            <select x-model="newMember.gender" class="w-full px-2 py-1.5 border rounded outline-none">
-                                <option value="Nam">Nam</option>
-                                <option value="Nữ">Nữ</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <input type="text" x-model="newMember.dhName" placeholder="Pháp danh" class="w-full px-3 py-2 border rounded outline-none">
-                    <input type="text" x-model="newMember.dob" placeholder="Ngày sinh (DD/MM/YYYY)" class="w-full px-3 py-2 border rounded outline-none">
-                    
-                    <label class="block text-[10px] text-gray-500 font-semibold mb-0.5">Thuộc Ngành / Đoàn:</label>
-                    <select x-model="newMember.group" class="w-full px-3 py-2 border rounded outline-none">
-                        <option value="Oanh Vũ">Đoàn Oanh Vũ</option>
-                        <option value="Thiếu">Đoàn Thiếu</option>
-                        <option value="Thanh">Đoàn Thanh</option>
-                        <option value="Huynh Trưởng">Huynh Trưởng</option>
-                    </select>
-
-                    <input type="text" x-model="newMember.phone" placeholder="SĐT cá nhân" class="w-full px-3 py-2 border rounded outline-none">
-                    <input type="text" x-model="newMember.parentPhone" placeholder="SĐT phụ huynh" class="w-full px-3 py-2 border rounded outline-none">
-                    <input type="text" x-model="newMember.address" placeholder="Địa chỉ cư trú" class="w-full px-3 py-2 border rounded outline-none">
-                    <input type="text" x-model="newMember.level" placeholder="Đã học bậc" class="w-full px-3 py-2 border rounded outline-none">
-                    
-                    <div class="flex gap-2 pt-2">
-                        <button @click="showAddModal = false" class="flex-1 bg-gray-200 py-2 rounded font-semibold">Hủy</button>
-                        <button @click="saveMember" class="flex-1 bg-blue-900 text-white py-2 rounded font-semibold">Lưu</button>
-                    </div>
-                </div>
-            </div>
-        </template>
-
-        <!-- MODAL THƯ MỤC KỸ NĂNG -->
-        <template x-if="showAddSkillModalState">
-            <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                <div class="bg-white rounded-2xl w-full max-w-sm p-4 space-y-3 text-xs max-h-[90vh] overflow-y-auto">
-                    <h3 class="font-bold text-sm text-blue-900" x-text="isEditSkillMode ? 'Chỉnh Sửa Thư Mục Kỹ Năng' : 'Tạo Thư Mục Kỹ Năng Mới'"></h3>
-                    <input type="text" x-model="skillForm.title" placeholder="Tên chuyên đề..." class="w-full px-2 py-1.5 border rounded">
-                    <input type="text" x-model="skillForm.desc" placeholder="Mô tả ngắn..." class="w-full px-2 py-1.5 border rounded">
-                    <textarea x-model="skillForm.content" placeholder="Nội dung chi tiết..." class="w-full px-2 py-1.5 border rounded h-20"></textarea>
-                    <input type="text" x-model="skillForm.imageUrl" placeholder="URL Hình ảnh (nếu có)" class="w-full px-2 py-1.5 border rounded">
-                    <input type="text" x-model="skillForm.linkUrl" placeholder="URL Link liên kết (nếu có)" class="w-full px-2 py-1.5 border rounded">
-                    <input type="text" x-model="skillForm.videoUrl" placeholder="URL Video nhúng (nếu có)" class="w-full px-2 py-1.5 border rounded">
-                    <div class="flex gap-2 pt-1">
-                        <button @click="showAddSkillModalState = false" class="flex-1 bg-gray-200 py-2 rounded font-semibold">Hủy</button>
-                        <button @click="saveSkillCategory" class="flex-1 bg-blue-900 text-white py-2 rounded font-semibold">Lưu Chuyên Đề</button>
-                    </div>
-                </div>
-            </div>
-        </template>
-
     </div>
 
     <!-- SCRIPT CHÍNH -->
@@ -1024,37 +567,7 @@
                 currentTab: 'home',
                 lbTab: 'attendance',
                 gameSubTab: 'wheel',
-                attendanceTimeFilter: 'ngay',
-                selectedFilterDate: new Date().toISOString().split('T')[0],
-                attendanceSearchKeyword: '',
-                searchPointMember: '',
-                searchAccountKeyword: '',
-                memberSearch: '',
-                memberFilterGroup: 'all',
-                editingSocial: false,
-
-                showBannerConfig: false,
-                showAddModal: false,
-                showAddSkillModalState: false,
-                isEditMode: false,
-                isEditSkillMode: false,
-
-                bannerConfig: {
-                    title: 'Nam Mô Bổn Sư Thích Ca Mâu Ni Phật',
-                    subtitle: 'Cổng thông tin nội bộ Gia Đình Phật Tử Minh Quang.',
-                    icon: '🪷',
-                    textColor: 'text-blue-900',
-                    fontClass: '',
-                    sizeClass: 'text-lg',
-                    bgClass: 'bg-blue-50 border-blue-200'
-                },
-
-                socialLinks: {
-                    facebook: 'https://facebook.com',
-                    groupFb: 'https://facebook.com/groups',
-                    tiktok: 'https://tiktok.com'
-                },
-
+                attendanceDate: new Date().toISOString().split('T')[0],
                 accounts: [],
                 members: [],
                 announcements: [],
@@ -1062,16 +575,10 @@
                 skillsList: [],
                 dailyAttendanceData: {},
 
-                newUser: { username: '', password: '', role: 'doansinh', linkedId: '' },
-                editingBHT: false,
-                newAnn: { title: '', content: '' },
-                newMember: { id: null, name: '', dhName: '', gender: 'Nam', dob: '', group: 'Thiếu', phone: '', parentPhone: '', address: '', level: '', status: 'Đang sinh hoạt', attendanceStatus: 'Chưa điểm danh', attendanceRate: 100, points: 100 },
-                myAttendanceHistory: [],
-                attendanceDate: new Date().toISOString().split('T')[0],
-                selectedSkill: null,
-                skillForm: { id: null, title: '', desc: '', content: '', imageUrl: '', linkUrl: '', videoUrl: '' },
+                bannerConfig: { title: 'Nam Mô Bổn Sư Thích Ca Mâu Ni Phật', subtitle: 'Cổng thông tin nội bộ Gia Đình Phật Tử Minh Quang.', icon: '🪷', textColor: 'text-blue-900', fontClass: '', sizeClass: 'text-lg', bgClass: 'bg-blue-50 border-blue-200' },
+                socialLinks: { facebook: 'https://facebook.com', groupFb: 'https://facebook.com/groups', tiktok: 'https://tiktok.com' },
 
-                // MODULE TRÒ CHƠI BỔ SUNG
+                // MODULE TRÒ CHƠI
                 mySpinTurns: 0,
                 spinGrantUser: '',
                 spinGrantAmount: 1,
@@ -1094,85 +601,56 @@
                 lastSpinResult: null,
                 wheelHistory: [],
 
+                // Đố Phật Pháp
                 showQuizConfig: false,
                 quizDuration: 30,
                 quizTimer: 30,
+                quizStarted: false,
                 currentQuizIdx: 0,
                 userAnswers: {},
                 quizFinished: false,
                 quizScore: 0,
+                quizTimerInterval: null,
                 newQuiz: { question: '', opt1: '', opt2: '', opt3: '', opt4: '', correct: '0' },
                 quizList: [
                     { question: 'Quy y Tam Bảo bao gồm những gì?', options: ['Phật - Pháp - Tăng', 'Cha - Mẹ - Thầy', 'Đức hạnh - Trí tuệ', 'Giới - Định - Tuệ'], correct: 0 }
                 ],
 
+                // Sự Kiện
                 eventsList: [{ id: 1, title: 'Đố vui Phật pháp online', content: 'Tham gia trả lời câu hỏi nhận điểm thưởng.', date: 'Chủ Nhật hàng tuần' }],
+                showEventForm: false,
+                isEditEventMode: false,
+                eventForm: { id: null, title: '', content: '', date: '' },
+
+                // Shop Quà
                 shopItems: [{ id: 1, name: 'Tràng hạt niệm Phật', price: 100 }, { id: 2, name: 'Huy hiệu GĐPT', price: 50 }],
                 showShopConfig: false,
                 newShopItem: { name: '', price: 0 },
                 myShopHistory: [],
+
+                // Kho Tài Liệu
                 documentsList: [{ id: 1, title: 'Nội quy GĐPT Việt Nam', desc: 'Tài liệu học tập huynh trưởng và đoàn sinh', linkUrl: '#' }],
+                showDocForm: false,
+                isEditDocMode: false,
+                docForm: { id: null, title: '', desc: '', linkUrl: '' },
 
                 initFirebase() {
-                    if (!firebase.apps.length) {
-                        firebase.initializeApp(firebaseConfig);
-                    }
+                    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
                     const db = firebase.database();
-
-                    db.ref('members').on('value', (snapshot) => {
-                        const data = snapshot.val();
-                        if (data) {
-                            this.members = Object.values(data);
-                        } else {
-                            this.members = [];
-                            this.saveMembersToFirebase();
-                        }
-                    });
-
-                    db.ref('accounts').on('value', (snapshot) => {
-                        const data = snapshot.val();
-                        if (data) {
-                            this.accounts = Object.values(data);
-                        } else {
-                            this.accounts = [];
-                        }
-                    });
-
-                    db.ref('dailyAttendance').on('value', (snapshot) => {
-                        this.dailyAttendanceData = snapshot.val() || {};
-                    });
-
-                    db.ref('announcements').on('value', (snapshot) => {
-                        this.announcements = snapshot.val() ? Object.values(snapshot.val()) : [{ title: 'Thông báo khai mạc', content: 'Chào mừng đến với cổng thông tin GĐPT Minh Quang online.', date: '15/10/2026' }];
-                    });
-
-                    db.ref('bhtList').on('value', (snapshot) => {
-                        this.bhtList = snapshot.val() ? Object.values(snapshot.val()) : [];
-                    });
-
-                    db.ref('skillsList').on('value', (snapshot) => {
-                        this.skillsList = snapshot.val() ? Object.values(snapshot.val()) : [];
-                    });
-
-                    db.ref('gamesData').on('value', (snapshot) => {
-                        const data = snapshot.val();
+                    db.ref('members').on('value', (s) => { this.members = s.val() ? Object.values(s.val()) : []; });
+                    db.ref('accounts').on('value', (s) => { this.accounts = s.val() ? Object.values(s.val()) : []; });
+                    db.ref('gamesData').on('value', (s) => {
+                        const data = s.val();
                         if (data) {
                             if (data.wheelItems) this.wheelItems = data.wheelItems;
                             if (data.quizList) this.quizList = data.quizList;
                             if (data.shopItems) this.shopItems = data.shopItems;
-                        }
-                    });
-
-                    db.ref('settings').on('value', (snapshot) => {
-                        const data = snapshot.val();
-                        if (data) {
-                            if (data.socialLinks) this.socialLinks = data.socialLinks;
-                            if (data.bannerConfig) this.bannerConfig = data.bannerConfig;
+                            if (data.eventsList) this.eventsList = data.eventsList;
+                            if (data.documentsList) this.documentsList = data.documentsList;
                         }
                     });
                 },
 
-                // Lấy Điểm Tinh Tấn hiện có của người dùng
                 get currentTinhTanPoints() {
                     if (this.currentUser && this.currentUser.linkedId) {
                         const m = this.members.find(item => item.id == this.currentUser.linkedId);
@@ -1181,7 +659,6 @@
                     return 0;
                 },
 
-                // Công thức tạo đường cong SVG cho Vòng Quay
                 getSvgArcPath(index, total) {
                     const angle = 360 / total;
                     const startAngle = index * angle;
@@ -1193,7 +670,6 @@
                     return `M 100 100 L ${x1} ${y1} A 100 100 0 0 1 ${x2} ${y2} Z`;
                 },
 
-                // Tính tọa độ chữ nằm ngang chuẩn xác trên từng ô SVG
                 getSvgTextCoords(index, total) {
                     const angle = index * (360 / total) + (360 / total / 2);
                     const radius = 68;
@@ -1202,73 +678,42 @@
                     return { x, y };
                 },
 
-                // Admin cộng thêm lượt quay cho bất kỳ tài khoản nào
                 grantSpinTurns() {
                     if (!this.spinGrantUser) return alert('Vui lòng chọn tài khoản!');
-                    if (!this.spinGrantAmount || this.spinGrantAmount <= 0) return alert('Nhập số lượt quay hợp lệ!');
-
                     const userRef = firebase.database().ref('userGameData/' + this.spinGrantUser);
                     userRef.once('value', (snapshot) => {
                         const data = snapshot.val() || {};
                         const newTurns = (data.spinTurns || 0) + Number(this.spinGrantAmount);
                         userRef.update({ spinTurns: newTurns });
-
-                        if (this.currentUser && this.currentUser.username === this.spinGrantUser) {
-                            this.mySpinTurns = newTurns;
-                        }
-                        alert('Đã cộng thành công ' + this.spinGrantAmount + ' lượt quay cho tài khoản: ' + this.spinGrantUser);
+                        if (this.currentUser && this.currentUser.username === this.spinGrantUser) this.mySpinTurns = newTurns;
+                        alert('Đã cộng thành công lượt quay!');
                     });
                 },
 
-                // Vòng quay 6 giây chuẩn
                 spinWheel() {
                     if (this.isSpinning) return;
-                    if (this.mySpinTurns <= 0) {
-                        alert('Bạn đã hết lượt quay! Hãy điểm danh sinh hoạt vào Chủ Nhật để nhận thêm lượt.');
-                        return;
-                    }
+                    if (this.mySpinTurns <= 0) return alert('Bạn đã hết lượt quay!');
                     this.isSpinning = true;
                     this.mySpinTurns--;
 
-                    let rand = Math.random() * 100;
-                    let cumulative = 0;
-                    let selectedIdx = 0;
+                    let rand = Math.random() * 100, cumulative = 0, selectedIdx = 0;
                     for (let i = 0; i < this.wheelItems.length; i++) {
                         cumulative += this.wheelItems[i].rate;
-                        if (rand <= cumulative) {
-                            selectedIdx = i;
-                            break;
-                        }
+                        if (rand <= cumulative) { selectedIdx = i; break; }
                     }
                     const selected = this.wheelItems[selectedIdx];
-                    const extraRounds = 6;
-                    const targetAngle = 360 * extraRounds + (360 - (selectedIdx * 36 + 18));
+                    const targetAngle = 360 * 6 + (360 - (selectedIdx * 36 + 18));
                     this.wheelRotation = targetAngle;
-
-                    const disk = document.getElementById('wheelDisk');
-                    if (disk) {
-                        disk.style.transition = 'transform 6s cubic-bezier(0.15, 0.85, 0.15, 1)';
-                        disk.style.transform = `rotate(${targetAngle}deg)`;
-                    }
 
                     setTimeout(() => {
                         this.isSpinning = false;
                         this.lastSpinResult = selected;
-                        const record = { date: new Date().toLocaleDateString('vi-VN'), reward: selected.name };
-                        this.wheelHistory.unshift(record);
-
+                        this.wheelHistory.unshift({ date: new Date().toLocaleDateString('vi-VN'), reward: selected.name });
                         if (selected.points > 0 && this.currentUser.linkedId) {
                             const member = this.members.find(m => m.id == this.currentUser.linkedId);
-                            if (member) {
-                                member.tinhTanPoints = (member.tinhTanPoints || 0) + selected.points;
-                                this.saveMembersToFirebase();
-                            }
+                            if (member) { member.tinhTanPoints = (member.tinhTanPoints || 0) + selected.points; firebase.database().ref('members').set(this.members); }
                         }
-
-                        firebase.database().ref('userGameData/' + this.currentUser.username).update({
-                            spinTurns: this.mySpinTurns,
-                            wheelHistory: this.wheelHistory
-                        });
+                        firebase.database().ref('userGameData/' + this.currentUser.username).update({ spinTurns: this.mySpinTurns, wheelHistory: this.wheelHistory });
                     }, 6000);
                 },
 
@@ -1278,224 +723,141 @@
                     this.showWheelConfig = false;
                 },
 
+                // Logic Đố Phật Pháp
+                startQuiz() {
+                    this.quizStarted = true;
+                    this.quizFinished = false;
+                    this.currentQuizIdx = 0;
+                    this.userAnswers = {};
+                    this.quizTimer = this.quizDuration;
+                    if (this.quizTimerInterval) clearInterval(this.quizTimerInterval);
+                    this.quizTimerInterval = setInterval(() => {
+                        if (this.quizTimer > 0) {
+                            this.quizTimer--;
+                        } else {
+                            clearInterval(this.quizTimerInterval);
+                            this.finishQuiz();
+                        }
+                    }, 1000);
+                },
+                nextQuizQuestion() {
+                    if (this.currentQuizIdx < this.quizList.length - 1) {
+                        this.currentQuizIdx++;
+                    } else {
+                        if (this.quizTimerInterval) clearInterval(this.quizTimerInterval);
+                        this.finishQuiz();
+                    }
+                },
+                finishQuiz() {
+                    let score = 0;
+                    this.quizList.forEach((q, idx) => { if (this.userAnswers[idx] === q.correct) score++; });
+                    this.quizScore = score;
+                    this.quizFinished = true;
+                    this.quizStarted = false;
+                },
+                resetQuiz() {
+                    this.quizStarted = false;
+                    this.quizFinished = false;
+                    this.currentQuizIdx = 0;
+                    this.userAnswers = {};
+                },
+
+                // Logic Sự Kiện
+                openAddEventModal() {
+                    this.isEditEventMode = false;
+                    this.eventForm = { id: Date.now(), title: '', content: '', date: '' };
+                    this.showEventForm = true;
+                },
+                editEvent(ev) {
+                    this.isEditEventMode = true;
+                    this.eventForm = { ...ev };
+                    this.showEventForm = true;
+                },
+                saveEvent() {
+                    if (!this.eventForm.title) return alert('Nhập tiêu đề!');
+                    if (this.isEditEventMode) {
+                        const idx = this.eventsList.findIndex(e => e.id === this.eventForm.id);
+                        if (idx !== -1) this.eventsList[idx] = { ...this.eventForm };
+                    } else {
+                        this.eventsList.push({ ...this.eventForm });
+                    }
+                    firebase.database().ref('gamesData/eventsList').set(this.eventsList);
+                    this.showEventForm = false;
+                    alert('Đã lưu sự kiện!');
+                },
+                deleteEvent(id) {
+                    if (confirm('Xóa sự kiện này?')) {
+                        this.eventsList = this.eventsList.filter(e => e.id !== id);
+                        firebase.database().ref('gamesData/eventsList').set(this.eventsList);
+                    }
+                },
+
+                // Logic Shop
                 saveShopItem() {
                     if (!this.newShopItem.name) return;
                     this.shopItems.push({ id: Date.now(), ...this.newShopItem });
                     firebase.database().ref('gamesData/shopItems').set(this.shopItems);
                     this.newShopItem = { name: '', price: 0 };
-                    alert('Đã thêm vật phẩm mới!');
+                    alert('Đã thêm quà!');
                 },
-
                 deleteShopItem(itemId) {
-                    if (confirm('Bạn có chắc muốn xóa vật phẩm này khỏi Shop?')) {
-                        this.shopItems = this.shopItems.filter(item => item.id !== itemId);
-                        firebase.database().ref('gamesData/shopItems').set(this.shopItems);
-                    }
+                    this.shopItems = this.shopItems.filter(item => item.id !== itemId);
+                    firebase.database().ref('gamesData/shopItems').set(this.shopItems);
                 },
-
                 buyShopItem(item) {
                     const member = this.members.find(m => m.id == this.currentUser.linkedId);
-                    if (!member || (member.tinhTanPoints || 0) < item.price) {
-                        alert('Bạn không đủ Điểm Tinh Tấn!');
-                        return;
-                    }
+                    if (!member || (member.tinhTanPoints || 0) < item.price) return alert('Không đủ điểm!');
                     member.tinhTanPoints -= item.price;
-                    this.saveMembersToFirebase();
-
-                    const record = { date: new Date().toLocaleDateString('vi-VN'), itemName: item.name, price: item.price, username: this.currentUser.username };
-                    this.myShopHistory.unshift(record);
-
-                    firebase.database().ref('userGameData/' + this.currentUser.username).update({ myShopHistory: this.myShopHistory });
+                    firebase.database().ref('members').set(this.members);
                     alert('Đổi quà thành công!');
+                },
+
+                // Logic Kho Tài Liệu
+                openAddDocModal() {
+                    this.isEditDocMode = false;
+                    this.docForm = { id: Date.now(), title: '', desc: '', linkUrl: '#' };
+                    this.showDocForm = true;
+                },
+                editDocument(doc) {
+                    this.isEditDocMode = true;
+                    this.docForm = { ...doc };
+                    this.showDocForm = true;
+                },
+                saveDocument() {
+                    if (!this.docForm.title) return alert('Nhập tiêu đề tài liệu!');
+                    if (this.isEditDocMode) {
+                        const idx = this.documentsList.findIndex(d => d.id === this.docForm.id);
+                        if (idx !== -1) this.documentsList[idx] = { ...this.docForm };
+                    } else {
+                        this.documentsList.push({ ...this.docForm });
+                    }
+                    firebase.database().ref('gamesData/documentsList').set(this.documentsList);
+                    this.showDocForm = false;
+                    alert('Đã lưu tài liệu!');
+                },
+                deleteDocument(id) {
+                    if (confirm('Xóa tài liệu này?')) {
+                        this.documentsList = this.documentsList.filter(d => d.id !== id);
+                        firebase.database().ref('gamesData/documentsList').set(this.documentsList);
+                    }
                 },
 
                 login() {
                     const found = this.accounts.find(a => a.username === this.loginForm.username && a.password === this.loginForm.password);
                     if (found) {
-                        if (found.locked) {
-                            this.loginError = 'Tài khoản đã bị KHÓA!';
-                            return;
-                        }
                         this.currentUser = found;
                         this.isLoggedIn = true;
-                        this.loginError = '';
-                        
-                        firebase.database().ref('attendanceHistory/' + found.username).once('value', (snapshot) => {
-                            const data = snapshot.val();
-                            this.myAttendanceHistory = data ? Object.values(data) : [];
-                        });
-
-                        firebase.database().ref('userGameData/' + found.username).once('value', (snapshot) => {
-                            const data = snapshot.val();
+                        firebase.database().ref('userGameData/' + found.username).once('value', (s) => {
+                            const data = s.val();
                             this.mySpinTurns = data ? (data.spinTurns || 0) : 0;
-                            this.wheelHistory = data ? (data.wheelHistory || []) : [];
-                            this.myShopHistory = data ? (data.myShopHistory || []) : [];
                         });
                     } else {
-                        this.loginError = 'Sai tên đăng nhập hoặc mật khẩu!';
+                        this.loginError = 'Sai tài khoản hoặc mật khẩu!';
                     }
                 },
-
-                logout() {
-                    this.isLoggedIn = false;
-                    this.loginForm = { username: '', password: '' };
-                    this.currentUser = null;
-                    this.myAttendanceHistory = [];
-                },
-
-                addNewBHTPosition() {
-                    this.bhtList.push({ id: Date.now(), role: 'Chức vụ mới', dhName: 'Pháp danh', name: 'Họ tên', phone: '090xxxxxxx', colorClass: 'bg-blue-50 border-blue-500' });
-                },
-                removeBHTPosition(idx) { this.bhtList.splice(idx, 1); },
-                saveBHTList() { this.editingBHT = false; firebase.database().ref('bhtList').set(this.bhtList); alert('Đã lưu BHT!'); },
-
-                openAddSkillModal() { this.isEditSkillMode = false; this.skillForm = { id: Date.now(), title: '', desc: '', content: '', icon: '📁', imageUrl: '', linkUrl: '', videoUrl: '' }; this.showAddSkillModalState = true; },
-                editSkillModal(skill) { this.isEditSkillMode = true; this.skillForm = { ...skill }; this.showAddSkillModalState = true; },
-                saveSkillCategory() {
-                    if (!this.skillForm.title) return alert('Vui lòng nhập tên!');
-                    if (this.isEditSkillMode) {
-                        const idx = this.skillsList.findIndex(s => s.id === this.skillForm.id);
-                        if (idx !== -1) this.skillsList[idx] = { ...this.skillForm };
-                    } else { this.skillsList.push({ ...this.skillForm }); }
-                    this.saveSkillsToFirebase();
-                    this.showAddSkillModalState = false;
-                },
-                deleteSkillCategory(id) { if (confirm('Xóa chuyên đề?')) { this.skillsList = this.skillsList.filter(s => s.id !== id); this.saveSkillsToFirebase(); } },
-                saveSkillsToFirebase() { firebase.database().ref('skillsList').set(this.skillsList); },
-
-                exportAttendanceToExcel() {
-                    if (!this.members || this.members.length === 0) return alert('Không có dữ liệu!');
-                    const targetDate = this.selectedFilterDate;
-                    const dateRecords = this.dailyAttendanceData[targetDate] || {};
-                    let csvContent = "\uFEFFSTT,Họ và tên,Pháp danh,Giới tính,Đoàn/Ngành,Trạng thái điểm danh ngày " + targetDate + ",Tỷ lệ đi sinh hoạt (%),Địa chỉ\n";
-                    this.members.forEach((m, index) => {
-                        csvContent += `${index + 1},"${m.name || ''}","${m.dhName || ''}","${m.gender || 'Nam'}","${m.group || ''}","${dateRecords[m.id] || 'Chưa điểm danh'}","${m.attendanceRate || 100}%","${m.address || ''}"\n`;
-                    });
-                    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                    const link = document.createElement('a');
-                    link.href = URL.createObjectURL(blob);
-                    link.download = `Bao_Cao_Diem_Danh_${targetDate}.csv`;
-                    link.click();
-                },
-
-                get filteredAccounts() { return !this.searchAccountKeyword ? this.accounts : this.accounts.filter(acc => acc.username.toLowerCase().includes(this.searchAccountKeyword.toLowerCase())); },
-                saveMembersToFirebase() { firebase.database().ref('members').set(this.members); },
-                saveAccountsToFirebase() { firebase.database().ref('accounts').set(this.accounts); },
-                saveAnnouncementsToFirebase() { firebase.database().ref('announcements').set(this.announcements); },
-                saveSocialLinks() { this.editingSocial = false; firebase.database().ref('settings/socialLinks').set(this.socialLinks); alert('Đã lưu!'); },
-                saveBannerConfig() { this.showBannerConfig = false; firebase.database().ref('settings/bannerConfig').set(this.bannerConfig); alert('Đã lưu Banner!'); },
-
-                get filteredPointMembers() {
-                    let sorted = [...this.members].sort((a, b) => b.points - a.points);
-                    return this.searchPointMember ? sorted.filter(m => m.name.toLowerCase().includes(this.searchPointMember.toLowerCase()) || m.dhName.toLowerCase().includes(this.searchPointMember.toLowerCase())) : sorted;
-                },
-
-                get attendanceLeaderboard() { return [...this.members].sort((a, b) => (b.attendanceRate || 100) - (a.attendanceRate || 100)); },
-
-                get attendanceReportList() {
-                    const targetDate = this.selectedFilterDate;
-                    const dateRecords = this.dailyAttendanceData[targetDate] || {};
-                    const search = (this.attendanceSearchKeyword || '').trim().toLowerCase();
-                    return this.members.filter(m => {
-                        const status = dateRecords[m.id];
-                        const matchSearch = !search || m.name.toLowerCase().includes(search) || (m.dhName && m.dhName.toLowerCase().includes(search));
-                        return search ? matchSearch : status && status !== 'Chưa điểm danh';
-                    });
-                },
-
+                logout() { this.isLoggedIn = false; this.currentUser = null; },
                 getRoleName(role) { return role === 'admin' ? 'Quản trị viên' : (role === 'huynhtruong' ? 'Huynh Trưởng' : 'Đoàn Sinh'); },
-                getMemberNameById(id) { const found = this.members.find(m => m.id == id); return found ? found.name + ' (' + found.dhName + ')' : 'Chưa liên kết'; },
-                getLinkedUsername(memberId) { const acc = this.accounts.find(a => a.linkedId == memberId); return acc ? acc.username : 'Chưa liên kết'; },
-                countMembersByGroup(groupName) { return this.members.filter(m => m.group === groupName).length; },
-                countMembersByStatus(statusName) { return this.members.filter(m => m.status === statusName).length; },
-                countAttendanceByDate(status) { return Object.values(this.dailyAttendanceData[this.selectedFilterDate] || {}).filter(s => s === status).length; },
-                getMemberStatusForSelectedDate(memberId) { return (this.dailyAttendanceData[this.selectedFilterDate] && this.dailyAttendanceData[this.selectedFilterDate][memberId]) || 'Chưa điểm danh'; },
-
-                updateMemberAttendanceForSelectedDate(memberId, status) {
-                    const targetDate = this.selectedFilterDate;
-                    if (!this.dailyAttendanceData[targetDate]) this.dailyAttendanceData[targetDate] = {};
-                    this.dailyAttendanceData[targetDate][memberId] = status;
-                    firebase.database().ref('dailyAttendance/' + targetDate + '/' + memberId).set(status);
-
-                    if (targetDate === this.attendanceDate) {
-                        const member = this.members.find(m => m.id == memberId);
-                        if (member) { member.attendanceStatus = status; this.saveMembersToFirebase(); }
-                    }
-                },
-
-                get filteredMembers() {
-                    if (this.currentUser && this.currentUser.role === 'doansinh') return this.members.filter(m => m.id == this.currentUser.linkedId);
-                    return this.members.filter(m => {
-                        const search = (this.memberSearch || '').toLowerCase();
-                        return (!search || m.name.toLowerCase().includes(search) || (m.dhName && m.dhName.toLowerCase().includes(search))) && (this.memberFilterGroup === 'all' || m.group === this.memberFilterGroup);
-                    });
-                },
-
-                changeAccountPassword(acc) {
-                    if (!acc.newPasswordInput) return alert('Nhập mật khẩu mới!');
-                    acc.password = acc.newPasswordInput; acc.newPasswordInput = ''; this.saveAccountsToFirebase(); alert('Đã đổi mật khẩu!');
-                },
-
-                applyCustomPoints(member) {
-                    if (member.inputPoint !== undefined && member.inputPoint !== null) {
-                        member.points = Number(member.inputPoint); member.inputPoint = null; this.saveMembersToFirebase(); alert('Cập nhật điểm thành công!');
-                    }
-                },
-
-                adjustPoints(member, delta) { member.points += delta; this.saveMembersToFirebase(); },
-
-                createAccount() {
-                    if(!this.newUser.username || !this.newUser.password) return alert('Nhập tên đăng nhập và mật khẩu!');
-                    this.accounts.push({ username: this.newUser.username, password: this.newUser.password, name: this.newUser.username, role: this.newUser.role, locked: false, linkedId: this.newUser.linkedId });
-                    this.saveAccountsToFirebase();
-                    this.newUser = { username: '', password: '', role: 'doansinh', linkedId: '' };
-                    alert('Tạo tài khoản thành công!');
-                },
-
-                submitSelfAttendance(status) {
-                    if (!this.currentUser) return;
-                    const now = new Date();
-                    const todayStr = now.toISOString().split('T')[0];
-                    if (this.attendanceDate !== todayStr) return alert('Chỉ có thể điểm danh ngày hôm nay!');
-
-                    const alreadyChecked = this.myAttendanceHistory.some(h => h.date === this.attendanceDate);
-                    if (alreadyChecked) return alert('Bạn đã điểm danh cho ngày này rồi!');
-
-                    this.myAttendanceHistory.unshift({ date: this.attendanceDate, status: status });
-                    firebase.database().ref('attendanceHistory/' + this.currentUser.username).set(this.myAttendanceHistory);
-
-                    this.mySpinTurns++;
-                    firebase.database().ref('userGameData/' + this.currentUser.username).update({ spinTurns: this.mySpinTurns });
-
-                    if (this.currentUser.linkedId) {
-                        const member = this.members.find(m => m.id == this.currentUser.linkedId);
-                        if (member) {
-                            member.attendanceStatus = status;
-                            const totalSessions = this.myAttendanceHistory.length;
-                            const presentSessions = this.myAttendanceHistory.filter(h => h.status === 'Có mặt').length;
-                            member.attendanceRate = totalSessions > 0 ? Math.round((presentSessions / totalSessions) * 100) : 100;
-                            this.saveMembersToFirebase();
-                            this.updateMemberAttendanceForSelectedDate(member.id, status);
-                        }
-                    }
-                    alert('Điểm danh thành công! Bạn nhận được +1 lượt quay.');
-                },
-
-                openAddMemberModal() { this.isEditMode = false; this.newMember = { id: Date.now(), name: '', dhName: '', gender: 'Nam', dob: '', group: 'Thiếu', phone: '', parentPhone: '', address: '', level: '', status: 'Đang sinh hoạt', attendanceStatus: 'Chưa điểm danh', attendanceRate: 100, points: 100 }; this.showAddModal = true; },
-                editMemberProfile(m) { this.isEditMode = true; this.newMember = { ...m }; this.showAddModal = true; },
-                deleteMember(id) { if (confirm('Xóa hồ sơ?')) { this.members = this.members.filter(m => m.id !== id); this.saveMembersToFirebase(); } },
-                saveMember() {
-                    if(!this.newMember.name) return alert('Nhập họ tên!');
-                    if (this.isEditMode) { const idx = this.members.findIndex(m => m.id === this.newMember.id); if (idx !== -1) this.members[idx] = { ...this.newMember }; }
-                    else { this.members.push({ ...this.newMember }); }
-                    this.saveMembersToFirebase(); this.showAddModal = false; alert('Đã lưu!');
-                },
-                toggleLockAccount(acc) { acc.locked = !acc.locked; this.saveAccountsToFirebase(); },
-                addAnnouncement() { if (!this.newAnn.title) return; this.announcements.unshift({ ...this.newAnn, date: new Date().toLocaleDateString('vi-VN') }); this.saveAnnouncementsToFirebase(); this.newAnn = { title: '', content: '' }; },
-                deleteAnnouncement(idx) { this.announcements.splice(idx, 1); this.saveAnnouncementsToFirebase(); },
-                addQuizQuestion() { if (!this.newQuiz.question) return; this.quizList.push({ question: this.newQuiz.question, options: [this.newQuiz.opt1, this.newQuiz.opt2, this.newQuiz.opt3, this.newQuiz.opt4], correct: Number(this.newQuiz.correct) }); firebase.database().ref('gamesData/quizList').set(this.quizList); this.newQuiz = { question: '', opt1: '', opt2: '', opt3: '', opt4: '', correct: '0' }; alert('Đã thêm câu hỏi!'); },
-                nextQuizQuestion() { if (this.currentQuizIdx < this.quizList.length - 1) { this.currentQuizIdx++; } else { let score = 0; this.quizList.forEach((q, idx) => { if (this.userAnswers[idx] === q.correct) score++; }); this.quizScore = score; this.quizFinished = true; } },
-                resetQuiz() { this.currentQuizIdx = 0; this.userAnswers = {}; this.quizFinished = false; }
+                get filteredMembers() { return this.currentUser && this.currentUser.role === 'doansinh' ? this.members.filter(m => m.id == this.currentUser.linkedId) : this.members; }
             }
         }
     </script>

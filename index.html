@@ -329,6 +329,7 @@
                                 <span>✋</span> XIN VẮNG
                             </button>
                         </div>
+                        <p class="text-[10px] text-gray-400 italic mt-1">Lưu ý: Chỉ điểm danh được vào ngày Chủ Nhật từ 14:00 - 17:00 (Báo vắng từ 07:00 - 17:00).</p>
                     </div>
 
                     <!-- Lịch sử điểm danh cá nhân -->
@@ -384,35 +385,47 @@
                         <div class="grid grid-cols-3 gap-2 text-center my-2">
                             <div class="bg-green-50 border border-green-200 p-2 rounded-lg">
                                 <p class="text-[10px] text-gray-500">Có mặt</p>
-                                <p class="font-bold text-base text-green-700" x-text="countAttendance('Có mặt')"></p>
+                                <p class="font-bold text-base text-green-700" x-text="countAttendanceByDate('Có mặt')"></p>
                             </div>
                             <div class="bg-amber-50 border border-amber-200 p-2 rounded-lg">
                                 <p class="text-[10px] text-gray-500">Vắng có phép</p>
-                                <p class="font-bold text-base text-amber-700" x-text="countAttendance('Vắng có phép')"></p>
+                                <p class="font-bold text-base text-amber-700" x-text="countAttendanceByDate('Vắng có phép')"></p>
                             </div>
                             <div class="bg-red-50 border border-red-200 p-2 rounded-lg">
                                 <p class="text-[10px] text-gray-500">Vắng không phép</p>
-                                <p class="font-bold text-base text-red-700" x-text="countAttendance('Vắng không phép')"></p>
+                                <p class="font-bold text-base text-red-700" x-text="countAttendanceByDate('Vắng không phép')"></p>
+                            </div>
+                        </div>
+
+                        <!-- Ô TÌM TÊN ĐỂ ĐIỂM DANH HỘ -->
+                        <div class="bg-blue-50/60 border border-blue-200 p-2.5 rounded-xl space-y-2 mt-3">
+                            <p class="font-bold text-blue-900 text-[11px] flex items-center gap-1">
+                                <span>✍️ Điểm danh hộ / Tìm kiếm đoàn sinh:</span>
+                            </p>
+                            <div class="relative">
+                                <input type="text" x-model="attendanceSearchKeyword" placeholder="🔍 Nhập tên hoặc pháp danh..." class="w-full px-3 py-1.5 border rounded-lg text-xs bg-white outline-none">
                             </div>
                         </div>
 
                         <div class="space-y-2 pt-2">
                             <div class="flex justify-between items-center font-bold text-gray-700">
-                                <span>Bảng điểm danh chi tiết (Chỉ hiển thị người đã điểm danh/báo vắng):</span>
+                                <span x-text="attendanceSearchKeyword ? 'Kết quả tìm kiếm đoàn sinh:' : 'Bảng điểm danh chi tiết ngày ' + selectedFilterDate + ':'"></span>
                             </div>
                             <div class="space-y-2 max-h-60 overflow-y-auto pr-1 divide-y">
                                 <template x-for="m in attendanceReportList" :key="m.id">
                                     <div class="pt-2 flex items-center justify-between">
                                         <div>
                                             <p class="font-semibold text-gray-800" x-text="m.name"></p>
-                                            <p class="text-[10px] text-gray-400" x-text="m.group"></p>
+                                            <p class="text-[10px] text-gray-400" x-text="(m.dhName ? m.dhName + ' - ' : '') + m.group"></p>
                                         </div>
-                                        <select x-model="m.attendanceStatus" @change="saveMembersToFirebase()" class="px-2 py-1 border rounded text-xs outline-none font-semibold"
+                                        <select :value="getMemberStatusForSelectedDate(m.id)" @change="updateMemberAttendanceForSelectedDate(m.id, $event.target.value)" class="px-2 py-1 border rounded text-xs outline-none font-semibold"
                                             :class="{
-                                                'bg-green-50 text-green-700 border-green-300': m.attendanceStatus === 'Có mặt',
-                                                'bg-amber-50 text-amber-700 border-amber-300': m.attendanceStatus === 'Vắng có phép',
-                                                'bg-red-50 text-red-700 border-red-300': m.attendanceStatus === 'Vắng không phép'
+                                                'bg-green-50 text-green-700 border-green-300': getMemberStatusForSelectedDate(m.id) === 'Có mặt',
+                                                'bg-amber-50 text-amber-700 border-amber-300': getMemberStatusForSelectedDate(m.id) === 'Vắng có phép',
+                                                'bg-red-50 text-red-700 border-red-300': getMemberStatusForSelectedDate(m.id) === 'Vắng không phép',
+                                                'bg-gray-50 text-gray-500 border-gray-300': getMemberStatusForSelectedDate(m.id) === 'Chưa điểm danh'
                                             }">
+                                            <option value="Chưa điểm danh">Chưa điểm danh</option>
                                             <option value="Có mặt">Có mặt</option>
                                             <option value="Vắng có phép">Vắng có phép</option>
                                             <option value="Vắng không phép">Vắng không phép</option>
@@ -420,7 +433,7 @@
                                     </div>
                                 </template>
                                 <template x-if="attendanceReportList.length === 0">
-                                    <p class="text-gray-400 text-center py-2 italic text-[11px]">Chưa có dữ liệu điểm danh hoặc báo vắng nào.</p>
+                                    <p class="text-gray-400 text-center py-2 italic text-[11px]">Không có dữ liệu phù hợp cho ngày đang chọn.</p>
                                 </template>
                             </div>
                         </div>
@@ -766,6 +779,7 @@
                 lbTab: 'attendance',
                 attendanceTimeFilter: 'ngay',
                 selectedFilterDate: new Date().toISOString().split('T')[0],
+                attendanceSearchKeyword: '',
                 searchPointMember: '',
                 searchAccountKeyword: '',
                 memberSearch: '',
@@ -799,6 +813,7 @@
                 announcements: [],
                 bhtList: [],
                 skillsList: [],
+                dailyAttendanceData: {}, // Lưu toàn bộ dữ liệu điểm danh theo ngày
 
                 newUser: { username: '', password: '', role: 'doansinh', linkedId: '' },
                 editingBHT: false,
@@ -825,7 +840,6 @@
                         }
                     });
 
-                    // Ẩn thông tin admin cứng khỏi code tĩnh để bảo mật
                     db.ref('accounts').on('value', (snapshot) => {
                         const data = snapshot.val();
                         if (data) {
@@ -833,6 +847,12 @@
                         } else {
                             this.accounts = [];
                         }
+                    });
+
+                    // Tải dữ liệu điểm danh theo ngày
+                    db.ref('dailyAttendance').on('value', (snapshot) => {
+                        const data = snapshot.val();
+                        this.dailyAttendanceData = data || {};
                     });
 
                     db.ref('announcements').on('value', (snapshot) => {
@@ -931,16 +951,17 @@
                         alert('Không có dữ liệu đoàn sinh để xuất!');
                         return;
                     }
-                    const timeLabel = this.attendanceTimeFilter === 'ngay' ? this.selectedFilterDate : this.attendanceTimeFilter;
+                    const targetDate = this.selectedFilterDate;
+                    const dateRecords = this.dailyAttendanceData[targetDate] || {};
                     let csvContent = "\uFEFF";
-                    csvContent += "STT,Họ và tên,Pháp danh,Giới tính,Đoàn/Ngành,Trạng thái điểm danh,Tỷ lệ đi sinh hoạt (%),Địa chỉ\n";
+                    csvContent += "STT,Họ và tên,Pháp danh,Giới tính,Đoàn/Ngành,Trạng thái điểm danh ngày " + targetDate + ",Tỷ lệ đi sinh hoạt (%),Địa chỉ\n";
 
                     this.members.forEach((m, index) => {
                         const name = `"${(m.name || '').replace(/"/g, '""')}"`;
                         const dhName = `"${(m.dhName || '').replace(/"/g, '""')}"`;
                         const gender = `"${(m.gender || 'Nam').replace(/"/g, '""')}"`;
                         const group = `"${(m.group || '').replace(/"/g, '""')}"`;
-                        const status = `"${(m.attendanceStatus || 'Chưa điểm danh').replace(/"/g, '""')}"`;
+                        const status = `"${(dateRecords[m.id] || 'Chưa điểm danh').replace(/"/g, '""')}"`;
                         const rate = `"${(m.attendanceRate !== undefined ? m.attendanceRate : 100)}%"`;
                         const address = `"${(m.address || '').replace(/"/g, '""')}"`;
                         csvContent += `${index + 1},${name},${dhName},${gender},${group},${status},${rate},${address}\n`;
@@ -950,7 +971,7 @@
                     const url = URL.createObjectURL(blob);
                     const link = document.createElement('a');
                     link.setAttribute('href', url);
-                    link.setAttribute('download', `Bao_Cao_Diem_Danh_GDPT_MinhQuang_${timeLabel}.csv`);
+                    link.setAttribute('download', `Bao_Cao_Diem_Danh_GDPT_MinhQuang_${targetDate}.csv`);
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
@@ -993,14 +1014,27 @@
                     return sorted;
                 },
 
-                // BXH chuyên cần dựa theo dữ liệu thực tế đã bấm điểm danh
+                // BXH chuyên cần
                 get attendanceLeaderboard() {
                     return [...this.members].sort((a, b) => (b.attendanceRate || 100) - (a.attendanceRate || 100));
                 },
 
-                // Bảng điểm danh chi tiết chỉ hiển thị khi có người điểm danh hoặc báo vắng
+                // Lấy danh sách điểm danh theo đúng ngày chọn lọc (hoặc kết quả tìm kiếm)
                 get attendanceReportList() {
-                    return this.members.filter(m => m.attendanceStatus && m.attendanceStatus !== 'Chưa điểm danh');
+                    const targetDate = this.selectedFilterDate;
+                    const dateRecords = this.dailyAttendanceData[targetDate] || {};
+                    const search = (this.attendanceSearchKeyword || '').trim().toLowerCase();
+
+                    return this.members.filter(m => {
+                        const status = dateRecords[m.id];
+                        const matchSearch = !search || m.name.toLowerCase().includes(search) || (m.dhName && m.dhName.toLowerCase().includes(search));
+                        
+                        if (search) {
+                            return matchSearch;
+                        }
+                        // Nếu không tìm kiếm, chỉ hiển thị những ai đã có dữ liệu điểm danh/báo vắng của ngày đó
+                        return status && status !== 'Chưa điểm danh';
+                    });
                 },
 
                 getRoleName(role) {
@@ -1028,8 +1062,38 @@
                     return this.members.filter(m => m.status === statusName).length;
                 },
 
-                countAttendance(status) {
-                    return this.members.filter(m => m.attendanceStatus === status).length;
+                // Đếm số lượng theo ngày cụ thể đang chọn
+                countAttendanceByDate(status) {
+                    const targetDate = this.selectedFilterDate;
+                    const dateRecords = this.dailyAttendanceData[targetDate] || {};
+                    return Object.values(dateRecords).filter(s => s === status).length;
+                },
+
+                // Lấy trạng thái điểm danh của đoàn sinh theo ngày chọn
+                getMemberStatusForSelectedDate(memberId) {
+                    const targetDate = this.selectedFilterDate;
+                    return (this.dailyAttendanceData[targetDate] && this.dailyAttendanceData[targetDate][memberId]) || 'Chưa điểm danh';
+                },
+
+                // Cập nhật điểm danh ngày cụ thể (Dành cho Huynh trưởng / Admin)
+                updateMemberAttendanceForSelectedDate(memberId, status) {
+                    const targetDate = this.selectedFilterDate;
+                    if (!this.dailyAttendanceData[targetDate]) {
+                        this.dailyAttendanceData[targetDate] = {};
+                    }
+                    this.dailyAttendanceData[targetDate][memberId] = status;
+
+                    // Lưu vào Firebase
+                    firebase.database().ref('dailyAttendance/' + targetDate + '/' + memberId).set(status);
+
+                    // Cập nhật trạng thái hiển thị hiện tại nếu trùng ngày
+                    if (targetDate === this.attendanceDate) {
+                        const member = this.members.find(m => m.id == memberId);
+                        if (member) {
+                            member.attendanceStatus = status;
+                            this.saveMembersToFirebase();
+                        }
+                    }
                 },
 
                 login() {
@@ -1043,7 +1107,7 @@
                         this.isLoggedIn = true;
                         this.loginError = '';
                         
-                        // Tải lịch sử điểm danh cá nhân từ Firebase
+                        // Tải lịch sử điểm danh cá nhân
                         const dbRef = firebase.database().ref('attendanceHistory/' + found.username);
                         dbRef.once('value', (snapshot) => {
                             const data = snapshot.val();
@@ -1061,7 +1125,6 @@
                     this.myAttendanceHistory = [];
                 },
 
-                // Tài khoản Đoàn Sinh chỉ hiển thị thông tin của chính mình
                 get filteredMembers() {
                     if (this.currentUser && this.currentUser.role === 'doansinh') {
                         return this.members.filter(m => m.id == this.currentUser.linkedId);
@@ -1111,8 +1174,40 @@
                     alert('Tạo tài khoản thành công!');
                 },
 
+                // Xử lý điểm danh cá nhân kèm giới hạn ngày Chủ Nhật & thời gian
                 submitSelfAttendance(status) {
                     if (!this.currentUser) return;
+
+                    const now = new Date();
+                    const dayOfWeek = now.getDay(); // 0 là Chủ Nhật
+                    const currentHour = now.getHours();
+
+                    // Kiểm tra nếu ngày chọn không phải là hôm nay
+                    const todayStr = now.toISOString().split('T')[0];
+                    if (this.attendanceDate !== todayStr) {
+                        alert('Bạn chỉ có thể thực hiện điểm danh hoặc xin vắng cho ngày hôm nay (' + todayStr + ')!');
+                        return;
+                    }
+
+                    // 1. Kiểm tra ngày Chủ Nhật
+                    if (dayOfWeek !== 0) {
+                        alert('Hệ thống chỉ mở điểm danh vào ngày Chủ Nhật hàng tuần!');
+                        return;
+                    }
+
+                    // 2. Kiểm tra khung giờ điểm danh
+                    if (status === 'Có mặt') {
+                        if (currentHour < 14 || currentHour >= 17) {
+                            alert('Chức năng "BẤM ĐIỂM DANH" chỉ mở trong khoảng thời gian từ 14h00 đến 17h00 ngày Chủ Nhật!');
+                            return;
+                        }
+                    } else if (status === 'Vắng có phép') {
+                        if (currentHour < 7 || currentHour >= 17) {
+                            alert('Chức năng "XIN VẮNG" chỉ mở trong khoảng thời gian từ 07h00 đến 17h00 ngày Chủ Nhật!');
+                            return;
+                        }
+                    }
+
                     const alreadyChecked = this.myAttendanceHistory.some(h => h.date === this.attendanceDate);
                     if (alreadyChecked) {
                         alert('Bạn đã điểm danh hoặc xin vắng cho ngày ' + this.attendanceDate + ' rồi!');
@@ -1122,10 +1217,9 @@
                     const newRecord = { date: this.attendanceDate, status: status };
                     this.myAttendanceHistory.unshift(newRecord);
                     
-                    // Lưu lên Firebase theo tài khoản
+                    // Lưu lên Firebase
                     firebase.database().ref('attendanceHistory/' + this.currentUser.username).set(this.myAttendanceHistory);
 
-                    // Cập nhật trạng thái và tỷ lệ chuyên cần thực tế cho hồ sơ đoàn sinh liên kết
                     if (this.currentUser.linkedId) {
                         const member = this.members.find(m => m.id == this.currentUser.linkedId);
                         if (member) {
@@ -1134,6 +1228,9 @@
                             const presentSessions = this.myAttendanceHistory.filter(h => h.status === 'Có mặt').length;
                             member.attendanceRate = totalSessions > 0 ? Math.round((presentSessions / totalSessions) * 100) : 100;
                             this.saveMembersToFirebase();
+
+                            // Cập nhật vào danh sách điểm danh theo ngày
+                            this.updateMemberAttendanceForSelectedDate(member.id, status);
                         }
                     }
 
@@ -1152,7 +1249,6 @@
                     this.showAddModal = true;
                 },
 
-                // Thêm tính năng xóa hồ sơ dành riêng cho Admin
                 deleteMember(id) {
                     if (confirm('Bạn có chắc chắn muốn xóa hồ sơ đoàn sinh này không?')) {
                         this.members = this.members.filter(m => m.id !== id);

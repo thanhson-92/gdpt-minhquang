@@ -19,7 +19,7 @@
         .font-serif-custom { font-family: 'Merriweather', serif; }
         .font-mono-custom { font-family: 'Fira Code', monospace; }
         
-        /* Hiệu ứng xoay mượt cho Vòng quay Canvas */
+        /* Hiệu ứng xoay mượt chuẩn 6 giây cho Vòng quay Canvas */
         .wheel-canvas {
             transition: transform 6s cubic-bezier(0.15, 0.85, 0.15, 1);
         }
@@ -560,7 +560,7 @@
                     <button @click="gameSubTab = 'docs'" :class="gameSubTab === 'docs' ? 'bg-blue-900 text-white shadow' : 'bg-white text-gray-700 border'" class="p-2 rounded-xl text-center">📂 Kho Tài Liệu</button>
                 </div>
 
-                <!-- 1. VÒNG QUAY TINH TẤN (SỬ DỤNG CANVAS CHUẨN MẪU BẠN GỬI) -->
+                <!-- 1. VÒNG QUAY TINH TẤN (ĐÃ CẬP NHẬT CHUẨN XÁC KHỚP MŨI TÊN & TỐC ĐỘ 6 GIÂY) -->
                 <div x-show="gameSubTab === 'wheel'" class="space-y-3 bg-white border rounded-xl p-4 shadow-sm text-xs" x-init="$nextTick(() => drawWheelCanvas())">
                     <div class="flex justify-between items-center border-b pb-2">
                         <h3 class="font-bold text-sm text-blue-900">🎡 Vòng Quay Tinh Tấn May Mắn</h3>
@@ -1129,7 +1129,7 @@
                 lastSpinResult: null,
                 wheelHistory: [],
 
-                // Hàm vẽ vòng quay bằng Canvas chuẩn xác 100% dựa trên file mẫu
+                // Hàm vẽ vòng quay bằng Canvas căn chuẩn vị trí theo góc 12 giờ
                 drawWheelCanvas() {
                     const canvas = document.getElementById("wheelCanvas");
                     if (!canvas) return;
@@ -1140,7 +1140,7 @@
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
                     
                     this.wheelItems.forEach((item, i) => {
-                        const angle = i * arc;
+                        const angle = i * arc - Math.PI / 2; // Xoay bắt đầu từ đỉnh 12 giờ
                         ctx.fillStyle = this.wheelColors[i % this.wheelColors.length];
                         ctx.beginPath();
                         ctx.arc(200, 200, 200, angle, angle + arc, false);
@@ -1296,16 +1296,24 @@
                         }
                     }
                     const selected = this.wheelItems[selectedIdx];
-                    const extraRounds = 6;
-                    // Tính góc xoay chuẩn sao cho kim chỉ đúng vào phần thưởng trúng
+                    const extraRounds = 6; // Xoay 6 vòng đầy đủ
                     const sectorAngle = 360 / this.wheelItems.length;
+                    
+                    // Tính góc dừng chính xác để tâm của ô trúng giải nằm đúng vào mũi tên ở đỉnh trên cùng
                     const targetAngle = 360 * extraRounds + (360 - (selectedIdx * sectorAngle + sectorAngle / 2));
                     this.wheelRotation = targetAngle;
 
                     const canvasEl = document.getElementById('wheelCanvas');
                     if (canvasEl) {
-                        canvasEl.style.transition = 'transform 6s cubic-bezier(0.15, 0.85, 0.15, 1)';
-                        canvasEl.style.transform = `rotate(${targetAngle}deg)`;
+                        // Reset góc xoay về 0 tức thời không hiệu ứng để chuẩn bị vòng quay mới
+                        canvasEl.style.transition = 'none';
+                        canvasEl.style.transform = 'rotate(0deg)';
+                        
+                        // Kích hoạt lại hiệu ứng chuyển động mượt 6 giây
+                        setTimeout(() => {
+                            canvasEl.style.transition = 'transform 6s cubic-bezier(0.15, 0.85, 0.15, 1)';
+                            canvasEl.style.transform = `rotate(${targetAngle}deg)`;
+                        }, 50);
                     }
 
                     setTimeout(() => {

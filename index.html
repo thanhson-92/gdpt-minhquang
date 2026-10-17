@@ -19,8 +19,8 @@
         .font-serif-custom { font-family: 'Merriweather', serif; }
         .font-mono-custom { font-family: 'Fira Code', monospace; }
         
-        /* Hiệu ứng xoay mượt cho Vòng quay 6 giây */
-        .wheel-disk-container {
+        /* Hiệu ứng xoay mượt cho Vòng quay Canvas */
+        .wheel-canvas {
             transition: transform 6s cubic-bezier(0.15, 0.85, 0.15, 1);
         }
     </style>
@@ -560,8 +560,8 @@
                     <button @click="gameSubTab = 'docs'" :class="gameSubTab === 'docs' ? 'bg-blue-900 text-white shadow' : 'bg-white text-gray-700 border'" class="p-2 rounded-xl text-center">📂 Kho Tài Liệu</button>
                 </div>
 
-                <!-- 1. VÒNG QUAY TINH TẤN -->
-                <div x-show="gameSubTab === 'wheel'" class="space-y-3 bg-white border rounded-xl p-4 shadow-sm text-xs">
+                <!-- 1. VÒNG QUAY TINH TẤN (SỬ DỤNG CANVAS CHUẨN MẪU BẠN GỬI) -->
+                <div x-show="gameSubTab === 'wheel'" class="space-y-3 bg-white border rounded-xl p-4 shadow-sm text-xs" x-init="$nextTick(() => drawWheelCanvas())">
                     <div class="flex justify-between items-center border-b pb-2">
                         <h3 class="font-bold text-sm text-blue-900">🎡 Vòng Quay Tinh Tấn May Mắn</h3>
                         <div class="flex items-center gap-2">
@@ -582,11 +582,11 @@
                                     <input type="number" x-model.number="item.points" placeholder="Điểm" class="px-2 py-1 border rounded bg-white">
                                 </div>
                             </template>
-                            <button @click="saveWheelConfig()" class="w-full bg-blue-900 text-white py-1.5 rounded font-semibold">Lưu Cấu Hình Vòng Quay</button>
+                            <button @click="saveWheelConfig(); drawWheelCanvas()" class="w-full bg-blue-900 text-white py-1.5 rounded font-semibold">Lưu Cấu Hình Vòng Quay</button>
                         </div>
                     </template>
 
-                    <!-- Khung Vòng Quay Chuẩn Mẫu -->
+                    <!-- Khung Vòng Quay Canvas -->
                     <div class="relative w-64 h-64 mx-auto my-4 flex items-center justify-center">
                         <div class="absolute -top-3 left-1/2 -translate-x-1/2 z-30 drop-shadow-md">
                             <svg width="28" height="34" viewBox="0 0 28 34" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -594,17 +594,8 @@
                             </svg>
                         </div>
 
-                        <div class="w-full h-full rounded-full border-8 border-amber-400 shadow-xl overflow-hidden relative bg-amber-200">
-                            <div class="w-full h-full wheel-disk-container" :style="{ transform: 'rotate(' + wheelRotation + 'deg)' }" id="wheelDisk">
-                                <svg viewBox="0 0 200 200" class="w-full h-full transform -rotate-90">
-                                    <template x-for="(item, idx) in wheelItems" :key="idx">
-                                        <g>
-                                            <path :d="getSvgArcPath(idx, 10)" :fill="wheelColors[idx % wheelColors.length]" stroke="#FFFFFF" stroke-width="1.5"/>
-                                            <text :x="getSvgTextCoords(idx, 10).x" :y="getSvgTextCoords(idx, 10).y" fill="#FFFFFF" font-size="7.5" font-weight="bold" text-anchor="middle" dominant-baseline="middle" :transform="'rotate(' + (idx * 36 + 18) + ',' + getSvgTextCoords(idx, 10).x + ',' + getSvgTextCoords(idx, 10).y + ')'" x-text="item.name"></text>
-                                        </g>
-                                    </template>
-                                </svg>
-                            </div>
+                        <div class="w-full h-full rounded-full border-8 border-amber-400 shadow-xl overflow-hidden relative bg-white">
+                            <canvas id="wheelCanvas" width="400" height="400" class="w-full h-full wheel-canvas"></canvas>
                         </div>
 
                         <!-- Tâm Nút Quay -->
@@ -1115,7 +1106,7 @@
                 selectedSkill: null,
                 skillForm: { id: null, title: '', desc: '', content: '', imageUrl: '', linkUrl: '', videoUrl: '' },
 
-                // MODULE TRÒ CHƠI BỔ SUNG
+                // MODULE TRÒ CHƠI BỔ SUNG (VÒNG QUAY CANVAS)
                 mySpinTurns: 0,
                 spinGrantUser: '',
                 spinGrantAmount: 1,
@@ -1137,6 +1128,35 @@
                 ],
                 lastSpinResult: null,
                 wheelHistory: [],
+
+                // Hàm vẽ vòng quay bằng Canvas chuẩn xác 100% dựa trên file mẫu
+                drawWheelCanvas() {
+                    const canvas = document.getElementById("wheelCanvas");
+                    if (!canvas) return;
+                    const ctx = canvas.getContext("2d");
+                    const totalSectors = this.wheelItems.length;
+                    const arc = (2 * Math.PI) / totalSectors;
+                    
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    
+                    this.wheelItems.forEach((item, i) => {
+                        const angle = i * arc;
+                        ctx.fillStyle = this.wheelColors[i % this.wheelColors.length];
+                        ctx.beginPath();
+                        ctx.arc(200, 200, 200, angle, angle + arc, false);
+                        ctx.lineTo(200, 200);
+                        ctx.fill();
+
+                        ctx.save();
+                        ctx.translate(200, 200);
+                        ctx.rotate(angle + arc / 2);
+                        ctx.fillStyle = "#fff";
+                        ctx.font = "bold 15px Arial";
+                        ctx.textAlign = "right";
+                        ctx.fillText(item.name, 185, 6);
+                        ctx.restore();
+                    });
+                },
 
                 showQuizConfig: false,
                 quizDuration: 30,
@@ -1211,7 +1231,10 @@
                     db.ref('gamesData').on('value', (snapshot) => {
                         const data = snapshot.val();
                         if (data) {
-                            if (data.wheelItems) this.wheelItems = data.wheelItems;
+                            if (data.wheelItems) {
+                                this.wheelItems = data.wheelItems;
+                                setTimeout(() => this.drawWheelCanvas(), 100);
+                            }
                             if (data.quizList) this.quizList = data.quizList;
                             if (data.shopItems) this.shopItems = data.shopItems;
                             if (data.eventsList) this.eventsList = data.eventsList;
@@ -1234,25 +1257,6 @@
                         return m ? (m.tinhTanPoints || 0) : 0;
                     }
                     return 0;
-                },
-
-                getSvgArcPath(index, total) {
-                    const angle = 360 / total;
-                    const startAngle = index * angle;
-                    const endAngle = (index + 1) * angle;
-                    const x1 = 100 + 100 * Math.cos(Math.PI * startAngle / 180);
-                    const y1 = 100 + 100 * Math.sin(Math.PI * startAngle / 180);
-                    const x2 = 100 + 100 * Math.cos(Math.PI * endAngle / 180);
-                    const y2 = 100 + 100 * Math.sin(Math.PI * endAngle / 180);
-                    return `M 100 100 L ${x1} ${y1} A 100 100 0 0 1 ${x2} ${y2} Z`;
-                },
-
-                getSvgTextCoords(index, total) {
-                    const angle = index * (360 / total) + (360 / total / 2);
-                    const radius = 68;
-                    const x = 100 + radius * Math.cos(Math.PI * angle / 180);
-                    const y = 100 + radius * Math.sin(Math.PI * angle / 180);
-                    return { x, y };
                 },
 
                 grantSpinTurns() {
@@ -1293,13 +1297,15 @@
                     }
                     const selected = this.wheelItems[selectedIdx];
                     const extraRounds = 6;
-                    const targetAngle = 360 * extraRounds + (360 - (selectedIdx * 36 + 18));
+                    // Tính góc xoay chuẩn sao cho kim chỉ đúng vào phần thưởng trúng
+                    const sectorAngle = 360 / this.wheelItems.length;
+                    const targetAngle = 360 * extraRounds + (360 - (selectedIdx * sectorAngle + sectorAngle / 2));
                     this.wheelRotation = targetAngle;
 
-                    const disk = document.getElementById('wheelDisk');
-                    if (disk) {
-                        disk.style.transition = 'transform 6s cubic-bezier(0.15, 0.85, 0.15, 1)';
-                        disk.style.transform = `rotate(${targetAngle}deg)`;
+                    const canvasEl = document.getElementById('wheelCanvas');
+                    if (canvasEl) {
+                        canvasEl.style.transition = 'transform 6s cubic-bezier(0.15, 0.85, 0.15, 1)';
+                        canvasEl.style.transform = `rotate(${targetAngle}deg)`;
                     }
 
                     setTimeout(() => {
@@ -1327,6 +1333,7 @@
                     firebase.database().ref('gamesData/wheelItems').set(this.wheelItems);
                     alert('Đã lưu cấu hình vòng quay!');
                     this.showWheelConfig = false;
+                    this.drawWheelCanvas();
                 },
 
                 startQuiz() {
@@ -1478,6 +1485,8 @@
                             this.wheelHistory = data ? (data.wheelHistory || []) : [];
                             this.myShopHistory = data ? (data.myShopHistory || []) : [];
                         });
+
+                        setTimeout(() => this.drawWheelCanvas(), 200);
                     } else {
                         this.loginError = 'Sai tên đăng nhập hoặc mật khẩu!';
                     }

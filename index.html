@@ -18,11 +18,9 @@
         .text-lam { color: #1e3a8a; }
         .font-serif-custom { font-family: 'Merriweather', serif; }
         .font-mono-custom { font-family: 'Fira Code', monospace; }
-        @keyframes spinWheel {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(var(--spin-deg, 1800deg)); }
-        }
-        .spinning {
+        
+        /* Hiệu ứng xoay mượt cho Vòng quay 6 giây */
+        .wheel-disk-container {
             transition: transform 6s cubic-bezier(0.15, 0.85, 0.15, 1);
         }
     </style>
@@ -140,7 +138,7 @@
                     </template>
                 </div>
 
-                <!-- 3 Ô MẠNG XÃ HỘI (ĐÃ SỬA KÍCH THƯỚC SVG) -->
+                <!-- 3 Ô MẠNG XÃ HỘI -->
                 <div class="bg-white border rounded-xl p-3 shadow-sm space-y-2 text-xs">
                     <div class="flex justify-between items-center">
                         <span class="font-bold text-gray-700">🌐 Kênh Mạng Xã Hội GĐPT Minh Quang</span>
@@ -166,7 +164,7 @@
                             <span class="text-[11px] font-bold">Group FB</span>
                         </a>
 
-                       <!-- TikTok (Màu trắng) -->
+                       <!-- TikTok -->
                         <a :href="socialLinks.tiktok" target="_blank" class="p-2.5 bg-gray-900 hover:bg-gray-800 text-white font-semibold rounded-xl text-center border border-gray-700 flex flex-col items-center justify-center gap-1.5 transition shadow-xs">
                             <svg class="w-6 h-6 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor">
                                 <path d="M448,209.91a210.06,210.06,0,0,1-122.77-39.25V352.32A162.55,162.55,0,1,1,185,188.31V251.5a96,96,0,1,0,64,90.5V0h64A211.37,211.37,0,0,0,448,78.48ZM305.15,108.64a137.25,137.25,0,0,1,77.78,76.51A211.37,211.37,0,0,0,400,209.91V278.48A145.41,145.41,0,0,1,305.15,108.64Z"/>
@@ -545,25 +543,33 @@
                 </div>
             </div>
 
-            <!-- TAB 5: TRÒ CHƠI & KỸ NĂNG (ĐÃ TÍCH HỢP VÒNG QUAY 6 GIÂY) -->
+            <!-- TAB 5: TRÒ CHƠI & KỸ NĂNG (CẬP NHẬT 6 TÍNH NĂNG CHUẨN) -->
             <div x-show="currentTab === 'games'" class="space-y-4">
                 <div class="flex justify-between items-center">
-                    <h2 class="font-bold text-lg text-gray-900">Trò Chơi & Kỹ Năng</h2>
-                    <div class="flex items-center gap-2">
-                        <span class="text-xs bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full font-bold">✨ Lượt quay: <span x-text="mySpinTurns"></span></span>
-                        <template x-if="currentUser.role === 'admin'">
-                            <button @click="openAddSkillModal()" class="bg-blue-600 text-white text-xs px-2.5 py-1 rounded font-semibold">+ Thư mục mới</button>
-                        </template>
-                    </div>
+                    <h2 class="font-bold text-lg text-gray-900">🎮 Trò Chơi & Hoạt Động</h2>
+                    <span class="text-xs bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full font-bold">✨ Lượt quay: <span x-text="mySpinTurns"></span></span>
                 </div>
 
-                <!-- BỔ SUNG: VÒNG QUAY TINH TẤN 6 GIÂY CHUẨN MẪU -->
-                <div class="bg-white border rounded-xl p-4 shadow-sm space-y-3 text-xs">
+                <!-- MENU 6 TÍNH NĂNG -->
+                <div class="grid grid-cols-3 gap-2 text-xs font-bold">
+                    <button @click="gameSubTab = 'wheel'" :class="gameSubTab === 'wheel' ? 'bg-blue-900 text-white shadow' : 'bg-white text-gray-700 border'" class="p-2 rounded-xl text-center">🎡 Vòng Quay</button>
+                    <button @click="gameSubTab = 'quiz'" :class="gameSubTab === 'quiz' ? 'bg-blue-900 text-white shadow' : 'bg-white text-gray-700 border'" class="p-2 rounded-xl text-center">🧠 Đố Phật Pháp</button>
+                    <button @click="gameSubTab = 'skills'" :class="gameSubTab === 'skills' ? 'bg-blue-900 text-white shadow' : 'bg-white text-gray-700 border'" class="p-2 rounded-xl text-center">📚 Kỹ Năng</button>
+                    <button @click="gameSubTab = 'events'" :class="gameSubTab === 'events' ? 'bg-blue-900 text-white shadow' : 'bg-white text-gray-700 border'" class="p-2 rounded-xl text-center">🎉 Sự Kiện</button>
+                    <button @click="gameSubTab = 'shop'" :class="gameSubTab === 'shop' ? 'bg-blue-900 text-white shadow' : 'bg-white text-gray-700 border'" class="p-2 rounded-xl text-center">🎁 Shop Quà</button>
+                    <button @click="gameSubTab = 'docs'" :class="gameSubTab === 'docs' ? 'bg-blue-900 text-white shadow' : 'bg-white text-gray-700 border'" class="p-2 rounded-xl text-center">📂 Kho Tài Liệu</button>
+                </div>
+
+                <!-- 1. VÒNG QUAY TINH TẤN (SỬA LỖI MŨI TÊN & CHỮ NẰM NGANG) -->
+                <div x-show="gameSubTab === 'wheel'" class="space-y-3 bg-white border rounded-xl p-4 shadow-sm text-xs">
                     <div class="flex justify-between items-center border-b pb-2">
                         <h3 class="font-bold text-sm text-blue-900">🎡 Vòng Quay Tinh Tấn May Mắn</h3>
-                        <template x-if="currentUser.role === 'admin'">
-                            <button @click="showWheelConfig = !showWheelConfig" class="text-[10px] bg-blue-100 text-blue-800 px-2 py-1 rounded font-semibold">⚙️ Cài đặt 10 ô</button>
-                        </template>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[11px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold">💎 Điểm: <b x-text="currentTinhTanPoints"></b></span>
+                            <template x-if="currentUser.role === 'admin'">
+                                <button @click="showWheelConfig = !showWheelConfig" class="text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-semibold">⚙️ Cài đặt 10 ô</button>
+                            </template>
+                        </div>
                     </div>
 
                     <template x-if="showWheelConfig && currentUser.role === 'admin'">
@@ -576,29 +582,41 @@
                                     <input type="number" x-model.number="item.points" placeholder="Điểm" class="px-2 py-1 border rounded bg-white">
                                 </div>
                             </template>
-                            <button @click="saveWheelConfig()" class="w-full bg-blue-900 text-white py-1.5 rounded font-semibold">Lưu Cấu Hình</button>
+                            <button @click="saveWheelConfig()" class="w-full bg-blue-900 text-white py-1.5 rounded font-semibold">Lưu Cấu Hình Vòng Quay</button>
                         </div>
                     </template>
 
-                    <!-- Vòng tròn quay mô phỏng mẫu -->
+                    <!-- Khung Vòng Quay (Sử dụng SVG để chữ thẳng hàng tuyệt đối) -->
                     <div class="relative w-64 h-64 mx-auto my-4 flex items-center justify-center">
-                        <div class="absolute -top-3 left-1/2 -translate-x-1/2 z-20 w-6 h-8 bg-amber-500 clip-triangle shadow-md border border-yellow-200"></div>
-                        <div class="w-full h-full rounded-full border-8 border-amber-400 shadow-xl overflow-hidden relative bg-amber-200 flex items-center justify-center">
-                            <div class="w-full h-full rounded-full relative spinning"
-                                :style="{ transform: 'rotate(' + wheelRotation + 'deg)' }"
-                                id="wheelDisk">
-                                <template x-for="(item, idx) in wheelItems" :key="idx">
-                                    <div class="absolute w-1/2 h-1/2 top-0 left-1/2 origin-bottom-left flex items-center justify-center font-bold text-[10px] text-white p-2"
-                                        :style="{
-                                            transform: 'rotate(' + (idx * 36) + 'deg) skewY(-50deg)',
-                                            backgroundColor: wheelColors[idx % wheelColors.length]
-                                        }">
-                                        <span class="transform skewY(50deg) rotate(18deg) block text-center truncate max-w-[60px]" x-text="item.name"></span>
-                                    </div>
-                                </template>
+                        <!-- Mũi tên chỉ giải thưởng chuẩn thiết kế -->
+                        <div class="absolute -top-3 left-1/2 -translate-x-1/2 z-30 drop-shadow-md">
+                            <svg width="28" height="34" viewBox="0 0 28 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M14 34L2 2C2 2 8 0 14 0C20 0 26 2 26 2L14 34Z" fill="#EA580C" stroke="#FDE047" stroke-width="2"/>
+                            </svg>
+                        </div>
+
+                        <!-- Đĩa quay viền vàng -->
+                        <div class="w-full h-full rounded-full border-8 border-amber-400 shadow-xl overflow-hidden relative bg-amber-200">
+                            <div class="w-full h-full wheel-disk-container" :style="{ transform: 'rotate(' + wheelRotation + 'deg)' }" id="wheelDisk">
+                                <svg viewBox="0 0 200 200" class="w-full h-full transform -rotate-90">
+                                    <template x-for="(item, idx) in wheelItems" :key="idx">
+                                        <g>
+                                            <!-- Vẽ 10 hình quạt (36 độ / ô) -->
+                                            <path :d="getSvgArcPath(idx, 10)" :fill="wheelColors[idx % wheelColors.length]" stroke="#FFFFFF" stroke-width="1"/>
+                                            <!-- Hiển thị chữ nằm ngang chuẩn xác -->
+                                            <text :x="getSvgTextCoords(idx, 10).x" :y="getSvgTextCoords(idx, 10).y"
+                                                  fill="#FFFFFF" font-size="7.5" font-weight="bold" text-anchor="middle" dominant-baseline="middle"
+                                                  :transform="'rotate(' + (idx * 36 + 18) + ',' + getSvgTextCoords(idx, 10).x + ',' + getSvgTextCoords(idx, 10).y + ')'">
+                                                <tspan x-text="item.name"></tspan>
+                                            </text>
+                                        </g>
+                                    </template>
+                                </svg>
                             </div>
                         </div>
-                        <div class="absolute w-10 h-10 bg-gradient-to-tr from-yellow-500 to-amber-300 rounded-full border-2 border-white shadow-md z-10 flex items-center justify-center text-[10px] font-extrabold text-blue-900">☸️</div>
+
+                        <!-- Tâm vòng quay -->
+                        <div class="absolute w-10 h-10 bg-gradient-to-tr from-yellow-500 to-amber-300 rounded-full border-2 border-white shadow-md z-20 flex items-center justify-center text-xs font-extrabold text-blue-900">☸️</div>
                     </div>
 
                     <div class="text-center space-y-2">
@@ -629,60 +647,195 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-3 pt-2">
-                    <template x-for="skill in skillsList" :key="skill.id">
-                        <div class="bg-white border rounded-xl p-3 shadow-sm flex flex-col justify-between">
-                            <div @click="selectedSkill = skill" class="cursor-pointer">
-                                <span class="text-2xl" x-text="skill.icon || '📁'"></span>
-                                <h3 class="font-bold text-sm mt-2 text-gray-800" x-text="skill.title"></h3>
-                                <p class="text-[11px] text-gray-500 mt-1" x-text="skill.desc"></p>
+                <!-- 2. TRAO DỒI PHẬT PHÁP -->
+                <div x-show="gameSubTab === 'quiz'" class="space-y-3 bg-white border rounded-xl p-4 shadow-sm text-xs">
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <h3 class="font-bold text-sm text-blue-900">🧠 Trao Dồi Phật Pháp & Thi Đố Vui</h3>
+                        <template x-if="currentUser.role === 'admin'">
+                            <button @click="showQuizConfig = !showQuizConfig" class="text-[10px] bg-blue-100 text-blue-800 px-2 py-1 rounded font-semibold">⚙️ Tạo câu hỏi</button>
+                        </template>
+                    </div>
+                    <template x-if="showQuizConfig && currentUser.role === 'admin'">
+                        <div class="bg-blue-50 border p-3 rounded-lg space-y-2">
+                            <input type="number" x-model.number="quizDuration" placeholder="Thời gian (giây)" class="w-full px-2 py-1 border rounded bg-white">
+                            <input type="text" x-model="newQuiz.question" placeholder="Câu hỏi..." class="w-full px-2 py-1 border rounded bg-white">
+                            <div class="grid grid-cols-2 gap-1">
+                                <input type="text" x-model="newQuiz.opt1" placeholder="Đáp án A" class="px-2 py-1 border rounded bg-white">
+                                <input type="text" x-model="newQuiz.opt2" placeholder="Đáp án B" class="px-2 py-1 border rounded bg-white">
+                                <input type="text" x-model="newQuiz.opt3" placeholder="Đáp án C" class="px-2 py-1 border rounded bg-white">
+                                <input type="text" x-model="newQuiz.opt4" placeholder="Đáp án D" class="px-2 py-1 border rounded bg-white">
                             </div>
-                            
-                            <template x-if="currentUser.role === 'admin'">
-                                <div class="flex gap-1 mt-3 pt-2 border-t text-[10px]">
-                                    <button @click="editSkillModal(skill)" class="flex-1 bg-gray-100 hover:bg-gray-200 text-blue-700 py-1 rounded font-semibold">Sửa</button>
-                                    <button @click="deleteSkillCategory(skill.id)" class="flex-1 bg-red-50 hover:bg-red-100 text-red-600 py-1 rounded font-semibold">Xóa</button>
-                                </div>
-                            </template>
+                            <select x-model="newQuiz.correct" class="w-full px-2 py-1 border rounded bg-white">
+                                <option value="0">Đúng: A</option><option value="1">Đúng: B</option><option value="2">Đúng: C</option><option value="3">Đúng: D</option>
+                            </select>
+                            <button @click="addQuizQuestion()" class="w-full bg-blue-900 text-white py-1.5 rounded font-semibold">Thêm Câu Hỏi</button>
+                        </div>
+                    </template>
+                    <template x-if="quizList.length > 0 && !quizFinished">
+                        <div class="space-y-3 bg-blue-50/50 p-3 rounded-xl border">
+                            <div class="flex justify-between font-bold text-blue-900">
+                                <span x-text="'Câu ' + (currentQuizIdx + 1) + '/' + quizList.length"></span>
+                                <span class="text-red-600">⏱️ <b x-text="quizTimer"></b>s</span>
+                            </div>
+                            <p class="font-bold text-gray-800 text-sm" x-text="quizList[currentQuizIdx].question"></p>
+                            <div class="space-y-1.5">
+                                <template x-for="(opt, oIdx) in quizList[currentQuizIdx].options" :key="oIdx">
+                                    <label class="block p-2 bg-white border rounded-lg cursor-pointer hover:bg-blue-100">
+                                        <input type="radio" :name="'q_' + currentQuizIdx" :value="oIdx" x-model.number="userAnswers[currentQuizIdx]" class="mr-2">
+                                        <span x-text="opt"></span>
+                                    </label>
+                                </template>
+                            </div>
+                            <button @click="nextQuizQuestion()" class="w-full py-2 bg-blue-900 text-white rounded font-semibold" x-text="currentQuizIdx < quizList.length - 1 ? 'Câu tiếp' : 'Nộp bài'"></button>
+                        </div>
+                    </template>
+                    <template x-if="quizFinished">
+                        <div class="p-4 bg-emerald-50 border border-emerald-300 rounded-xl text-center space-y-2">
+                            <p class="font-bold text-emerald-900 text-sm">🎯 KẾT QUẢ THI PHẬT PHÁP</p>
+                            <p class="text-lg font-extrabold text-blue-900" x-text="'Đúng: ' + quizScore + '/' + quizList.length"></p>
+                            <button @click="resetQuiz()" class="bg-blue-900 text-white px-4 py-1.5 rounded-lg font-semibold">Làm Lại</button>
                         </div>
                     </template>
                 </div>
 
-                <template x-if="selectedSkill">
-                    <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                        <div class="bg-white rounded-2xl w-full max-w-sm p-5 space-y-3 max-h-[85vh] overflow-y-auto text-xs">
-                            <div class="flex justify-between items-center">
-                                <h3 class="font-bold text-base text-blue-900" x-text="selectedSkill.title"></h3>
-                                <button @click="selectedSkill = null" class="text-gray-400 font-bold text-lg">&times;</button>
+                <!-- 3. RÈN LUYỆN KỸ NĂNG -->
+                <div x-show="gameSubTab === 'skills'" class="space-y-3 bg-white border rounded-xl p-4 shadow-sm text-xs">
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <h3 class="font-bold text-sm text-blue-900">📚 Rèn Luyện Kỹ Năng</h3>
+                        <template x-if="currentUser.role === 'admin'">
+                            <button @click="openAddSkillModal()" class="bg-blue-600 text-white px-2.5 py-1 rounded font-semibold">+ Thêm thư mục mới</button>
+                        </template>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 pt-1">
+                        <template x-for="skill in skillsList" :key="skill.id">
+                            <div class="bg-gray-50 border rounded-xl p-3 shadow-sm flex flex-col justify-between">
+                                <div @click="selectedSkill = skill" class="cursor-pointer">
+                                    <span class="text-2xl" x-text="skill.icon || '📁'"></span>
+                                    <h3 class="font-bold text-sm mt-2 text-gray-800" x-text="skill.title"></h3>
+                                    <p class="text-[11px] text-gray-500 mt-1" x-text="skill.desc"></p>
+                                </div>
+                                <template x-if="currentUser.role === 'admin'">
+                                    <div class="flex gap-1 mt-3 pt-2 border-t text-[10px]">
+                                        <button @click="editSkillModal(skill)" class="flex-1 bg-gray-100 hover:bg-gray-200 text-blue-700 py-1 rounded font-semibold">Sửa</button>
+                                        <button @click="deleteSkillCategory(skill.id)" class="flex-1 bg-red-50 hover:bg-red-100 text-red-600 py-1 rounded font-semibold">Xóa</button>
+                                    </div>
+                                </template>
                             </div>
-                            <p class="text-gray-600 leading-relaxed whitespace-pre-line" x-text="selectedSkill.content"></p>
-                            
-                            <template x-if="selectedSkill.imageUrl">
-                                <div class="rounded-lg overflow-hidden border">
-                                    <img :src="selectedSkill.imageUrl" alt="Hình ảnh minh họa" class="w-full h-32 object-cover">
-                                </div>
-                            </template>
+                        </template>
+                    </div>
+                </div>
 
-                            <template x-if="selectedSkill.linkUrl">
-                                <a :href="selectedSkill.linkUrl" target="_blank" class="block p-2 bg-blue-50 text-blue-700 font-semibold rounded text-center underline">🔗 Mở liên kết tài liệu / website</a>
-                            </template>
+                <!-- 4. SỰ KIỆN -->
+                <div x-show="gameSubTab === 'events'" class="space-y-3 bg-white border rounded-xl p-4 shadow-sm text-xs">
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <h3 class="font-bold text-sm text-blue-900">🎉 Sự Kiện & Thử Thách</h3>
+                        <template x-if="currentUser.role === 'admin'">
+                            <button @click="openAddEventModal()" class="bg-blue-600 text-white px-2.5 py-1 rounded font-semibold">+ Tạo sự kiện</button>
+                        </template>
+                    </div>
+                    <div class="space-y-2">
+                        <template x-for="ev in eventsList" :key="ev.id">
+                            <div class="p-3 bg-amber-50/50 border border-amber-200 rounded-xl space-y-1">
+                                <p class="font-bold text-amber-900 text-sm" x-text="ev.title"></p>
+                                <p class="text-gray-600" x-text="ev.content"></p>
+                                <span class="text-[10px] bg-red-100 text-red-600 px-2 py-0.5 rounded font-bold inline-block" x-text="'Thời gian: ' + ev.date"></span>
+                            </div>
+                        </template>
+                    </div>
+                </div>
 
-                            <template x-if="selectedSkill.videoUrl">
-                                <div class="rounded-lg overflow-hidden border">
-                                    <iframe :src="selectedSkill.videoUrl" class="w-full h-40" frameborder="0" allowfullscreen></iframe>
-                                </div>
+                <!-- 5. SHOP QUÀ TẶNG (HIỂN THỊ ĐIỂM TINH TẤN & XÓA VẬT PHẨM) -->
+                <div x-show="gameSubTab === 'shop'" class="space-y-3 bg-white border rounded-xl p-4 shadow-sm text-xs">
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <h3 class="font-bold text-sm text-blue-900">🎁 Shop Quà Tặng Tinh Tấn</h3>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[11px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold">💎 Điểm: <b x-text="currentTinhTanPoints"></b></span>
+                            <template x-if="currentUser.role === 'admin'">
+                                <button @click="showShopConfig = !showShopConfig" class="bg-blue-600 text-white px-2 py-0.5 rounded font-semibold">+ Thêm quà</button>
                             </template>
-
-                            <button @click="selectedSkill = null" class="w-full bg-gray-200 text-gray-800 py-2 rounded-lg font-semibold">Đóng</button>
                         </div>
                     </div>
-                </template>
+
+                    <template x-if="showShopConfig && currentUser.role === 'admin'">
+                        <div class="bg-blue-50 border p-3 rounded-lg space-y-2">
+                            <input type="text" x-model="newShopItem.name" placeholder="Tên vật phẩm..." class="w-full px-2 py-1 border rounded bg-white">
+                            <input type="number" x-model.number="newShopItem.price" placeholder="Giá điểm" class="w-full px-2 py-1 border rounded bg-white">
+                            <button @click="saveShopItem()" class="w-full bg-blue-900 text-white py-1.5 rounded font-semibold">Lưu Vật Phẩm</button>
+                        </div>
+                    </template>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <template x-for="item in shopItems" :key="item.id">
+                            <div class="p-3 bg-gray-50 border rounded-xl text-center space-y-2 flex flex-col justify-between relative">
+                                <template x-if="currentUser.role === 'admin'">
+                                    <button @click="deleteShopItem(item.id)" class="absolute top-1 right-1 text-red-500 font-bold px-1.5 py-0.5 text-[10px] bg-red-50 rounded border hover:bg-red-100">✕ Xóa</button>
+                                </template>
+                                <div>
+                                    <p class="font-bold text-blue-900 mt-1" x-text="item.name"></p>
+                                    <p class="text-amber-700 font-extrabold text-sm" x-text="item.price + ' điểm'"></p>
+                                </div>
+                                <button @click="buyShopItem(item)" class="w-full bg-green-600 text-white py-1.5 rounded font-bold hover:bg-green-700">Đổi Quà</button>
+                            </div>
+                        </template>
+                    </div>
+
+                    <div class="border-t pt-3 space-y-2">
+                        <p class="font-bold text-gray-700">🛒 Lịch sử đổi quà của bạn:</p>
+                        <div class="space-y-1 max-h-32 overflow-y-auto">
+                            <template x-for="(buy, idx) in myShopHistory" :key="idx">
+                                <div class="bg-gray-50 p-2 rounded border flex justify-between">
+                                    <span class="text-gray-600" x-text="buy.itemName"></span>
+                                    <span class="font-bold text-red-600" x-text="'-' + buy.price + 'đ'"></span>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. KHO TÀI LIỆU -->
+                <div x-show="gameSubTab === 'docs'" class="space-y-3 bg-white border rounded-xl p-4 shadow-sm text-xs">
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <h3 class="font-bold text-sm text-blue-900">📂 Kho Thư Mục Tài Liệu</h3>
+                        <template x-if="currentUser.role === 'admin'">
+                            <button @click="openAddDocModal()" class="bg-blue-600 text-white px-2.5 py-1 rounded font-semibold">+ Thêm thư mục</button>
+                        </template>
+                    </div>
+                    <div class="space-y-2">
+                        <template x-for="doc in documentsList" :key="doc.id">
+                            <div class="p-3 bg-gray-50 border rounded-xl space-y-1">
+                                <p class="font-bold text-blue-900 text-sm" x-text="doc.title"></p>
+                                <p class="text-gray-600" x-text="doc.desc"></p>
+                                <a :href="doc.linkUrl" target="_blank" class="text-blue-600 underline block pt-1">📥 Mở tài liệu</a>
+                            </div>
+                        </template>
+                    </div>
+                </div>
             </div>
 
-            <!-- TAB 6: QUẢN TRỊ -->
+            <!-- TAB 6: QUẢN TRỊ (BỔ SUNG THÊM LƯỢT QUAY CHO TÀI KHOẢN) -->
             <div x-show="currentTab === 'admin' && currentUser.role === 'admin'" class="space-y-4">
                 <h2 class="font-bold text-lg text-gray-900">Quản Trị Hệ Thống</h2>
                 
+                <!-- Ô CỘNG LƯỢT QUAY BỔ SUNG NỔI BẬT -->
+                <div class="bg-amber-50 border border-amber-300 rounded-xl p-3 shadow-sm space-y-2 text-xs">
+                    <h3 class="font-bold text-amber-900 flex items-center gap-1">
+                        <span>✨ Cộng Lượt Quay Vòng Quay Tinh Tấn</span>
+                    </h3>
+                    <div class="space-y-1.5">
+                        <label class="block text-[10px] text-gray-600 font-semibold">Chọn hoặc tìm kiếm tài khoản:</label>
+                        <select x-model="spinGrantUser" class="w-full px-2 py-1.5 border rounded bg-white font-semibold">
+                            <option value="">-- Chọn tài khoản --</option>
+                            <template x-for="acc in accounts" :key="acc.username">
+                                <option :value="acc.username" x-text="acc.username + ' (' + acc.name + ')'"></option>
+                            </template>
+                        </select>
+                        <div class="flex gap-2">
+                            <input type="number" x-model.number="spinGrantAmount" placeholder="Số lượt quay..." class="flex-1 px-2 py-1.5 border rounded bg-white">
+                            <button @click="grantSpinTurns()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-3 py-1.5 rounded">Cộng Lượt</button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="bg-white border rounded-xl p-3 shadow-sm space-y-2 text-xs">
                     <h3 class="font-bold text-blue-900 flex items-center gap-1">
                         <span>🔐 Tạo Tài Khoản & Liên Kết Hồ Sơ</span>
@@ -870,6 +1023,7 @@
                 currentUser: null,
                 currentTab: 'home',
                 lbTab: 'attendance',
+                gameSubTab: 'wheel',
                 attendanceTimeFilter: 'ngay',
                 selectedFilterDate: new Date().toISOString().split('T')[0],
                 attendanceSearchKeyword: '',
@@ -917,8 +1071,10 @@
                 selectedSkill: null,
                 skillForm: { id: null, title: '', desc: '', content: '', imageUrl: '', linkUrl: '', videoUrl: '' },
 
-                // Biến bổ sung cho Vòng Quay 6 Giây
+                // MODULE TRÒ CHƠI BỔ SUNG
                 mySpinTurns: 0,
+                spinGrantUser: '',
+                spinGrantAmount: 1,
                 showWheelConfig: false,
                 wheelRotation: 0,
                 isSpinning: false,
@@ -937,6 +1093,25 @@
                 ],
                 lastSpinResult: null,
                 wheelHistory: [],
+
+                showQuizConfig: false,
+                quizDuration: 30,
+                quizTimer: 30,
+                currentQuizIdx: 0,
+                userAnswers: {},
+                quizFinished: false,
+                quizScore: 0,
+                newQuiz: { question: '', opt1: '', opt2: '', opt3: '', opt4: '', correct: '0' },
+                quizList: [
+                    { question: 'Quy y Tam Bảo bao gồm những gì?', options: ['Phật - Pháp - Tăng', 'Cha - Mẹ - Thầy', 'Đức hạnh - Trí tuệ', 'Giới - Định - Tuệ'], correct: 0 }
+                ],
+
+                eventsList: [{ id: 1, title: 'Đố vui Phật pháp online', content: 'Tham gia trả lời câu hỏi nhận điểm thưởng.', date: 'Chủ Nhật hàng tuần' }],
+                shopItems: [{ id: 1, name: 'Tràng hạt niệm Phật', price: 100 }, { id: 2, name: 'Huy hiệu GĐPT', price: 50 }],
+                showShopConfig: false,
+                newShopItem: { name: '', price: 0 },
+                myShopHistory: [],
+                documentsList: [{ id: 1, title: 'Nội quy GĐPT Việt Nam', desc: 'Tài liệu học tập huynh trưởng và đoàn sinh', linkUrl: '#' }],
 
                 initFirebase() {
                     if (!firebase.apps.length) {
@@ -964,38 +1139,27 @@
                     });
 
                     db.ref('dailyAttendance').on('value', (snapshot) => {
-                        const data = snapshot.val();
-                        this.dailyAttendanceData = data || {};
+                        this.dailyAttendanceData = snapshot.val() || {};
                     });
 
                     db.ref('announcements').on('value', (snapshot) => {
-                        const data = snapshot.val();
-                        this.announcements = data ? Object.values(data) : [{ title: 'Thông báo khai mạc', content: 'Chào mừng đến với cổng thông tin GĐPT Minh Quang online.', date: '15/10/2026' }];
+                        this.announcements = snapshot.val() ? Object.values(snapshot.val()) : [{ title: 'Thông báo khai mạc', content: 'Chào mừng đến với cổng thông tin GĐPT Minh Quang online.', date: '15/10/2026' }];
                     });
 
                     db.ref('bhtList').on('value', (snapshot) => {
-                        const data = snapshot.val();
-                        if (data) {
-                            this.bhtList = Object.values(data);
-                        } else {
-                            this.bhtList = [
-                                { id: 1, role: 'Gia Trưởng', dhName: 'Quảng Tâm', name: 'Huỳnh Văn A', phone: '0905123456', colorClass: 'bg-blue-50 border-blue-500' },
-                                { id: 2, role: 'Liên Đoàn Trưởng', dhName: 'Tâm Định', name: 'Trần Văn B', phone: '0905654321', colorClass: 'bg-indigo-50 border-indigo-500' }
-                            ];
-                            this.saveBHTList();
-                        }
+                        this.bhtList = snapshot.val() ? Object.values(snapshot.val()) : [];
                     });
 
                     db.ref('skillsList').on('value', (snapshot) => {
+                        this.skillsList = snapshot.val() ? Object.values(snapshot.val()) : [];
+                    });
+
+                    db.ref('gamesData').on('value', (snapshot) => {
                         const data = snapshot.val();
                         if (data) {
-                            this.skillsList = Object.values(data);
-                        } else {
-                            this.skillsList = [
-                                { id: 1, title: 'Nút Dây Cơ Bản', desc: 'Học các nút dây sinh hoạt đoàn thể', content: 'Hướng dẫn thắt nút dợt, nút kép, nút ghế...', icon: '🪢', imageUrl: '', linkUrl: '', videoUrl: '' },
-                                { id: 2, title: 'Mật Thư GĐPT', desc: 'Cách giải và lập mật thư', content: 'Các quy tắc giải mật thư thường dùng trong GĐPT.', icon: '📜', imageUrl: '', linkUrl: '', videoUrl: '' }
-                            ];
-                            this.saveSkillsToFirebase();
+                            if (data.wheelItems) this.wheelItems = data.wheelItems;
+                            if (data.quizList) this.quizList = data.quizList;
+                            if (data.shopItems) this.shopItems = data.shopItems;
                         }
                     });
 
@@ -1008,7 +1172,55 @@
                     });
                 },
 
-                // Logic Vòng Quay Mượt Mà 6 Giây
+                // Lấy Điểm Tinh Tấn hiện có của người dùng
+                get currentTinhTanPoints() {
+                    if (this.currentUser && this.currentUser.linkedId) {
+                        const m = this.members.find(item => item.id == this.currentUser.linkedId);
+                        return m ? (m.tinhTanPoints || 0) : 0;
+                    }
+                    return 0;
+                },
+
+                // Công thức tạo đường cong SVG cho Vòng Quay
+                getSvgArcPath(index, total) {
+                    const angle = 360 / total;
+                    const startAngle = index * angle;
+                    const endAngle = (index + 1) * angle;
+                    const x1 = 100 + 100 * Math.cos(Math.PI * startAngle / 180);
+                    const y1 = 100 + 100 * Math.sin(Math.PI * startAngle / 180);
+                    const x2 = 100 + 100 * Math.cos(Math.PI * endAngle / 180);
+                    const y2 = 100 + 100 * Math.sin(Math.PI * endAngle / 180);
+                    return `M 100 100 L ${x1} ${y1} A 100 100 0 0 1 ${x2} ${y2} Z`;
+                },
+
+                // Tính tọa độ chữ nằm ngang chuẩn xác trên từng ô SVG
+                getSvgTextCoords(index, total) {
+                    const angle = index * (360 / total) + (360 / total / 2);
+                    const radius = 68;
+                    const x = 100 + radius * Math.cos(Math.PI * angle / 180);
+                    const y = 100 + radius * Math.sin(Math.PI * angle / 180);
+                    return { x, y };
+                },
+
+                // Admin cộng thêm lượt quay cho bất kỳ tài khoản nào
+                grantSpinTurns() {
+                    if (!this.spinGrantUser) return alert('Vui lòng chọn tài khoản!');
+                    if (!this.spinGrantAmount || this.spinGrantAmount <= 0) return alert('Nhập số lượt quay hợp lệ!');
+
+                    const userRef = firebase.database().ref('userGameData/' + this.spinGrantUser);
+                    userRef.once('value', (snapshot) => {
+                        const data = snapshot.val() || {};
+                        const newTurns = (data.spinTurns || 0) + Number(this.spinGrantAmount);
+                        userRef.update({ spinTurns: newTurns });
+
+                        if (this.currentUser && this.currentUser.username === this.spinGrantUser) {
+                            this.mySpinTurns = newTurns;
+                        }
+                        alert('Đã cộng thành công ' + this.spinGrantAmount + ' lượt quay cho tài khoản: ' + this.spinGrantUser);
+                    });
+                },
+
+                // Vòng quay 6 giây chuẩn
                 spinWheel() {
                     if (this.isSpinning) return;
                     if (this.mySpinTurns <= 0) {
@@ -1029,7 +1241,7 @@
                         }
                     }
                     const selected = this.wheelItems[selectedIdx];
-                    const extraRounds = 5;
+                    const extraRounds = 6;
                     const targetAngle = 360 * extraRounds + (360 - (selectedIdx * 36 + 18));
                     this.wheelRotation = targetAngle;
 
@@ -1066,197 +1278,35 @@
                     this.showWheelConfig = false;
                 },
 
-                addNewBHTPosition() {
-                    this.bhtList.push({
-                        id: Date.now(),
-                        role: 'Chức vụ mới',
-                        dhName: 'Pháp danh',
-                        name: 'Họ tên',
-                        phone: '090xxxxxxx',
-                        colorClass: 'bg-blue-50 border-blue-500'
-                    });
-                },
-                removeBHTPosition(idx) {
-                    this.bhtList.splice(idx, 1);
-                },
-                saveBHTList() {
-                    this.editingBHT = false;
-                    firebase.database().ref('bhtList').set(this.bhtList);
-                    alert('Đã lưu sơ đồ Ban Huynh Trưởng lên đám mây!');
+                saveShopItem() {
+                    if (!this.newShopItem.name) return;
+                    this.shopItems.push({ id: Date.now(), ...this.newShopItem });
+                    firebase.database().ref('gamesData/shopItems').set(this.shopItems);
+                    this.newShopItem = { name: '', price: 0 };
+                    alert('Đã thêm vật phẩm mới!');
                 },
 
-                openAddSkillModal() {
-                    this.isEditSkillMode = false;
-                    this.skillForm = { id: Date.now(), title: '', desc: '', content: '', icon: '📁', imageUrl: '', linkUrl: '', videoUrl: '' };
-                    this.showAddSkillModalState = true;
-                },
-                editSkillModal(skill) {
-                    this.isEditSkillMode = true;
-                    this.skillForm = { ...skill };
-                    this.showAddSkillModalState = true;
-                },
-                saveSkillCategory() {
-                    if (!this.skillForm.title) return alert('Vui lòng nhập tên chuyên đề!');
-                    if (this.isEditSkillMode) {
-                        const idx = this.skillsList.findIndex(s => s.id === this.skillForm.id);
-                        if (idx !== -1) this.skillsList[idx] = { ...this.skillForm };
-                    } else {
-                        this.skillsList.push({ ...this.skillForm });
+                deleteShopItem(itemId) {
+                    if (confirm('Bạn có chắc muốn xóa vật phẩm này khỏi Shop?')) {
+                        this.shopItems = this.shopItems.filter(item => item.id !== itemId);
+                        firebase.database().ref('gamesData/shopItems').set(this.shopItems);
                     }
-                    this.saveSkillsToFirebase();
-                    this.showAddSkillModalState = false;
-                    alert('Đã lưu chuyên đề kỹ năng!');
-                },
-                deleteSkillCategory(id) {
-                    if (confirm('Bạn có chắc muốn xóa chuyên đề này?')) {
-                        this.skillsList = this.skillsList.filter(s => s.id !== id);
-                        this.saveSkillsToFirebase();
-                    }
-                },
-                saveSkillsToFirebase() {
-                    firebase.database().ref('skillsList').set(this.skillsList);
                 },
 
-                exportAttendanceToExcel() {
-                    if (!this.members || this.members.length === 0) {
-                        alert('Không có dữ liệu đoàn sinh để xuất!');
+                buyShopItem(item) {
+                    const member = this.members.find(m => m.id == this.currentUser.linkedId);
+                    if (!member || (member.tinhTanPoints || 0) < item.price) {
+                        alert('Bạn không đủ Điểm Tinh Tấn!');
                         return;
                     }
-                    const targetDate = this.selectedFilterDate;
-                    const dateRecords = this.dailyAttendanceData[targetDate] || {};
-                    let csvContent = "\uFEFF";
-                    csvContent += "STT,Họ và tên,Pháp danh,Giới tính,Đoàn/Ngành,Trạng thái điểm danh ngày " + targetDate + ",Tỷ lệ đi sinh hoạt (%),Địa chỉ\n";
+                    member.tinhTanPoints -= item.price;
+                    this.saveMembersToFirebase();
 
-                    this.members.forEach((m, index) => {
-                        const name = `"${(m.name || '').replace(/"/g, '""')}"`;
-                        const dhName = `"${(m.dhName || '').replace(/"/g, '""')}"`;
-                        const gender = `"${(m.gender || 'Nam').replace(/"/g, '""')}"`;
-                        const group = `"${(m.group || '').replace(/"/g, '""')}"`;
-                        const status = `"${(dateRecords[m.id] || 'Chưa điểm danh').replace(/"/g, '""')}"`;
-                        const rate = `"${(m.attendanceRate !== undefined ? m.attendanceRate : 100)}%"`;
-                        const address = `"${(m.address || '').replace(/"/g, '""')}"`;
-                        csvContent += `${index + 1},${name},${dhName},${gender},${group},${status},${rate},${address}\n`;
-                    });
+                    const record = { date: new Date().toLocaleDateString('vi-VN'), itemName: item.name, price: item.price, username: this.currentUser.username };
+                    this.myShopHistory.unshift(record);
 
-                    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                    const url = URL.createObjectURL(blob);
-                    const link = document.createElement('a');
-                    link.setAttribute('href', url);
-                    link.setAttribute('download', `Bao_Cao_Diem_Danh_GDPT_MinhQuang_${targetDate}.csv`);
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                },
-
-                get filteredAccounts() {
-                    if (!this.searchAccountKeyword) return this.accounts;
-                    return this.accounts.filter(acc => acc.username.toLowerCase().includes(this.searchAccountKeyword.toLowerCase()));
-                },
-
-                saveMembersToFirebase() {
-                    firebase.database().ref('members').set(this.members);
-                },
-
-                saveAccountsToFirebase() {
-                    firebase.database().ref('accounts').set(this.accounts);
-                },
-
-                saveAnnouncementsToFirebase() {
-                    firebase.database().ref('announcements').set(this.announcements);
-                },
-
-                saveSocialLinks() {
-                    this.editingSocial = false;
-                    firebase.database().ref('settings/socialLinks').set(this.socialLinks);
-                    alert('Đã lưu link mạng xã hội lên đám mây!');
-                },
-
-                saveBannerConfig() {
-                    this.showBannerConfig = false;
-                    firebase.database().ref('settings/bannerConfig').set(this.bannerConfig);
-                    alert('Đã lưu cấu hình Banner!');
-                },
-
-                get filteredPointMembers() {
-                    let sorted = [...this.members].sort((a, b) => b.points - a.points);
-                    if (this.searchPointMember) {
-                        return sorted.filter(m => m.name.toLowerCase().includes(this.searchPointMember.toLowerCase()) || m.dhName.toLowerCase().includes(this.searchPointMember.toLowerCase()));
-                    }
-                    return sorted;
-                },
-
-                get attendanceLeaderboard() {
-                    return [...this.members].sort((a, b) => (b.attendanceRate || 100) - (a.attendanceRate || 100));
-                },
-
-                get attendanceReportList() {
-                    const targetDate = this.selectedFilterDate;
-                    const dateRecords = this.dailyAttendanceData[targetDate] || {};
-                    const search = (this.attendanceSearchKeyword || '').trim().toLowerCase();
-
-                    return this.members.filter(m => {
-                        const status = dateRecords[m.id];
-                        const matchSearch = !search || m.name.toLowerCase().includes(search) || (m.dhName && m.dhName.toLowerCase().includes(search));
-                        
-                        if (search) {
-                            return matchSearch;
-                        }
-                        return status && status !== 'Chưa điểm danh';
-                    });
-                },
-
-                getRoleName(role) {
-                    if (role === 'admin') return 'Quản trị viên';
-                    if (role === 'huynhtruong') return 'Huynh Trưởng';
-                    return 'Đoàn Sinh';
-                },
-
-                getMemberNameById(id) {
-                    if (!id) return 'Chưa liên kết';
-                    const found = this.members.find(m => m.id == id);
-                    return found ? found.name + ' (' + found.dhName + ')' : 'Không tìm thấy';
-                },
-
-                getLinkedUsername(memberId) {
-                    const acc = this.accounts.find(a => a.linkedId == memberId);
-                    return acc ? acc.username : 'Chưa liên kết';
-                },
-
-                countMembersByGroup(groupName) {
-                    return this.members.filter(m => m.group === groupName).length;
-                },
-
-                countMembersByStatus(statusName) {
-                    return this.members.filter(m => m.status === statusName).length;
-                },
-
-                countAttendanceByDate(status) {
-                    const targetDate = this.selectedFilterDate;
-                    const dateRecords = this.dailyAttendanceData[targetDate] || {};
-                    return Object.values(dateRecords).filter(s => s === status).length;
-                },
-
-                getMemberStatusForSelectedDate(memberId) {
-                    const targetDate = this.selectedFilterDate;
-                    return (this.dailyAttendanceData[targetDate] && this.dailyAttendanceData[targetDate][memberId]) || 'Chưa điểm danh';
-                },
-
-                updateMemberAttendanceForSelectedDate(memberId, status) {
-                    const targetDate = this.selectedFilterDate;
-                    if (!this.dailyAttendanceData[targetDate]) {
-                        this.dailyAttendanceData[targetDate] = {};
-                    }
-                    this.dailyAttendanceData[targetDate][memberId] = status;
-
-                    firebase.database().ref('dailyAttendance/' + targetDate + '/' + memberId).set(status);
-
-                    if (targetDate === this.attendanceDate) {
-                        const member = this.members.find(m => m.id == memberId);
-                        if (member) {
-                            member.attendanceStatus = status;
-                            this.saveMembersToFirebase();
-                        }
-                    }
+                    firebase.database().ref('userGameData/' + this.currentUser.username).update({ myShopHistory: this.myShopHistory });
+                    alert('Đổi quà thành công!');
                 },
 
                 login() {
@@ -1279,6 +1329,7 @@
                             const data = snapshot.val();
                             this.mySpinTurns = data ? (data.spinTurns || 0) : 0;
                             this.wheelHistory = data ? (data.wheelHistory || []) : [];
+                            this.myShopHistory = data ? (data.myShopHistory || []) : [];
                         });
                     } else {
                         this.loginError = 'Sai tên đăng nhập hoặc mật khẩu!';
@@ -1292,50 +1343,110 @@
                     this.myAttendanceHistory = [];
                 },
 
-                get filteredMembers() {
-                    if (this.currentUser && this.currentUser.role === 'doansinh') {
-                        return this.members.filter(m => m.id == this.currentUser.linkedId);
+                addNewBHTPosition() {
+                    this.bhtList.push({ id: Date.now(), role: 'Chức vụ mới', dhName: 'Pháp danh', name: 'Họ tên', phone: '090xxxxxxx', colorClass: 'bg-blue-50 border-blue-500' });
+                },
+                removeBHTPosition(idx) { this.bhtList.splice(idx, 1); },
+                saveBHTList() { this.editingBHT = false; firebase.database().ref('bhtList').set(this.bhtList); alert('Đã lưu BHT!'); },
+
+                openAddSkillModal() { this.isEditSkillMode = false; this.skillForm = { id: Date.now(), title: '', desc: '', content: '', icon: '📁', imageUrl: '', linkUrl: '', videoUrl: '' }; this.showAddSkillModalState = true; },
+                editSkillModal(skill) { this.isEditSkillMode = true; this.skillForm = { ...skill }; this.showAddSkillModalState = true; },
+                saveSkillCategory() {
+                    if (!this.skillForm.title) return alert('Vui lòng nhập tên!');
+                    if (this.isEditSkillMode) {
+                        const idx = this.skillsList.findIndex(s => s.id === this.skillForm.id);
+                        if (idx !== -1) this.skillsList[idx] = { ...this.skillForm };
+                    } else { this.skillsList.push({ ...this.skillForm }); }
+                    this.saveSkillsToFirebase();
+                    this.showAddSkillModalState = false;
+                },
+                deleteSkillCategory(id) { if (confirm('Xóa chuyên đề?')) { this.skillsList = this.skillsList.filter(s => s.id !== id); this.saveSkillsToFirebase(); } },
+                saveSkillsToFirebase() { firebase.database().ref('skillsList').set(this.skillsList); },
+
+                exportAttendanceToExcel() {
+                    if (!this.members || this.members.length === 0) return alert('Không có dữ liệu!');
+                    const targetDate = this.selectedFilterDate;
+                    const dateRecords = this.dailyAttendanceData[targetDate] || {};
+                    let csvContent = "\uFEFFSTT,Họ và tên,Pháp danh,Giới tính,Đoàn/Ngành,Trạng thái điểm danh ngày " + targetDate + ",Tỷ lệ đi sinh hoạt (%),Địa chỉ\n";
+                    this.members.forEach((m, index) => {
+                        csvContent += `${index + 1},"${m.name || ''}","${m.dhName || ''}","${m.gender || 'Nam'}","${m.group || ''}","${dateRecords[m.id] || 'Chưa điểm danh'}","${m.attendanceRate || 100}%","${m.address || ''}"\n`;
+                    });
+                    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `Bao_Cao_Diem_Danh_${targetDate}.csv`;
+                    link.click();
+                },
+
+                get filteredAccounts() { return !this.searchAccountKeyword ? this.accounts : this.accounts.filter(acc => acc.username.toLowerCase().includes(this.searchAccountKeyword.toLowerCase())); },
+                saveMembersToFirebase() { firebase.database().ref('members').set(this.members); },
+                saveAccountsToFirebase() { firebase.database().ref('accounts').set(this.accounts); },
+                saveAnnouncementsToFirebase() { firebase.database().ref('announcements').set(this.announcements); },
+                saveSocialLinks() { this.editingSocial = false; firebase.database().ref('settings/socialLinks').set(this.socialLinks); alert('Đã lưu!'); },
+                saveBannerConfig() { this.showBannerConfig = false; firebase.database().ref('settings/bannerConfig').set(this.bannerConfig); alert('Đã lưu Banner!'); },
+
+                get filteredPointMembers() {
+                    let sorted = [...this.members].sort((a, b) => b.points - a.points);
+                    return this.searchPointMember ? sorted.filter(m => m.name.toLowerCase().includes(this.searchPointMember.toLowerCase()) || m.dhName.toLowerCase().includes(this.searchPointMember.toLowerCase())) : sorted;
+                },
+
+                get attendanceLeaderboard() { return [...this.members].sort((a, b) => (b.attendanceRate || 100) - (a.attendanceRate || 100)); },
+
+                get attendanceReportList() {
+                    const targetDate = this.selectedFilterDate;
+                    const dateRecords = this.dailyAttendanceData[targetDate] || {};
+                    const search = (this.attendanceSearchKeyword || '').trim().toLowerCase();
+                    return this.members.filter(m => {
+                        const status = dateRecords[m.id];
+                        const matchSearch = !search || m.name.toLowerCase().includes(search) || (m.dhName && m.dhName.toLowerCase().includes(search));
+                        return search ? matchSearch : status && status !== 'Chưa điểm danh';
+                    });
+                },
+
+                getRoleName(role) { return role === 'admin' ? 'Quản trị viên' : (role === 'huynhtruong' ? 'Huynh Trưởng' : 'Đoàn Sinh'); },
+                getMemberNameById(id) { const found = this.members.find(m => m.id == id); return found ? found.name + ' (' + found.dhName + ')' : 'Chưa liên kết'; },
+                getLinkedUsername(memberId) { const acc = this.accounts.find(a => a.linkedId == memberId); return acc ? acc.username : 'Chưa liên kết'; },
+                countMembersByGroup(groupName) { return this.members.filter(m => m.group === groupName).length; },
+                countMembersByStatus(statusName) { return this.members.filter(m => m.status === statusName).length; },
+                countAttendanceByDate(status) { return Object.values(this.dailyAttendanceData[this.selectedFilterDate] || {}).filter(s => s === status).length; },
+                getMemberStatusForSelectedDate(memberId) { return (this.dailyAttendanceData[this.selectedFilterDate] && this.dailyAttendanceData[this.selectedFilterDate][memberId]) || 'Chưa điểm danh'; },
+
+                updateMemberAttendanceForSelectedDate(memberId, status) {
+                    const targetDate = this.selectedFilterDate;
+                    if (!this.dailyAttendanceData[targetDate]) this.dailyAttendanceData[targetDate] = {};
+                    this.dailyAttendanceData[targetDate][memberId] = status;
+                    firebase.database().ref('dailyAttendance/' + targetDate + '/' + memberId).set(status);
+
+                    if (targetDate === this.attendanceDate) {
+                        const member = this.members.find(m => m.id == memberId);
+                        if (member) { member.attendanceStatus = status; this.saveMembersToFirebase(); }
                     }
+                },
+
+                get filteredMembers() {
+                    if (this.currentUser && this.currentUser.role === 'doansinh') return this.members.filter(m => m.id == this.currentUser.linkedId);
                     return this.members.filter(m => {
                         const search = (this.memberSearch || '').toLowerCase();
-                        const matchText = !search || m.name.toLowerCase().includes(search) || (m.dhName && m.dhName.toLowerCase().includes(search));
-                        const matchGroup = this.memberFilterGroup === 'all' || m.group === this.memberFilterGroup;
-                        return matchText && matchGroup;
+                        return (!search || m.name.toLowerCase().includes(search) || (m.dhName && m.dhName.toLowerCase().includes(search))) && (this.memberFilterGroup === 'all' || m.group === this.memberFilterGroup);
                     });
                 },
 
                 changeAccountPassword(acc) {
                     if (!acc.newPasswordInput) return alert('Nhập mật khẩu mới!');
-                    acc.password = acc.newPasswordInput;
-                    acc.newPasswordInput = '';
-                    this.saveAccountsToFirebase();
-                    alert('Đã đổi mật khẩu thành công!');
+                    acc.password = acc.newPasswordInput; acc.newPasswordInput = ''; this.saveAccountsToFirebase(); alert('Đã đổi mật khẩu!');
                 },
 
                 applyCustomPoints(member) {
                     if (member.inputPoint !== undefined && member.inputPoint !== null) {
-                        member.points = Number(member.inputPoint);
-                        member.inputPoint = null;
-                        this.saveMembersToFirebase();
-                        alert('Đã cập nhật điểm thành công!');
+                        member.points = Number(member.inputPoint); member.inputPoint = null; this.saveMembersToFirebase(); alert('Cập nhật điểm thành công!');
                     }
                 },
 
-                adjustPoints(member, delta) {
-                    member.points += delta;
-                    this.saveMembersToFirebase();
-                },
+                adjustPoints(member, delta) { member.points += delta; this.saveMembersToFirebase(); },
 
                 createAccount() {
                     if(!this.newUser.username || !this.newUser.password) return alert('Nhập tên đăng nhập và mật khẩu!');
-                    this.accounts.push({
-                        username: this.newUser.username,
-                        password: this.newUser.password,
-                        name: this.newUser.username,
-                        role: this.newUser.role,
-                        locked: false,
-                        linkedId: this.newUser.linkedId
-                    });
+                    this.accounts.push({ username: this.newUser.username, password: this.newUser.password, name: this.newUser.username, role: this.newUser.role, locked: false, linkedId: this.newUser.linkedId });
                     this.saveAccountsToFirebase();
                     this.newUser = { username: '', password: '', role: 'doansinh', linkedId: '' };
                     alert('Tạo tài khoản thành công!');
@@ -1343,46 +1454,16 @@
 
                 submitSelfAttendance(status) {
                     if (!this.currentUser) return;
-
                     const now = new Date();
-                    const dayOfWeek = now.getDay();
-                    const currentHour = now.getHours();
-
                     const todayStr = now.toISOString().split('T')[0];
-                    if (this.attendanceDate !== todayStr) {
-                        alert('Bạn chỉ có thể thực hiện điểm danh hoặc xin vắng cho ngày hôm nay (' + todayStr + ')!');
-                        return;
-                    }
-
-                    if (dayOfWeek !== 0) {
-                        alert('Hệ thống chỉ mở điểm danh vào ngày Chủ Nhật hàng tuần!');
-                        return;
-                    }
-
-                    if (status === 'Có mặt') {
-                        if (currentHour < 14 || currentHour >= 17) {
-                            alert('Chức năng "BẤM ĐIỂM DANH" chỉ mở trong khoảng thời gian từ 14h00 đến 17h00 ngày Chủ Nhật!');
-                            return;
-                        }
-                    } else if (status === 'Vắng có phép') {
-                        if (currentHour < 7 || currentHour >= 17) {
-                            alert('Chức năng "XIN VẮNG" chỉ mở trong khoảng thời gian từ 07h00 đến 17h00 ngày Chủ Nhật!');
-                            return;
-                        }
-                    }
+                    if (this.attendanceDate !== todayStr) return alert('Chỉ có thể điểm danh ngày hôm nay!');
 
                     const alreadyChecked = this.myAttendanceHistory.some(h => h.date === this.attendanceDate);
-                    if (alreadyChecked) {
-                        alert('Bạn đã điểm danh hoặc xin vắng cho ngày ' + this.attendanceDate + ' rồi!');
-                        return;
-                    }
+                    if (alreadyChecked) return alert('Bạn đã điểm danh cho ngày này rồi!');
 
-                    const newRecord = { date: this.attendanceDate, status: status };
-                    this.myAttendanceHistory.unshift(newRecord);
-                    
+                    this.myAttendanceHistory.unshift({ date: this.attendanceDate, status: status });
                     firebase.database().ref('attendanceHistory/' + this.currentUser.username).set(this.myAttendanceHistory);
 
-                    // Cộng +1 lượt quay khi điểm danh thành công
                     this.mySpinTurns++;
                     firebase.database().ref('userGameData/' + this.currentUser.username).update({ spinTurns: this.mySpinTurns });
 
@@ -1394,63 +1475,27 @@
                             const presentSessions = this.myAttendanceHistory.filter(h => h.status === 'Có mặt').length;
                             member.attendanceRate = totalSessions > 0 ? Math.round((presentSessions / totalSessions) * 100) : 100;
                             this.saveMembersToFirebase();
-
                             this.updateMemberAttendanceForSelectedDate(member.id, status);
                         }
                     }
-
-                    alert('Đã ghi nhận điểm danh online ngày ' + this.attendanceDate + ' thành công! Bạn nhận được +1 lượt quay vòng quay.');
+                    alert('Điểm danh thành công! Bạn nhận được +1 lượt quay.');
                 },
 
-                openAddMemberModal() {
-                    this.isEditMode = false;
-                    this.newMember = { id: Date.now(), name: '', dhName: '', gender: 'Nam', dob: '', group: 'Thiếu', phone: '', parentPhone: '', address: '', level: '', status: 'Đang sinh hoạt', attendanceStatus: 'Chưa điểm danh', attendanceRate: 100, points: 100 };
-                    this.showAddModal = true;
-                },
-
-                editMemberProfile(m) {
-                    this.isEditMode = true;
-                    this.newMember = { ...m };
-                    this.showAddModal = true;
-                },
-
-                deleteMember(id) {
-                    if (confirm('Bạn có chắc chắn muốn xóa hồ sơ đoàn sinh này không?')) {
-                        this.members = this.members.filter(m => m.id !== id);
-                        this.saveMembersToFirebase();
-                        alert('Đã xóa hồ sơ thành công!');
-                    }
-                },
-
+                openAddMemberModal() { this.isEditMode = false; this.newMember = { id: Date.now(), name: '', dhName: '', gender: 'Nam', dob: '', group: 'Thiếu', phone: '', parentPhone: '', address: '', level: '', status: 'Đang sinh hoạt', attendanceStatus: 'Chưa điểm danh', attendanceRate: 100, points: 100 }; this.showAddModal = true; },
+                editMemberProfile(m) { this.isEditMode = true; this.newMember = { ...m }; this.showAddModal = true; },
+                deleteMember(id) { if (confirm('Xóa hồ sơ?')) { this.members = this.members.filter(m => m.id !== id); this.saveMembersToFirebase(); } },
                 saveMember() {
                     if(!this.newMember.name) return alert('Nhập họ tên!');
-                    if (this.isEditMode) {
-                        const idx = this.members.findIndex(m => m.id === this.newMember.id);
-                        if (idx !== -1) this.members[idx] = { ...this.newMember };
-                    } else {
-                        this.members.push({ ...this.newMember });
-                    }
-                    this.saveMembersToFirebase();
-                    this.showAddModal = false;
-                    alert('Đã lưu hồ sơ!');
+                    if (this.isEditMode) { const idx = this.members.findIndex(m => m.id === this.newMember.id); if (idx !== -1) this.members[idx] = { ...this.newMember }; }
+                    else { this.members.push({ ...this.newMember }); }
+                    this.saveMembersToFirebase(); this.showAddModal = false; alert('Đã lưu!');
                 },
-
-                toggleLockAccount(acc) {
-                    acc.locked = !acc.locked;
-                    this.saveAccountsToFirebase();
-                },
-
-                addAnnouncement() {
-                    if (!this.newAnn.title) return;
-                    this.announcements.unshift({ ...this.newAnn, date: new Date().toLocaleDateString('vi-VN') });
-                    this.saveAnnouncementsToFirebase();
-                    this.newAnn = { title: '', content: '' };
-                },
-
-                deleteAnnouncement(idx) {
-                    this.announcements.splice(idx, 1);
-                    this.saveAnnouncementsToFirebase();
-                }
+                toggleLockAccount(acc) { acc.locked = !acc.locked; this.saveAccountsToFirebase(); },
+                addAnnouncement() { if (!this.newAnn.title) return; this.announcements.unshift({ ...this.newAnn, date: new Date().toLocaleDateString('vi-VN') }); this.saveAnnouncementsToFirebase(); this.newAnn = { title: '', content: '' }; },
+                deleteAnnouncement(idx) { this.announcements.splice(idx, 1); this.saveAnnouncementsToFirebase(); },
+                addQuizQuestion() { if (!this.newQuiz.question) return; this.quizList.push({ question: this.newQuiz.question, options: [this.newQuiz.opt1, this.newQuiz.opt2, this.newQuiz.opt3, this.newQuiz.opt4], correct: Number(this.newQuiz.correct) }); firebase.database().ref('gamesData/quizList').set(this.quizList); this.newQuiz = { question: '', opt1: '', opt2: '', opt3: '', opt4: '', correct: '0' }; alert('Đã thêm câu hỏi!'); },
+                nextQuizQuestion() { if (this.currentQuizIdx < this.quizList.length - 1) { this.currentQuizIdx++; } else { let score = 0; this.quizList.forEach((q, idx) => { if (this.userAnswers[idx] === q.correct) score++; }); this.quizScore = score; this.quizFinished = true; } },
+                resetQuiz() { this.currentQuizIdx = 0; this.userAnswers = {}; this.quizFinished = false; }
             }
         }
     </script>

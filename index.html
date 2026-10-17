@@ -560,7 +560,7 @@
                     <button @click="gameSubTab = 'docs'" :class="gameSubTab === 'docs' ? 'bg-blue-900 text-white shadow' : 'bg-white text-gray-700 border'" class="p-2 rounded-xl text-center">📂 Kho Tài Liệu</button>
                 </div>
 
-                <!-- 1. VÒNG QUAY TINH TẤN (SỬA LỖI HIỂN THỊ TÊN 10 Ô) -->
+                <!-- 1. VÒNG QUAY TINH TẤN (KHẮC PHỤC HOÀN TOÀN LỖI ĐĨA QUAY TRỐNG) -->
                 <div x-show="gameSubTab === 'wheel'" class="space-y-3 bg-white border rounded-xl p-4 shadow-sm text-xs">
                     <div class="flex justify-between items-center border-b pb-2">
                         <h3 class="font-bold text-sm text-blue-900">🎡 Vòng Quay Tinh Tấn May Mắn</h3>
@@ -586,32 +586,77 @@
                         </div>
                     </template>
 
-                    <!-- Khung Vòng Quay với SVG hiển thị đầy đủ tên 10 ô -->
+                    <!-- Khung Vòng Quay với SVG Render trực tiếp 10 Múi Màu & Tên Phần Thưởng -->
                     <div class="relative w-64 h-64 mx-auto my-4 flex items-center justify-center">
+                        <!-- Mũi tên Kim Chỉ -->
                         <div class="absolute -top-3 left-1/2 -translate-x-1/2 z-30 drop-shadow-md">
                             <svg width="28" height="34" viewBox="0 0 28 34" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M14 34L2 2C2 2 8 0 14 0C20 0 26 2 26 2L14 34Z" fill="#EA580C" stroke="#FDE047" stroke-width="2"/>
                             </svg>
                         </div>
 
+                        <!-- Đĩa quay 10 Múi Màu -->
                         <div class="w-full h-full rounded-full border-8 border-amber-400 shadow-xl overflow-hidden relative bg-amber-200">
                             <div class="w-full h-full wheel-disk-container" :style="{ transform: 'rotate(' + wheelRotation + 'deg)' }" id="wheelDisk">
                                 <svg viewBox="0 0 200 200" class="w-full h-full transform -rotate-90">
-                                    <template x-for="(item, idx) in wheelItems" :key="idx">
-                                        <g>
-                                            <path :d="getSvgArcPath(idx, 10)" :fill="wheelColors[idx % wheelColors.length]" stroke="#FFFFFF" stroke-width="1"/>
-                                            <text :x="getSvgTextCoords(idx, 10).x" :y="getSvgTextCoords(idx, 10).y"
-                                                  fill="#FFFFFF" font-size="7.5" font-weight="bold" text-anchor="middle" dominant-baseline="middle"
-                                                  :transform="'rotate(' + (idx * 36 + 18) + ',' + getSvgTextCoords(idx, 10).x + ',' + getSvgTextCoords(idx, 10).y + ')'">
-                                                <tspan x-text="item.name"></tspan>
-                                            </text>
-                                        </g>
-                                    </template>
+                                    <!-- Ô 0 -->
+                                    <g>
+                                        <path :d="getSvgArcPath(0, 10)" :fill="wheelColors[0]" stroke="#FFFFFF" stroke-width="1.5"/>
+                                        <text :x="getSvgTextCoords(0, 10).x" :y="getSvgTextCoords(0, 10).y" fill="#FFFFFF" font-size="7.5" font-weight="bold" text-anchor="middle" dominant-baseline="middle" :transform="'rotate(' + (0 * 36 + 18) + ',' + getSvgTextCoords(0, 10).x + ',' + getSvgTextCoords(0, 10).y + ')'" x-text="wheelItems[0] ? wheelItems[0].name : ''"></text>
+                                    </g>
+                                    <!-- Ô 1 -->
+                                    <g>
+                                        <path :d="getSvgArcPath(1, 10)" :fill="wheelColors[1]" stroke="#FFFFFF" stroke-width="1.5"/>
+                                        <text :x="getSvgTextCoords(1, 10).x" :y="getSvgTextCoords(1, 10).y" fill="#FFFFFF" font-size="7.5" font-weight="bold" text-anchor="middle" dominant-baseline="middle" :transform="'rotate(' + (1 * 36 + 18) + ',' + getSvgTextCoords(1, 10).x + ',' + getSvgTextCoords(1, 10).y + ')'" x-text="wheelItems[1] ? wheelItems[1].name : ''"></text>
+                                    </g>
+                                    <!-- Ô 2 -->
+                                    <g>
+                                        <path :d="getSvgArcPath(2, 10)" :fill="wheelColors[2]" stroke="#FFFFFF" stroke-width="1.5"/>
+                                        <text :x="getSvgTextCoords(2, 10).x" :y="getSvgTextCoords(2, 10).y" fill="#FFFFFF" font-size="7.5" font-weight="bold" text-anchor="middle" dominant-baseline="middle" :transform="'rotate(' + (2 * 36 + 18) + ',' + getSvgTextCoords(2, 10).x + ',' + getSvgTextCoords(2, 10).y + ')'" x-text="wheelItems[2] ? wheelItems[2].name : ''"></text>
+                                    </g>
+                                    <!-- Ô 3 -->
+                                    <g>
+                                        <path :d="getSvgArcPath(3, 10)" :fill="wheelColors[3]" stroke="#FFFFFF" stroke-width="1.5"/>
+                                        <text :x="getSvgTextCoords(3, 10).x" :y="getSvgTextCoords(3, 10).y" fill="#FFFFFF" font-size="7.5" font-weight="bold" text-anchor="middle" dominant-baseline="middle" :transform="'rotate(' + (3 * 36 + 18) + ',' + getSvgTextCoords(3, 10).x + ',' + getSvgTextCoords(3, 10).y + ')'" x-text="wheelItems[3] ? wheelItems[3].name : ''"></text>
+                                    </g>
+                                    <!-- Ô 4 -->
+                                    <g>
+                                        <path :d="getSvgArcPath(4, 10)" :fill="wheelColors[4]" stroke="#FFFFFF" stroke-width="1.5"/>
+                                        <text :x="getSvgTextCoords(4, 10).x" :y="getSvgTextCoords(4, 10).y" fill="#FFFFFF" font-size="7.5" font-weight="bold" text-anchor="middle" dominant-baseline="middle" :transform="'rotate(' + (4 * 36 + 18) + ',' + getSvgTextCoords(4, 10).x + ',' + getSvgTextCoords(4, 10).y + ')'" x-text="wheelItems[4] ? wheelItems[4].name : ''"></text>
+                                    </g>
+                                    <!-- Ô 5 -->
+                                    <g>
+                                        <path :d="getSvgArcPath(5, 10)" :fill="wheelColors[5]" stroke="#FFFFFF" stroke-width="1.5"/>
+                                        <text :x="getSvgTextCoords(5, 10).x" :y="getSvgTextCoords(5, 10).y" fill="#FFFFFF" font-size="7.5" font-weight="bold" text-anchor="middle" dominant-baseline="middle" :transform="'rotate(' + (5 * 36 + 18) + ',' + getSvgTextCoords(5, 10).x + ',' + getSvgTextCoords(5, 10).y + ')'" x-text="wheelItems[5] ? wheelItems[5].name : ''"></text>
+                                    </g>
+                                    <!-- Ô 6 -->
+                                    <g>
+                                        <path :d="getSvgArcPath(6, 10)" :fill="wheelColors[6]" stroke="#FFFFFF" stroke-width="1.5"/>
+                                        <text :x="getSvgTextCoords(6, 10).x" :y="getSvgTextCoords(6, 10).y" fill="#FFFFFF" font-size="7.5" font-weight="bold" text-anchor="middle" dominant-baseline="middle" :transform="'rotate(' + (6 * 36 + 18) + ',' + getSvgTextCoords(6, 10).x + ',' + getSvgTextCoords(6, 10).y + ')'" x-text="wheelItems[6] ? wheelItems[6].name : ''"></text>
+                                    </g>
+                                    <!-- Ô 7 -->
+                                    <g>
+                                        <path :d="getSvgArcPath(7, 10)" :fill="wheelColors[7]" stroke="#FFFFFF" stroke-width="1.5"/>
+                                        <text :x="getSvgTextCoords(7, 10).x" :y="getSvgTextCoords(7, 10).y" fill="#FFFFFF" font-size="7.5" font-weight="bold" text-anchor="middle" dominant-baseline="middle" :transform="'rotate(' + (7 * 36 + 18) + ',' + getSvgTextCoords(7, 10).x + ',' + getSvgTextCoords(7, 10).y + ')'" x-text="wheelItems[7] ? wheelItems[7].name : ''"></text>
+                                    </g>
+                                    <!-- Ô 8 -->
+                                    <g>
+                                        <path :d="getSvgArcPath(8, 10)" :fill="wheelColors[8]" stroke="#FFFFFF" stroke-width="1.5"/>
+                                        <text :x="getSvgTextCoords(8, 10).x" :y="getSvgTextCoords(8, 10).y" fill="#FFFFFF" font-size="7.5" font-weight="bold" text-anchor="middle" dominant-baseline="middle" :transform="'rotate(' + (8 * 36 + 18) + ',' + getSvgTextCoords(8, 10).x + ',' + getSvgTextCoords(8, 10).y + ')'" x-text="wheelItems[8] ? wheelItems[8].name : ''"></text>
+                                    </g>
+                                    <!-- Ô 9 -->
+                                    <g>
+                                        <path :d="getSvgArcPath(9, 10)" :fill="wheelColors[9]" stroke="#FFFFFF" stroke-width="1.5"/>
+                                        <text :x="getSvgTextCoords(9, 10).x" :y="getSvgTextCoords(9, 10).y" fill="#FFFFFF" font-size="7.5" font-weight="bold" text-anchor="middle" dominant-baseline="middle" :transform="'rotate(' + (9 * 36 + 18) + ',' + getSvgTextCoords(9, 10).x + ',' + getSvgTextCoords(9, 10).y + ')'" x-text="wheelItems[9] ? wheelItems[9].name : ''"></text>
+                                    </g>
                                 </svg>
                             </div>
                         </div>
 
-                        <div class="absolute w-10 h-10 bg-gradient-to-tr from-yellow-500 to-amber-300 rounded-full border-2 border-white shadow-md z-20 flex items-center justify-center text-xs font-extrabold text-blue-900">☸️</div>
+                        <!-- Tâm Nút Quay -->
+                        <button @click="spinWheel()" :disabled="isSpinning" class="absolute w-12 h-12 bg-gradient-to-tr from-sky-500 to-blue-600 rounded-full border-4 border-white shadow-xl z-20 flex items-center justify-center text-[11px] font-extrabold text-white active:scale-95 transition">
+                            <span>Quay</span>
+                        </button>
                     </div>
 
                     <div class="text-center space-y-2">
@@ -1124,18 +1169,18 @@
                 showWheelConfig: false,
                 wheelRotation: 0,
                 isSpinning: false,
-                wheelColors: ['#f59e0b', '#ef4444', '#ec4899', '#8b5cf6', '#3b82f6', '#10b981', '#84cc16', '#eab308', '#f97316', '#06b6d4'],
+                wheelColors: ['#3b82f6', '#ef4444', '#eab308', '#10b981', '#7e22ce', '#3b82f6', '#ef4444', '#eab308', '#10b981', '#7e22ce'],
                 wheelItems: [
                     { name: '10 Điểm', rate: 20, points: 10 },
                     { name: '20 Điểm', rate: 15, points: 20 },
-                    { name: '50 Điểm', rate: 10, points: 50 },
-                    { name: '100 Điểm', rate: 5, points: 100 },
-                    { name: 'May Mắn Lại', rate: 15, points: 0 },
-                    { name: '15 Điểm', rate: 10, points: 15 },
                     { name: '30 Điểm', rate: 10, points: 30 },
-                    { name: 'Thêm Lượt', rate: 5, points: 0 },
-                    { name: '5 Điểm', rate: 5, points: 5 },
-                    { name: 'Phật Pháp', rate: 5, points: 25 }
+                    { name: '40 Điểm', rate: 5, points: 40 },
+                    { name: '50 Điểm', rate: 15, points: 50 },
+                    { name: '100 Điểm', rate: 5, points: 100 },
+                    { name: '5 Điểm', rate: 10, points: 5 },
+                    { name: 'Gấu Bông', rate: 5, points: 0 },
+                    { name: 'Trà Sữa', rate: 5, points: 0 },
+                    { name: '10k', rate: 10, points: 0 }
                 ],
                 lastSpinResult: null,
                 wheelHistory: [],
@@ -1251,7 +1296,7 @@
                     return `M 100 100 L ${x1} ${y1} A 100 100 0 0 1 ${x2} ${y2} Z`;
                 },
 
-                // Tính tọa độ chữ nằm ngang chuẩn xác trên từng ô SVG
+                // Tính tọa độ chữ nằm hướng vào tâm chuẩn xác trên từng ô SVG
                 getSvgTextCoords(index, total) {
                     const angle = index * (360 / total) + (360 / total / 2);
                     const radius = 68;
@@ -1619,40 +1664,4 @@
                     if (alreadyChecked) return alert('Bạn đã điểm danh cho ngày này rồi!');
 
                     this.myAttendanceHistory.unshift({ date: this.attendanceDate, status: status });
-                    firebase.database().ref('attendanceHistory/' + this.currentUser.username).set(this.myAttendanceHistory);
-
-                    this.mySpinTurns++;
-                    firebase.database().ref('userGameData/' + this.currentUser.username).update({ spinTurns: this.mySpinTurns });
-
-                    if (this.currentUser.linkedId) {
-                        const member = this.members.find(m => m.id == this.currentUser.linkedId);
-                        if (member) {
-                            member.attendanceStatus = status;
-                            const totalSessions = this.myAttendanceHistory.length;
-                            const presentSessions = this.myAttendanceHistory.filter(h => h.status === 'Có mặt').length;
-                            member.attendanceRate = totalSessions > 0 ? Math.round((presentSessions / totalSessions) * 100) : 100;
-                            this.saveMembersToFirebase();
-                            this.updateMemberAttendanceForSelectedDate(member.id, status);
-                        }
-                    }
-                    alert('Điểm danh thành công! Bạn nhận được +1 lượt quay.');
-                },
-
-                openAddMemberModal() { this.isEditMode = false; this.newMember = { id: Date.now(), name: '', dhName: '', gender: 'Nam', dob: '', group: 'Thiếu', phone: '', parentPhone: '', address: '', level: '', status: 'Đang sinh hoạt', attendanceStatus: 'Chưa điểm danh', attendanceRate: 100, points: 100 }; this.showAddModal = true; },
-                editMemberProfile(m) { this.isEditMode = true; this.newMember = { ...m }; this.showAddModal = true; },
-                deleteMember(id) { if (confirm('Xóa hồ sơ?')) { this.members = this.members.filter(m => m.id !== id); this.saveMembersToFirebase(); } },
-                saveMember() {
-                    if(!this.newMember.name) return alert('Nhập họ tên!');
-                    if (this.isEditMode) { const idx = this.members.findIndex(m => m.id === this.newMember.id); if (idx !== -1) this.members[idx] = { ...this.newMember }; }
-                    else { this.members.push({ ...this.newMember }); }
-                    this.saveMembersToFirebase(); this.showAddModal = false; alert('Đã lưu!');
-                },
-                toggleLockAccount(acc) { acc.locked = !acc.locked; this.saveAccountsToFirebase(); },
-                addAnnouncement() { if (!this.newAnn.title) return; this.announcements.unshift({ ...this.newAnn, date: new Date().toLocaleDateString('vi-VN') }); this.saveAnnouncementsToFirebase(); this.newAnn = { title: '', content: '' }; },
-                deleteAnnouncement(idx) { this.announcements.splice(idx, 1); this.saveAnnouncementsToFirebase(); },
-                addQuizQuestion() { if (!this.newQuiz.question) return; this.quizList.push({ question: this.newQuiz.question, options: [this.newQuiz.opt1, this.newQuiz.opt2, this.newQuiz.opt3, this.newQuiz.opt4], correct: Number(this.newQuiz.correct) }); firebase.database().ref('gamesData/quizList').set(this.quizList); this.newQuiz = { question: '', opt1: '', opt2: '', opt3: '', opt4: '', correct: '0' }; alert('Đã thêm câu hỏi!'); }
-            }
-        }
-    </script>
-</body>
-</html>
+                    firebase.database().ref('attendanceHistory/' + this.currentUser.username).

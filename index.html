@@ -238,7 +238,6 @@
                 <div class="flex justify-between items-center">
                     <h2 class="font-bold text-lg text-gray-900" x-text="currentUser.role === 'doansinh' ? 'Thông Tin Cá Nhân' : 'Danh Sách Đoàn Sinh'"></h2>
                     <div class="flex gap-1.5">
-                        <!-- Nút xuất Excel toàn bộ hồ sơ dành cho Huynh Trưởng và Admin -->
                         <template x-if="currentUser.role !== 'doansinh'">
                             <button @click="exportAllMembersToExcel()" class="bg-emerald-700 hover:bg-emerald-800 text-white text-xs px-2.5 py-1.5 rounded-lg font-semibold flex items-center gap-1 shadow-xs">
                                 <span>📥</span> Xuất Excel
@@ -641,7 +640,7 @@
                     </div>
                 </div>
 
-                <!-- 2. TRAO DỒI PHẬT PHÁP (CÓ TÍNH NĂNG SỬA/XÓA CÂU HỎI CHO ADMIN) -->
+                <!-- 2. TRAO DỒI PHẬT PHÁP -->
                 <div x-show="gameSubTab === 'quiz'" class="space-y-3 bg-white border rounded-xl p-4 shadow-sm text-xs">
                     <div class="flex justify-between items-center border-b pb-2">
                         <h3 class="font-bold text-sm text-blue-900">🧠 Trao Dồi Phật Pháp & Thi Đố Vui</h3>
@@ -650,7 +649,6 @@
                         </template>
                     </div>
 
-                    <!-- Modal Thêm/Sửa câu hỏi dành cho Admin -->
                     <template x-if="showQuizConfig && currentUser.role === 'admin'">
                         <div class="bg-blue-50 border p-3 rounded-lg space-y-2">
                             <p class="font-bold text-blue-900" x-text="isEditQuizMode ? 'Chỉnh sửa câu hỏi Phật Pháp' : 'Thêm câu hỏi mới'"></p>
@@ -681,7 +679,6 @@
                         </div>
                     </template>
 
-                    <!-- Danh sách quản lý câu hỏi cho Admin -->
                     <template x-if="currentUser.role === 'admin' && !quizStarted && !quizFinished">
                         <div class="border p-2.5 rounded-lg bg-gray-50 space-y-2">
                             <p class="font-bold text-gray-700 text-[11px]">📋 Danh sách bộ câu hỏi hiện tại:</p>
@@ -1439,7 +1436,6 @@
                     this.userAnswers = {};
                 },
 
-                // Quản lý Sửa/Xóa câu hỏi Đố Phật Pháp cho Admin
                 openQuizModal() {
                     this.isEditQuizMode = false;
                     this.editingQuizIndex = null;
@@ -1628,7 +1624,6 @@
                 deleteSkillCategory(id) { if (confirm('Xóa chuyên đề?')) { this.skillsList = this.skillsList.filter(s => s.id !== id); this.saveSkillsToFirebase(); } },
                 saveSkillsToFirebase() { firebase.database().ref('skillsList').set(this.skillsList); },
 
-                // Xuất toàn bộ danh sách hồ sơ Đoàn sinh ra Excel (CSV)
                 exportAllMembersToExcel() {
                     if (!this.members || this.members.length === 0) return alert('Không có dữ liệu đoàn sinh để xuất!');
                     let csvContent = "\uFEFFSTT,Họ và tên,Pháp danh,Giới tính,Ngày sinh,Ngành/Đoàn,Sinh hoạt từ,SĐT cá nhân,SĐT phụ huynh,Địa chỉ,Đã học bậc,Trạng thái,Điểm Tinh Tấn\n";
@@ -1669,13 +1664,10 @@
                     return this.searchPointMember ? sorted.filter(m => m.name.toLowerCase().includes(this.searchPointMember.toLowerCase()) || m.dhName.toLowerCase().includes(this.searchPointMember.toLowerCase())) : sorted;
                 },
 
-                // Đếm số buổi có mặt thực tế cho BXH Chuyên Cần
                 countPresentSessions(memberIdentifier) {
                     if (!memberIdentifier) return 0;
-                    // Kiểm tra qua lịch sử tài khoản hoặc tìm theo id/username
                     let histories = this.attendanceHistoryAll[memberIdentifier];
                     if (!histories) {
-                        // Thử tìm theo username từ accounts liên kết với member
                         const acc = this.accounts.find(a => a.linkedId == memberIdentifier);
                         if (acc && this.attendanceHistoryAll[acc.username]) {
                             histories = this.attendanceHistoryAll[acc.username];
@@ -1756,7 +1748,7 @@
                     alert('Tạo tài khoản thành công!');
                 },
 
-                // Ràng buộc thời gian điểm danh (Chỉ Chủ Nhật từ 14:00 - 17:00, báo vắng từ 07:00 - 17:00)
+                // Ràng buộc thời gian & chỉ cộng lượt quay khi chọn "Có mặt"
                 submitSelfAttendance(status) {
                     if (!this.currentUser) return;
                     const now = new Date();
@@ -1790,8 +1782,11 @@
                     this.myAttendanceHistory.unshift({ date: this.attendanceDate, status: status });
                     firebase.database().ref('attendanceHistory/' + this.currentUser.username).set(this.myAttendanceHistory);
 
-                    this.mySpinTurns++;
-                    firebase.database().ref('userGameData/' + this.currentUser.username).update({ spinTurns: this.mySpinTurns });
+                    // Chỉ cộng lượt quay khi bấm "Có mặt", không cộng khi bấm "Vắng có phép"
+                    if (status === 'Có mặt') {
+                        this.mySpinTurns++;
+                        firebase.database().ref('userGameData/' + this.currentUser.username).update({ spinTurns: this.mySpinTurns });
+                    }
 
                     if (this.currentUser.linkedId) {
                         const member = this.members.find(m => m.id == this.currentUser.linkedId);
@@ -1804,7 +1799,12 @@
                             this.updateMemberAttendanceForSelectedDate(member.id, status);
                         }
                     }
-                    alert('Điểm danh thành công! Bạn nhận được +1 lượt quay.');
+
+                    if (status === 'Có mặt') {
+                        alert('Điểm danh thành công! Bạn nhận được +1 lượt quay.');
+                    } else {
+                        alert('Đã ghi nhận báo vắng có phép thành công.');
+                    }
                 },
 
                 openAddMemberModal() { this.isEditMode = false; this.newMember = { id: Date.now(), name: '', dhName: '', gender: 'Nam', dob: '', group: 'Thiếu', phone: '', parentPhone: '', joinDate: '', address: '', level: '', status: 'Đang sinh hoạt', attendanceStatus: 'Chưa điểm danh', attendanceRate: 100, points: 100 }; this.showAddModal = true; },

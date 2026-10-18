@@ -237,9 +237,17 @@
             <div x-show="currentTab === 'members'" class="space-y-4">
                 <div class="flex justify-between items-center">
                     <h2 class="font-bold text-lg text-gray-900" x-text="currentUser.role === 'doansinh' ? 'Thông Tin Cá Nhân' : 'Danh Sách Đoàn Sinh'"></h2>
-                    <template x-if="currentUser.role !== 'doansinh'">
-                        <button @click="openAddMemberModal" class="bg-blue-600 text-white text-xs px-3 py-1.5 rounded-lg font-semibold">+ Thêm Đoàn Sinh</button>
-                    </template>
+                    <div class="flex gap-1.5">
+                        <!-- Nút xuất Excel toàn bộ hồ sơ dành cho Huynh Trưởng và Admin -->
+                        <template x-if="currentUser.role !== 'doansinh'">
+                            <button @click="exportAllMembersToExcel()" class="bg-emerald-700 hover:bg-emerald-800 text-white text-xs px-2.5 py-1.5 rounded-lg font-semibold flex items-center gap-1 shadow-xs">
+                                <span>📥</span> Xuất Excel
+                            </button>
+                        </template>
+                        <template x-if="currentUser.role !== 'doansinh'">
+                            <button @click="openAddMemberModal" class="bg-blue-600 text-white text-xs px-3 py-1.5 rounded-lg font-semibold">+ Thêm Đoàn Sinh</button>
+                        </template>
+                    </div>
                 </div>
 
                 <template x-if="currentUser.role !== 'doansinh'">
@@ -316,6 +324,7 @@
                                 <div><b class="text-gray-700">Ngành/Đoàn:</b> <span x-text="m.group"></span></div>
                                 <div><b class="text-gray-700">SĐT:</b> <span x-text="m.phone"></span></div>
                                 <div><b class="text-gray-700">SĐT PH:</b> <span x-text="m.parentPhone"></span></div>
+                                <div><b class="text-gray-700">Sinh hoạt từ:</b> <span class="font-semibold text-blue-900" x-text="m.joinDate || 'Chưa cập nhật'"></span></div>
                                 <div class="col-span-2"><b class="text-gray-700">Địa chỉ:</b> <span x-text="m.address || 'Chưa cập nhật'"></span></div>
                                 <div><b class="text-gray-700">Đã học bậc:</b> <span x-text="m.level"></span></div>
                                 <div><b class="text-gray-700">TK Liên kết:</b> <span class="text-blue-600 font-semibold" x-text="getLinkedUsername(m.id)"></span></div>
@@ -491,7 +500,7 @@
                                         <p class="text-[10px] text-gray-500" x-text="rank.group"></p>
                                     </div>
                                 </div>
-                                <span class="font-extrabold text-blue-900 bg-white/80 px-2.5 py-1 rounded-lg border shadow-xs" x-text="(rank.attendanceRate !== undefined ? rank.attendanceRate : 100) + '% đi sinh hoạt'"></span>
+                                <span class="font-extrabold text-blue-900 bg-white/80 px-2.5 py-1 rounded-lg border shadow-xs" x-text="countPresentSessions(rank.username || rank.id) + ' buổi có mặt'"></span>
                             </div>
                         </template>
                     </div>
@@ -560,7 +569,7 @@
                     <button @click="gameSubTab = 'docs'" :class="gameSubTab === 'docs' ? 'bg-blue-900 text-white shadow' : 'bg-white text-gray-700 border'" class="p-2 rounded-xl text-center">📂 Kho Tài Liệu</button>
                 </div>
 
-                <!-- 1. VÒNG QUAY TINH TẤN (ĐÃ CẬP NHẬT CHUẨN XÁC KHỚP MŨI TÊN & TỐC ĐỘ 6 GIÂY) -->
+                <!-- 1. VÒNG QUAY TINH TẤN -->
                 <div x-show="gameSubTab === 'wheel'" class="space-y-3 bg-white border rounded-xl p-4 shadow-sm text-xs" x-init="$nextTick(() => drawWheelCanvas())">
                     <div class="flex justify-between items-center border-b pb-2">
                         <h3 class="font-bold text-sm text-blue-900">🎡 Vòng Quay Tinh Tấn May Mắn</h3>
@@ -632,29 +641,64 @@
                     </div>
                 </div>
 
-                <!-- 2. TRAO DỒI PHẬT PHÁP -->
+                <!-- 2. TRAO DỒI PHẬT PHÁP (CÓ TÍNH NĂNG SỬA/XÓA CÂU HỎI CHO ADMIN) -->
                 <div x-show="gameSubTab === 'quiz'" class="space-y-3 bg-white border rounded-xl p-4 shadow-sm text-xs">
                     <div class="flex justify-between items-center border-b pb-2">
                         <h3 class="font-bold text-sm text-blue-900">🧠 Trao Dồi Phật Pháp & Thi Đố Vui</h3>
                         <template x-if="currentUser.role === 'admin'">
-                            <button @click="showQuizConfig = !showQuizConfig" class="text-[10px] bg-blue-100 text-blue-800 px-2 py-1 rounded font-semibold">⚙️ Tạo câu hỏi</button>
+                            <button @click="openQuizModal()" class="text-[10px] bg-blue-600 text-white px-2.5 py-1 rounded font-semibold">+ Thêm câu hỏi</button>
                         </template>
                     </div>
 
+                    <!-- Modal Thêm/Sửa câu hỏi dành cho Admin -->
                     <template x-if="showQuizConfig && currentUser.role === 'admin'">
                         <div class="bg-blue-50 border p-3 rounded-lg space-y-2">
-                            <input type="number" x-model.number="quizDuration" placeholder="Thời gian (giây)" class="w-full px-2 py-1 border rounded bg-white">
-                            <input type="text" x-model="newQuiz.question" placeholder="Câu hỏi..." class="w-full px-2 py-1 border rounded bg-white">
+                            <p class="font-bold text-blue-900" x-text="isEditQuizMode ? 'Chỉnh sửa câu hỏi Phật Pháp' : 'Thêm câu hỏi mới'"></p>
+                            <div>
+                                <label class="block text-[10px] text-gray-500 font-semibold mb-0.5">Thời gian làm bài chung (giây):</label>
+                                <input type="number" x-model.number="quizDuration" class="w-full px-2 py-1 border rounded bg-white">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-gray-500 font-semibold mb-0.5">Nội dung câu hỏi:</label>
+                                <input type="text" x-model="newQuiz.question" placeholder="Câu hỏi..." class="w-full px-2 py-1 border rounded bg-white">
+                            </div>
                             <div class="grid grid-cols-2 gap-1">
                                 <input type="text" x-model="newQuiz.opt1" placeholder="Đáp án A" class="px-2 py-1 border rounded bg-white">
                                 <input type="text" x-model="newQuiz.opt2" placeholder="Đáp án B" class="px-2 py-1 border rounded bg-white">
                                 <input type="text" x-model="newQuiz.opt3" placeholder="Đáp án C" class="px-2 py-1 border rounded bg-white">
                                 <input type="text" x-model="newQuiz.opt4" placeholder="Đáp án D" class="px-2 py-1 border rounded bg-white">
                             </div>
-                            <select x-model="newQuiz.correct" class="w-full px-2 py-1 border rounded bg-white">
-                                <option value="0">Đúng: A</option><option value="1">Đúng: B</option><option value="2">Đúng: C</option><option value="3">Đúng: D</option>
-                            </select>
-                            <button @click="addQuizQuestion()" class="w-full bg-blue-900 text-white py-1.5 rounded font-semibold">Thêm Câu Hỏi</button>
+                            <div>
+                                <label class="block text-[10px] text-gray-500 font-semibold mb-0.5">Đáp án đúng:</label>
+                                <select x-model="newQuiz.correct" class="w-full px-2 py-1 border rounded bg-white">
+                                    <option value="0">Đúng: A</option><option value="1">Đúng: B</option><option value="2">Đúng: C</option><option value="3">Đúng: D</option>
+                                </select>
+                            </div>
+                            <div class="flex gap-2 pt-1">
+                                <button @click="showQuizConfig = false" class="flex-1 bg-gray-200 py-1.5 rounded font-semibold">Hủy</button>
+                                <button @click="saveQuizQuestion()" class="flex-1 bg-blue-900 text-white py-1.5 rounded font-semibold">Lưu Câu Hỏi</button>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- Danh sách quản lý câu hỏi cho Admin -->
+                    <template x-if="currentUser.role === 'admin' && !quizStarted && !quizFinished">
+                        <div class="border p-2.5 rounded-lg bg-gray-50 space-y-2">
+                            <p class="font-bold text-gray-700 text-[11px]">📋 Danh sách bộ câu hỏi hiện tại:</p>
+                            <div class="space-y-1.5 max-h-40 overflow-y-auto">
+                                <template x-for="(q, qIdx) in quizList" :key="qIdx">
+                                    <div class="p-2 bg-white border rounded flex justify-between items-center text-[11px]">
+                                        <div class="truncate flex-1 pr-2">
+                                            <span class="font-bold text-blue-900" x-text="'C' + (qIdx + 1) + ': '"></span>
+                                            <span x-text="q.question"></span>
+                                        </div>
+                                        <div class="flex gap-1 shrink-0">
+                                            <button @click="editQuizQuestion(qIdx)" class="bg-gray-100 hover:bg-gray-200 text-blue-700 px-1.5 py-0.5 rounded text-[10px]">✏️ Sửa</button>
+                                            <button @click="deleteQuizQuestion(qIdx)" class="bg-red-50 hover:bg-red-100 text-red-600 px-1.5 py-0.5 rounded text-[10px]">🗑️ Xóa</button>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
                         </div>
                     </template>
 
@@ -1006,6 +1050,12 @@
 
                     <input type="text" x-model="newMember.phone" placeholder="SĐT cá nhân" class="w-full px-3 py-2 border rounded outline-none">
                     <input type="text" x-model="newMember.parentPhone" placeholder="SĐT phụ huynh" class="w-full px-3 py-2 border rounded outline-none">
+                    
+                    <div>
+                        <label class="block text-[10px] text-gray-500 font-semibold mb-0.5">Sinh hoạt từ:</label>
+                        <input type="text" x-model="newMember.joinDate" placeholder="Ví dụ: Tháng 05/2024 hoặc Năm 2023" class="w-full px-3 py-2 border rounded outline-none">
+                    </div>
+
                     <input type="text" x-model="newMember.address" placeholder="Địa chỉ cư trú" class="w-full px-3 py-2 border rounded outline-none">
                     <input type="text" x-model="newMember.level" placeholder="Đã học bậc" class="w-full px-3 py-2 border rounded outline-none">
                     
@@ -1096,11 +1146,12 @@
                 bhtList: [],
                 skillsList: [],
                 dailyAttendanceData: {},
+                attendanceHistoryAll: {},
 
                 newUser: { username: '', password: '', role: 'doansinh', linkedId: '' },
                 editingBHT: false,
                 newAnn: { title: '', content: '' },
-                newMember: { id: null, name: '', dhName: '', gender: 'Nam', dob: '', group: 'Thiếu', phone: '', parentPhone: '', address: '', level: '', status: 'Đang sinh hoạt', attendanceStatus: 'Chưa điểm danh', attendanceRate: 100, points: 100 },
+                newMember: { id: null, name: '', dhName: '', gender: 'Nam', dob: '', group: 'Thiếu', phone: '', parentPhone: '', joinDate: '', address: '', level: '', status: 'Đang sinh hoạt', attendanceStatus: 'Chưa điểm danh', attendanceRate: 100, points: 100 },
                 myAttendanceHistory: [],
                 attendanceDate: new Date().toISOString().split('T')[0],
                 selectedSkill: null,
@@ -1159,6 +1210,8 @@
                 },
 
                 showQuizConfig: false,
+                isEditQuizMode: false,
+                editingQuizIndex: null,
                 quizDuration: 30,
                 quizTimer: 30,
                 quizStarted: false,
@@ -1214,6 +1267,10 @@
 
                     db.ref('dailyAttendance').on('value', (snapshot) => {
                         this.dailyAttendanceData = snapshot.val() || {};
+                    });
+
+                    db.ref('attendanceHistory').on('value', (snapshot) => {
+                        this.attendanceHistoryAll = snapshot.val() || {};
                     });
 
                     db.ref('announcements').on('value', (snapshot) => {
@@ -1382,6 +1439,50 @@
                     this.userAnswers = {};
                 },
 
+                // Quản lý Sửa/Xóa câu hỏi Đố Phật Pháp cho Admin
+                openQuizModal() {
+                    this.isEditQuizMode = false;
+                    this.editingQuizIndex = null;
+                    this.newQuiz = { question: '', opt1: '', opt2: '', opt3: '', opt4: '', correct: '0' };
+                    this.showQuizConfig = true;
+                },
+                editQuizQuestion(qIdx) {
+                    this.isEditQuizMode = true;
+                    this.editingQuizIndex = qIdx;
+                    const q = this.quizList[qIdx];
+                    this.newQuiz = {
+                        question: q.question,
+                        opt1: q.options[0] || '',
+                        opt2: q.options[1] || '',
+                        opt3: q.options[2] || '',
+                        opt4: q.options[3] || '',
+                        correct: String(q.correct || 0)
+                    };
+                    this.showQuizConfig = true;
+                },
+                saveQuizQuestion() {
+                    if (!this.newQuiz.question) return alert('Vui lòng nhập nội dung câu hỏi!');
+                    const formattedQ = {
+                        question: this.newQuiz.question,
+                        options: [this.newQuiz.opt1, this.newQuiz.opt2, this.newQuiz.opt3, this.newQuiz.opt4],
+                        correct: Number(this.newQuiz.correct)
+                    };
+                    if (this.isEditQuizMode && this.editingQuizIndex !== null) {
+                        this.quizList[this.editingQuizIndex] = formattedQ;
+                    } else {
+                        this.quizList.push(formattedQ);
+                    }
+                    firebase.database().ref('gamesData/quizList').set(this.quizList);
+                    this.showQuizConfig = false;
+                    alert('Đã lưu câu hỏi thành công!');
+                },
+                deleteQuizQuestion(qIdx) {
+                    if (confirm('Bạn có chắc chắn muốn xóa câu hỏi này không?')) {
+                        this.quizList.splice(qIdx, 1);
+                        firebase.database().ref('gamesData/quizList').set(this.quizList);
+                    }
+                },
+
                 openAddEventModal() {
                     this.isEditEventMode = false;
                     this.eventForm = { id: Date.now(), title: '', content: '', date: '' };
@@ -1527,13 +1628,27 @@
                 deleteSkillCategory(id) { if (confirm('Xóa chuyên đề?')) { this.skillsList = this.skillsList.filter(s => s.id !== id); this.saveSkillsToFirebase(); } },
                 saveSkillsToFirebase() { firebase.database().ref('skillsList').set(this.skillsList); },
 
+                // Xuất toàn bộ danh sách hồ sơ Đoàn sinh ra Excel (CSV)
+                exportAllMembersToExcel() {
+                    if (!this.members || this.members.length === 0) return alert('Không có dữ liệu đoàn sinh để xuất!');
+                    let csvContent = "\uFEFFSTT,Họ và tên,Pháp danh,Giới tính,Ngày sinh,Ngành/Đoàn,Sinh hoạt từ,SĐT cá nhân,SĐT phụ huynh,Địa chỉ,Đã học bậc,Trạng thái,Điểm Tinh Tấn\n";
+                    this.members.forEach((m, index) => {
+                        csvContent += `${index + 1},"${m.name || ''}","${m.dhName || ''}","${m.gender || 'Nam'}","${m.dob || ''}","${m.group || ''}","${m.joinDate || ''}","${m.phone || ''}","${m.parentPhone || ''}","${m.address || ''}","${m.level || ''}","${m.status || ''}","${m.tinhTanPoints || 0}"\n`;
+                    });
+                    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `Danh_Sach_Doan_Sinh_${new Date().toISOString().split('T')[0]}.csv`;
+                    link.click();
+                },
+
                 exportAttendanceToExcel() {
                     if (!this.members || this.members.length === 0) return alert('Không có dữ liệu!');
                     const targetDate = this.selectedFilterDate;
                     const dateRecords = this.dailyAttendanceData[targetDate] || {};
-                    let csvContent = "\uFEFFSTT,Họ và tên,Pháp danh,Giới tính,Đoàn/Ngành,Trạng thái điểm danh ngày " + targetDate + ",Tỷ lệ đi sinh hoạt (%),Địa chỉ\n";
+                    let csvContent = "\uFEFFSTT,Họ và tên,Pháp danh,Giới tính,Đoàn/Ngành,Trạng thái điểm danh ngày " + targetDate + ",Sinh hoạt từ,Địa chỉ\n";
                     this.members.forEach((m, index) => {
-                        csvContent += `${index + 1},"${m.name || ''}","${m.dhName || ''}","${m.gender || 'Nam'}","${m.group || ''}","${dateRecords[m.id] || 'Chưa điểm danh'}","${m.attendanceRate || 100}%","${m.address || ''}"\n`;
+                        csvContent += `${index + 1},"${m.name || ''}","${m.dhName || ''}","${m.gender || 'Nam'}","${m.group || ''}","${dateRecords[m.id] || 'Chưa điểm danh'}","${m.joinDate || ''}","${m.address || ''}"\n`;
                     });
                     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
                     const link = document.createElement('a');
@@ -1554,7 +1669,32 @@
                     return this.searchPointMember ? sorted.filter(m => m.name.toLowerCase().includes(this.searchPointMember.toLowerCase()) || m.dhName.toLowerCase().includes(this.searchPointMember.toLowerCase())) : sorted;
                 },
 
-                get attendanceLeaderboard() { return [...this.members].sort((a, b) => (b.attendanceRate || 100) - (a.attendanceRate || 100)); },
+                // Đếm số buổi có mặt thực tế cho BXH Chuyên Cần
+                countPresentSessions(memberIdentifier) {
+                    if (!memberIdentifier) return 0;
+                    // Kiểm tra qua lịch sử tài khoản hoặc tìm theo id/username
+                    let histories = this.attendanceHistoryAll[memberIdentifier];
+                    if (!histories) {
+                        // Thử tìm theo username từ accounts liên kết với member
+                        const acc = this.accounts.find(a => a.linkedId == memberIdentifier);
+                        if (acc && this.attendanceHistoryAll[acc.username]) {
+                            histories = this.attendanceHistoryAll[acc.username];
+                        }
+                    }
+                    if (histories) {
+                        const historyArr = Object.values(histories);
+                        return historyArr.filter(h => h.status === 'Có mặt').length;
+                    }
+                    return 0;
+                },
+
+                get attendanceLeaderboard() { 
+                    return [...this.members].sort((a, b) => {
+                        const countA = this.countPresentSessions(a.username || a.id);
+                        const countB = this.countPresentSessions(b.username || b.id);
+                        return countB - countA;
+                    }); 
+                },
 
                 get attendanceReportList() {
                     const targetDate = this.selectedFilterDate;
@@ -1616,11 +1756,33 @@
                     alert('Tạo tài khoản thành công!');
                 },
 
+                // Ràng buộc thời gian điểm danh (Chỉ Chủ Nhật từ 14:00 - 17:00, báo vắng từ 07:00 - 17:00)
                 submitSelfAttendance(status) {
                     if (!this.currentUser) return;
                     const now = new Date();
                     const todayStr = now.toISOString().split('T')[0];
-                    if (this.attendanceDate !== todayStr) return alert('Chỉ có thể điểm danh ngày hôm nay!');
+                    if (this.attendanceDate !== todayStr) return alert('Chỉ có thể điểm danh hoặc báo vắng cho ngày hôm nay!');
+
+                    const dayOfWeek = now.getDay(); // 0 là Chủ Nhật
+                    const currentHour = now.getHours();
+                    const currentMinute = now.getMinutes();
+                    const totalMinutes = currentHour * 60 + currentMinute;
+
+                    if (dayOfWeek !== 0) {
+                        return alert('Hệ thống chỉ mở điểm danh và báo vắng vào ngày Chủ Nhật hàng tuần!');
+                    }
+
+                    if (status === 'Có mặt') {
+                        // Từ 14:00 (840 phút) đến 17:00 (1020 phút)
+                        if (totalMinutes < 840 || totalMinutes > 1020) {
+                            return alert('Thời gian bấm điểm danh "Có mặt" chỉ mở vào Chủ Nhật từ 14:00 đến 17:00!');
+                        }
+                    } else if (status === 'Vắng có phép') {
+                        // Từ 07:00 (420 phút) đến 17:00 (1020 phút)
+                        if (totalMinutes < 420 || totalMinutes > 1020) {
+                            return alert('Thời gian báo vắng có phép chỉ mở vào Chủ Nhật từ 07:00 đến 17:00!');
+                        }
+                    }
 
                     const alreadyChecked = this.myAttendanceHistory.some(h => h.date === this.attendanceDate);
                     if (alreadyChecked) return alert('Bạn đã điểm danh cho ngày này rồi!');
@@ -1645,7 +1807,7 @@
                     alert('Điểm danh thành công! Bạn nhận được +1 lượt quay.');
                 },
 
-                openAddMemberModal() { this.isEditMode = false; this.newMember = { id: Date.now(), name: '', dhName: '', gender: 'Nam', dob: '', group: 'Thiếu', phone: '', parentPhone: '', address: '', level: '', status: 'Đang sinh hoạt', attendanceStatus: 'Chưa điểm danh', attendanceRate: 100, points: 100 }; this.showAddModal = true; },
+                openAddMemberModal() { this.isEditMode = false; this.newMember = { id: Date.now(), name: '', dhName: '', gender: 'Nam', dob: '', group: 'Thiếu', phone: '', parentPhone: '', joinDate: '', address: '', level: '', status: 'Đang sinh hoạt', attendanceStatus: 'Chưa điểm danh', attendanceRate: 100, points: 100 }; this.showAddModal = true; },
                 editMemberProfile(m) { this.isEditMode = true; this.newMember = { ...m }; this.showAddModal = true; },
                 deleteMember(id) { if (confirm('Xóa hồ sơ?')) { this.members = this.members.filter(m => m.id !== id); this.saveMembersToFirebase(); } },
                 saveMember() {
@@ -1656,8 +1818,7 @@
                 },
                 toggleLockAccount(acc) { acc.locked = !acc.locked; this.saveAccountsToFirebase(); },
                 addAnnouncement() { if (!this.newAnn.title) return; this.announcements.unshift({ ...this.newAnn, date: new Date().toLocaleDateString('vi-VN') }); this.saveAnnouncementsToFirebase(); this.newAnn = { title: '', content: '' }; },
-                deleteAnnouncement(idx) { this.announcements.splice(idx, 1); this.saveAnnouncementsToFirebase(); },
-                addQuizQuestion() { if (!this.newQuiz.question) return; this.quizList.push({ question: this.newQuiz.question, options: [this.newQuiz.opt1, this.newQuiz.opt2, this.newQuiz.opt3, this.newQuiz.opt4], correct: Number(this.newQuiz.correct) }); firebase.database().ref('gamesData/quizList').set(this.quizList); this.newQuiz = { question: '', opt1: '', opt2: '', opt3: '', opt4: '', correct: '0' }; alert('Đã thêm câu hỏi!'); }
+                deleteAnnouncement(idx) { this.announcements.splice(idx, 1); this.saveAnnouncementsToFirebase(); }
             }
         }
     </script>

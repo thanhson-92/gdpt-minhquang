@@ -1946,10 +1946,25 @@
                 },
 
                 get filteredMembers() {
-                    if (this.currentUser && this.currentUser.role === 'doansinh') return this.members.filter(m => m.id == this.currentUser.linkedId);
+                    if (this.currentUser && this.currentUser.role === 'doansinh') {
+                        return this.members.filter(m => m.id == this.currentUser.linkedId);
+                    }
+                    
+                    const search = (this.memberSearch || '').trim().toLowerCase();
+                    
+                    // Nếu chưa tìm kiếm, chỉ hiện đúng hồ sơ của chính tài khoản đang đăng nhập
+                    if (!search) {
+                        if (this.currentUser && this.currentUser.linkedId) {
+                            return this.members.filter(m => m.id == this.currentUser.linkedId);
+                        }
+                        return [];
+                    }
+
+                    // Nếu có nhập từ khóa tìm kiếm, hiển thị danh sách khớp với từ khóa
                     return this.members.filter(m => {
-                        const search = (this.memberSearch || '').toLowerCase();
-                        return (!search || m.name.toLowerCase().includes(search) || (m.dhName && m.dhName.toLowerCase().includes(search))) && (this.memberFilterGroup === 'all' || m.group === this.memberFilterGroup);
+                        const matchText = m.name.toLowerCase().includes(search) || (m.dhName && m.dhName.toLowerCase().includes(search));
+                        const matchGroup = (this.memberFilterGroup === 'all' || m.group === this.memberFilterGroup);
+                        return matchText && matchGroup;
                     });
                 },
 

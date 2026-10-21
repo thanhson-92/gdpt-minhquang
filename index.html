@@ -633,7 +633,7 @@
                 <!-- MENU 6 TÍNH NĂNG -->
                 <div class="grid grid-cols-3 gap-2 text-xs font-bold">
                     <button @click="gameSubTab = 'wheel'" :class="gameSubTab === 'wheel' ? 'bg-blue-900 text-white shadow' : 'bg-white text-gray-700 border'" class="p-2 rounded-xl text-center">🎡 Vòng Quay</button>
-                    <button @click="gameSubTab = 'quiz'" :class="gameSubTab === 'quiz' ? 'bg-blue-900 text-white shadow' : 'bg-white text-gray-700 border'" class="p-2 rounded-xl text-center">🧠 Đố Phật Pháp</button>
+                    <button @click="gameSubTab = 'quiz'" :class="gameSubTab === 'quiz' ? 'bg-blue-900 text-white shadow' : 'bg-white text-gray-700 border'" class="p-2 rounded-xl text-center">📔 Phật Pháp</button>
                     <button @click="gameSubTab = 'skills'" :class="gameSubTab === 'skills' ? 'bg-blue-900 text-white shadow' : 'bg-white text-gray-700 border'" class="p-2 rounded-xl text-center">📚 Kỹ Năng</button>
                     <button @click="gameSubTab = 'events'" :class="gameSubTab === 'events' ? 'bg-blue-900 text-white shadow' : 'bg-white text-gray-700 border'" class="p-2 rounded-xl text-center">🎉 Sự Kiện</button>
                     <button @click="gameSubTab = 'shop'" :class="gameSubTab === 'shop' ? 'bg-blue-900 text-white shadow' : 'bg-white text-gray-700 border'" class="p-2 rounded-xl text-center">🎁 Shop Quà</button>
@@ -890,7 +890,7 @@
                 <!-- 3. RÈN LUYỆN KỸ NĂNG (Hiển thị Top 3 Quán quân, Á quân, Hạng 3 chi tiết 2 hàng) -->
                 <div x-show="gameSubTab === 'skills'" class="space-y-3 bg-white border rounded-xl p-4 shadow-sm text-xs">
                     <div class="flex justify-between items-center border-b pb-2">
-                        <h3 class="font-bold text-sm text-blue-900">📚 Rèn Luyện Kỹ Năng (Thi Tự Luận)</h3>
+                        <h3 class="font-bold text-sm text-blue-900">📚 Rèn Luyện Kỹ Năng</h3>
                         <template x-if="currentUser.role === 'admin'">
                             <button @click="openAddEssaySkillModal()" class="bg-blue-600 text-white px-2.5 py-1 rounded font-semibold">+ Thêm câu hỏi tự luận</button>
                         </template>

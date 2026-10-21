@@ -129,7 +129,7 @@
                                     <p class="font-semibold text-blue-900" x-text="ann.title"></p>
                                     <span class="text-[10px] text-gray-400" x-text="ann.date"></span>
                                 </div>
-                                <p class="text-gray-600 leading-relaxed" x-text="ann.content"></p>
+                                <p class="text-gray-600 leading-relaxed whitespace-pre-line" x-text="ann.content"></p>>
                                 <template x-if="currentUser.role === 'admin'">
                                     <button @click="deleteAnnouncement(idx)" class="text-[10px] text-red-500 hover:underline pt-1 block">Xóa thông báo này</button>
                                 </template>
@@ -940,7 +940,7 @@
                                     </template>
                                 </div>
 
-                                <p class="text-gray-600 leading-relaxed text-xs" x-text="item.content"></p>
+                                <p class="text-gray-600 leading-relaxed text-xs whitespace-pre-line" x-text="item.content"></p>
 
                                 <!-- HIỂN THỊ TOP 3 QUÁN QUÂN, Á QUÂN, HẠNG 3 KỸ NĂNG -->
                                 <div class="space-y-1.5 pt-1">
@@ -1028,7 +1028,7 @@
                                     </div>
                                 </template>
                                 <p class="font-bold text-amber-900 text-sm" x-text="ev.title"></p>
-                                <p class="text-gray-600" x-text="ev.content"></p>
+                                <p class="text-gray-600 whitespace-pre-line" x-text="ev.content"></p>
                                 <span class="text-[10px] bg-red-100 text-red-600 px-2 py-0.5 rounded font-bold inline-block" x-text="'Thời gian: ' + ev.date"></span>
                             </div>
                         </template>

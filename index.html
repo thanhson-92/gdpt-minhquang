@@ -129,7 +129,7 @@
                                     <p class="font-semibold text-blue-900" x-text="ann.title"></p>
                                     <span class="text-[10px] text-gray-400" x-text="ann.date"></span>
                                 </div>
-                                <p class="text-gray-600 leading-relaxed whitespace-pre-line" x-text="ann.content"></p>>
+                                <p class="text-gray-600 leading-relaxed whitespace-pre-line" x-text="ann.content"></p>
                                 <template x-if="currentUser.role === 'admin'">
                                     <button @click="deleteAnnouncement(idx)" class="text-[10px] text-red-500 hover:underline pt-1 block">Xóa thông báo này</button>
                                 </template>
@@ -712,10 +712,10 @@
                     </div>
                 </div>
 
-                <!-- 2. TRAO DỒI PHẬT PHÁP (Hiển thị Top 3 Quán quân, Á quân, Hạng 3 chi tiết 3 hàng) -->
+                <!-- 2. TRAO DỒI PHẬT PHÁP -->
                 <div x-show="gameSubTab === 'quiz'" class="space-y-3 bg-white border rounded-xl p-4 shadow-sm text-xs">
                     <div class="flex justify-between items-center border-b pb-2">
-                        <h3 class="font-bold text-sm text-blue-900">🧠 Trao Dồi Phật Pháp & Thi Đố Vui</h3>
+                        <h3 class="font-bold text-sm text-blue-900">📔 Trao Dồi Phật Pháp & Thi Đố Vui</h3>
                         <template x-if="currentUser.role === 'admin'">
                             <button @click="openQuizCategoryModal()" class="text-[10px] bg-blue-600 text-white px-2.5 py-1 rounded font-semibold">+ Tạo bộ câu hỏi</button>
                         </template>
@@ -772,27 +772,11 @@
                                                 </div>
                                             </div>
 
-                                            <!-- HIỂN THỊ TOP 3 QUÁN QUÂN, Á QUÂN, HẠNG 3 BỘ ĐỀ THI -->
-                                            <div class="space-y-1.5 pt-1">
-                                                <template x-for="(champ, index) in getQuizTop3(cat.id)" :key="index">
-                                                    <div class="bg-amber-50 border border-amber-200 rounded-lg p-2 text-xs space-y-0.5">
-                                                        <div class="font-bold text-amber-900 flex items-center gap-1">
-                                                            <span x-text="index === 0 ? '👑 Quán quân:' : (index === 1 ? '🥈 Á quân:' : '🥉 Hạng 3:')"></span>
-                                                            <span x-text="champ.name"></span>
-                                                        </div>
-                                                        <div class="text-[10px] text-amber-800 font-medium">
-                                                            <span x-text="'Số câu đúng: ' + champ.score + ' | Số lần thi: ' + champ.retries"></span>
-                                                        </div>
-                                                        <div class="text-[10px] text-gray-500">
-                                                            <span x-text="'Thời gian nộp bài: ' + champ.dateTimeStr"></span>
-                                                        </div>
-                                                    </div>
-                                                </template>
-                                                <template x-if="getQuizTop3(cat.id).length === 0">
-                                                    <div class="bg-amber-50 border border-amber-200 rounded-lg p-2 text-[11px] text-amber-900 italic">
-                                                        Chưa có dữ liệu quán quân.
-                                                    </div>
-                                                </template>
+                                            <!-- NÚT XEM KẾT QUẢ THI NÂNG CẤP DẠNG MODAL FULL MÀN HÌNH -->
+                                            <div class="pt-1 flex justify-end">
+                                                <button @click="openQuizResultsModal(cat)" class="bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-2.5 py-1 rounded-lg text-[11px] border border-amber-300 flex items-center gap-1 transition">
+                                                    <span>🏆</span> Kết quả thi
+                                                </button>
                                             </div>
                                         </div>
                                     </template>
@@ -887,7 +871,7 @@
                     </template>
                 </div>
 
-                <!-- 3. RÈN LUYỆN KỸ NĂNG (Hiển thị Top 3 Quán quân, Á quân, Hạng 3 chi tiết 2 hàng) -->
+                <!-- 3. RÈN LUYỆN KỸ NĂNG -->
                 <div x-show="gameSubTab === 'skills'" class="space-y-3 bg-white border rounded-xl p-4 shadow-sm text-xs">
                     <div class="flex justify-between items-center border-b pb-2">
                         <h3 class="font-bold text-sm text-blue-900">📚 Rèn Luyện Kỹ Năng</h3>
@@ -942,24 +926,11 @@
 
                                 <p class="text-gray-600 leading-relaxed text-xs whitespace-pre-line" x-text="item.content"></p>
 
-                                <!-- HIỂN THỊ TOP 3 QUÁN QUÂN, Á QUÂN, HẠNG 3 KỸ NĂNG -->
-                                <div class="space-y-1.5 pt-1">
-                                    <template x-for="(champ, index) in getEssayTop3(item.id)" :key="index">
-                                        <div class="bg-amber-50 border border-amber-200 rounded-lg p-2 text-xs space-y-0.5">
-                                            <div class="font-bold text-amber-900 flex items-center gap-1">
-                                                <span x-text="index === 0 ? '🏆 Quán quân:' : (index === 1 ? '🥈 Á quân:' : '🥉 Hạng 3:')"></span>
-                                                <span x-text="champ.name"></span>
-                                            </div>
-                                            <div class="text-[10px] text-amber-800 font-medium">
-                                                <span x-text="'Thời gian nộp bài đúng: ' + champ.dateTimeStr"></span>
-                                            </div>
-                                        </div>
-                                    </template>
-                                    <template x-if="getEssayTop3(item.id).length === 0">
-                                        <div class="bg-amber-50 border border-amber-200 rounded-lg p-2 text-[11px] text-amber-900 italic">
-                                            Chưa có ai giải đúng câu hỏi này.
-                                        </div>
-                                    </template>
+                                <!-- NÚT XEM KẾT QUẢ THI NÂNG CẤP DẠNG MODAL KỸ NĂNG -->
+                                <div class="pt-1 flex justify-end">
+                                    <button @click="openEssayResultsModal(item)" class="bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-2.5 py-1 rounded-lg text-[11px] border border-amber-300 flex items-center gap-1 transition">
+                                        <span>🏆</span> Kết quả thi
+                                    </button>
                                 </div>
 
                                 <!-- Khung nhập đáp án người chơi -->
@@ -1298,6 +1269,112 @@
             </div>
         </template>
 
+        <!-- MODAL HIỂN THỊ TẤT CẢ KẾT QUẢ THI PHẬT PHÁP -->
+        <template x-if="showQuizResultsModal">
+            <div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+                <div class="bg-white rounded-2xl w-full max-w-sm p-4 space-y-3 max-h-[85vh] flex flex-col text-xs shadow-2xl">
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <div class="pr-2">
+                            <h3 class="font-bold text-sm text-blue-900 flex items-center gap-1">
+                                <span>🏆 Bảng Xếp Hạng Kết Quả Thi</span>
+                            </h3>
+                            <p class="text-[11px] text-amber-700 font-bold truncate mt-0.5" x-text="selectedQuizCatForResults ? selectedQuizCatForResults.title : ''"></p>
+                        </div>
+                        <button @click="showQuizResultsModal = false" class="text-gray-400 hover:text-gray-600 text-lg font-bold px-2 py-0.5 rounded">✕</button>
+                    </div>
+
+                    <div class="flex-1 overflow-y-auto space-y-2 pr-1 my-1">
+                        <template x-for="(champ, index) in getQuizAllResults(selectedQuizCatForResults ? selectedQuizCatForResults.id : null)" :key="index">
+                            <div class="p-2.5 rounded-xl border space-y-1 transition-all"
+                                :class="{
+                                    'bg-amber-50 border-amber-300 shadow-xs': index === 0,
+                                    'bg-slate-50 border-slate-300': index === 1,
+                                    'bg-orange-50 border-orange-200': index === 2,
+                                    'bg-gray-50 border-gray-200': index > 2
+                                }">
+                                <div class="font-bold text-gray-900 flex items-center justify-between text-xs">
+                                    <div class="flex items-center gap-1.5 truncate">
+                                        <span class="w-5 h-5 rounded-full text-center leading-5 text-[10px] font-extrabold"
+                                            :class="{
+                                                'bg-amber-400 text-white': index === 0,
+                                                'bg-slate-300 text-gray-800': index === 1,
+                                                'bg-amber-600 text-white': index === 2,
+                                                'bg-gray-200 text-gray-600': index > 2
+                                            }" x-text="index + 1"></span>
+                                        <span class="truncate" x-text="(index === 0 ? '👑 ' : (index === 1 ? '🥈 ' : (index === 2 ? '🥉 ' : ''))) + champ.name"></span>
+                                    </div>
+                                    <span class="text-blue-900 font-extrabold bg-white px-2 py-0.5 rounded border text-[11px]" x-text="champ.score + ' câu đúng'"></span>
+                                </div>
+                                <div class="flex justify-between items-center text-[10px] text-gray-500 pt-0.5">
+                                    <span x-text="'Số lần thi: ' + champ.retries"></span>
+                                    <span x-text="'Nộp bài: ' + champ.dateTimeStr"></span>
+                                </div>
+                            </div>
+                        </template>
+                        <template x-if="getQuizAllResults(selectedQuizCatForResults ? selectedQuizCatForResults.id : null).length === 0">
+                            <div class="text-center py-6 text-gray-400 italic">
+                                Chưa có thí sinh nào tham gia thi bộ câu hỏi này.
+                            </div>
+                        </template>
+                    </div>
+
+                    <button @click="showQuizResultsModal = false" class="w-full bg-blue-900 text-white py-2 rounded-xl font-bold hover:bg-blue-800 transition">Đóng</button>
+                </div>
+            </div>
+        </template>
+
+        <!-- MODAL HIỂN THỊ TẤT CẢ KẾT QUẢ THI KỸ NĂNG -->
+        <template x-if="showEssayResultsModal">
+            <div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+                <div class="bg-white rounded-2xl w-full max-w-sm p-4 space-y-3 max-h-[85vh] flex flex-col text-xs shadow-2xl">
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <div class="pr-2">
+                            <h3 class="font-bold text-sm text-blue-900 flex items-center gap-1">
+                                <span>🏆 Bảng Xếp Hạng Giải Đúng</span>
+                            </h3>
+                            <p class="text-[11px] text-amber-700 font-bold truncate mt-0.5" x-text="selectedEssayForResults ? selectedEssayForResults.title : ''"></p>
+                        </div>
+                        <button @click="showEssayResultsModal = false" class="text-gray-400 hover:text-gray-600 text-lg font-bold px-2 py-0.5 rounded">✕</button>
+                    </div>
+
+                    <div class="flex-1 overflow-y-auto space-y-2 pr-1 my-1">
+                        <template x-for="(champ, index) in getEssayAllResults(selectedEssayForResults ? selectedEssayForResults.id : null)" :key="index">
+                            <div class="p-2.5 rounded-xl border space-y-1 transition-all"
+                                :class="{
+                                    'bg-amber-50 border-amber-300 shadow-xs': index === 0,
+                                    'bg-slate-50 border-slate-300': index === 1,
+                                    'bg-orange-50 border-orange-200': index === 2,
+                                    'bg-gray-50 border-gray-200': index > 2
+                                }">
+                                <div class="font-bold text-gray-900 flex items-center justify-between text-xs">
+                                    <div class="flex items-center gap-1.5 truncate">
+                                        <span class="w-5 h-5 rounded-full text-center leading-5 text-[10px] font-extrabold"
+                                            :class="{
+                                                'bg-amber-400 text-white': index === 0,
+                                                'bg-slate-300 text-gray-800': index === 1,
+                                                'bg-amber-600 text-white': index === 2,
+                                                'bg-gray-200 text-gray-600': index > 2
+                                            }" x-text="index + 1"></span>
+                                        <span class="truncate" x-text="(index === 0 ? '👑 ' : (index === 1 ? '🥈 ' : (index === 2 ? '🥉 ' : ''))) + champ.name"></span>
+                                    </div>
+                                </div>
+                                <div class="text-[10px] text-amber-800 font-medium pt-0.5">
+                                    <span x-text="'Thời gian nộp bài đúng: ' + champ.dateTimeStr"></span>
+                                </div>
+                            </div>
+                        </template>
+                        <template x-if="getEssayAllResults(selectedEssayForResults ? selectedEssayForResults.id : null).length === 0">
+                            <div class="text-center py-6 text-gray-400 italic">
+                                Chưa có ai giải đúng câu hỏi này.
+                            </div>
+                        </template>
+                    </div>
+
+                    <button @click="showEssayResultsModal = false" class="w-full bg-blue-900 text-white py-2 rounded-xl font-bold hover:bg-blue-800 transition">Đóng</button>
+                </div>
+            </div>
+        </template>
+
     </div>
 
     <!-- SCRIPT CHÍNH -->
@@ -1333,6 +1410,12 @@
                 showBannerConfig: false,
                 showAddModal: false,
                 isEditMode: false,
+
+                // MODALS HIỂN THỊ FULL KẾT QUẢ
+                showQuizResultsModal: false,
+                selectedQuizCatForResults: null,
+                showEssayResultsModal: false,
+                selectedEssayForResults: null,
 
                 bannerConfig: {
                     title: 'Nam Mô Bổn Sư Thích Ca Mâu Ni Phật',
@@ -1664,9 +1747,9 @@
                     this.drawWheelCanvas();
                 },
 
-                // TÍNH TOP 3 (QUÁN QUÂN, Á QUÂN, HẠNG 3) CHO ĐỐ PHẬT PHÁP
-                getQuizTop3(catId) {
-                    if (!this.quizHistoryAll) return [];
+                // TÍNH TẤT CẢ KẾT QUẢ THI ĐỐ PHẬT PHÁP (SẮP XẾP XẾP HẠNG)
+                getQuizAllResults(catId) {
+                    if (!catId || !this.quizHistoryAll) return [];
                     let records = [];
 
                     Object.keys(this.quizHistoryAll).forEach(uname => {
@@ -1698,21 +1781,23 @@
                         }
                     });
 
-                    if (records.length === 0) return [];
-
-                    // Sắp xếp: 1. Số câu đúng nhiều nhất -> 2. Số lần thi lại ít nhất -> 3. Thời gian nộp bài sớm nhất
                     records.sort((a, b) => {
                         if (b.score !== a.score) return b.score - a.score;
                         if (a.retries !== b.retries) return a.retries - b.retries;
                         return a.timestamp - b.timestamp;
                     });
 
-                    return records.slice(0, 3);
+                    return records;
                 },
 
-                // TÍNH TOP 3 (QUÁN QUÂN, Á QUÂN, HẠNG 3) CHO KỸ NĂNG TỰ LUẬN
-                getEssayTop3(essayId) {
-                    if (!this.essayHistoryAll || !this.essayHistoryAll[essayId]) return [];
+                openQuizResultsModal(cat) {
+                    this.selectedQuizCatForResults = cat;
+                    this.showQuizResultsModal = true;
+                },
+
+                // TÍNH TẤT CẢ KẾT QUẢ THI KỸ NĂNG TỰ LUẬN
+                getEssayAllResults(essayId) {
+                    if (!essayId || !this.essayHistoryAll || !this.essayHistoryAll[essayId]) return [];
                     const essayRecords = Object.entries(this.essayHistoryAll[essayId]);
                     if (essayRecords.length === 0) return [];
 
@@ -1734,7 +1819,12 @@
                     });
 
                     records.sort((a, b) => a.timestamp - b.timestamp);
-                    return records.slice(0, 3);
+                    return records;
+                },
+
+                openEssayResultsModal(item) {
+                    this.selectedEssayForResults = item;
+                    this.showEssayResultsModal = true;
                 },
 
                 // CÁC HÀM XỬ LÝ ĐỐ PHẬT PHÁP

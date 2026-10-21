@@ -201,7 +201,7 @@
                        <!-- TikTok -->
                         <a :href="socialLinks.tiktok" target="_blank" class="p-2.5 bg-gray-900 hover:bg-gray-800 text-white font-semibold rounded-xl text-center border border-gray-700 flex flex-col items-center justify-center gap-1.5 transition shadow-xs">
                             <svg class="w-6 h-6 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor">
-                                <path d="M448,209.91a210.06,210.06,0,0,1-122.77-39.25V352.32A162.55,162.55,0,1,1,185,188.31V251.5a96,96,0,1,0,64,90.5V0h64A211.37,211.37,0,0,0,448,78.48ZM305.15,108.64a137.25,137.25,0,0,1,77.78,76.51A211.37,211.37,0,0,0,400,209.91V278.48A145.41,145.41,0,0,1,305.15,108.64Z"/>
+                                <path d="M448,209.91a210.06,210.06,0,0.1-122.77-39.25V352.32A162.55,162.55,0,1,1,185,188.31V251.5a96,96,0,1,0,64,90.5V0h64A211.37,211.37,0,0,0,448,78.48ZM305.15,108.64a137.25,137.25,0,0,1,77.78,76.51A211.37,211.37,0,0,0,400,209.91V278.48A145.41,145.41,0,0,1,305.15,108.64Z"/>
                             </svg>
                             <span class="text-[11px] font-bold">TikTok</span>
                         </a>
@@ -712,7 +712,7 @@
                     </div>
                 </div>
 
-                <!-- 2. TRAO DỒI PHẬT PHÁP (Nhiều bộ câu hỏi, hiển thị người Quán quân dựa trên 3 tiêu chí mới) -->
+                <!-- 2. TRAO DỒI PHẬT PHÁP (Hiển thị Top 3 Quán quân, Á quân, Hạng 3 chi tiết 3 hàng) -->
                 <div x-show="gameSubTab === 'quiz'" class="space-y-3 bg-white border rounded-xl p-4 shadow-sm text-xs">
                     <div class="flex justify-between items-center border-b pb-2">
                         <h3 class="font-bold text-sm text-blue-900">🧠 Trao Dồi Phật Pháp & Thi Đố Vui</h3>
@@ -746,7 +746,7 @@
                         </div>
                     </template>
 
-                    <!-- Danh sách bộ câu hỏi để quản lý (Admin) hoặc chọn thi (Đoàn sinh/Huynh trưởng) -->
+                    <!-- Danh sách bộ câu hỏi để quản lý (Admin) hoặc chọn thi -->
                     <template x-if="!quizStarted && !quizFinished">
                         <div class="space-y-3">
                             <div class="bg-blue-50/50 p-3 rounded-xl border space-y-2">
@@ -772,13 +772,27 @@
                                                 </div>
                                             </div>
 
-                                            <!-- HIỂN THỊ QUÁN QUÂN BỘ ĐỀ THI -->
-                                            <div class="bg-amber-50 border border-amber-200 rounded-lg p-2 text-[11px] flex items-center justify-between">
-                                                <span class="font-bold text-amber-900 flex items-center gap-1">
-                                                    <span>👑 Quán quân:</span>
-                                                    <span x-text="getQuizChampion(cat.id).name"></span>
-                                                </span>
-                                                <span class="text-amber-800 font-semibold" x-text="getQuizChampion(cat.id).details"></span>
+                                            <!-- HIỂN THỊ TOP 3 QUÁN QUÂN, Á QUÂN, HẠNG 3 BỘ ĐỀ THI -->
+                                            <div class="space-y-1.5 pt-1">
+                                                <template x-for="(champ, index) in getQuizTop3(cat.id)" :key="index">
+                                                    <div class="bg-amber-50 border border-amber-200 rounded-lg p-2 text-xs space-y-0.5">
+                                                        <div class="font-bold text-amber-900 flex items-center gap-1">
+                                                            <span x-text="index === 0 ? '👑 Quán quân:' : (index === 1 ? '🥈 Á quân:' : '🥉 Hạng 3:')"></span>
+                                                            <span x-text="champ.name"></span>
+                                                        </div>
+                                                        <div class="text-[10px] text-amber-800 font-medium">
+                                                            <span x-text="'Số câu đúng: ' + champ.score + ' | Số lần thi: ' + champ.retries"></span>
+                                                        </div>
+                                                        <div class="text-[10px] text-gray-500">
+                                                            <span x-text="'Thời gian nộp bài: ' + champ.dateTimeStr"></span>
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                                <template x-if="getQuizTop3(cat.id).length === 0">
+                                                    <div class="bg-amber-50 border border-amber-200 rounded-lg p-2 text-[11px] text-amber-900 italic">
+                                                        Chưa có dữ liệu quán quân.
+                                                    </div>
+                                                </template>
                                             </div>
                                         </div>
                                     </template>
@@ -873,7 +887,7 @@
                     </template>
                 </div>
 
-                <!-- 3. RÈN LUYỆN KỸ NĂNG (BỘ CÂU HỎI TỰ LUẬN, NGƯỜI QUÁN QUÂN & LỊCH SỬ NỘP ĐÁP ÁN ĐÚNG) -->
+                <!-- 3. RÈN LUYỆN KỸ NĂNG (Hiển thị Top 3 Quán quân, Á quân, Hạng 3 chi tiết 2 hàng) -->
                 <div x-show="gameSubTab === 'skills'" class="space-y-3 bg-white border rounded-xl p-4 shadow-sm text-xs">
                     <div class="flex justify-between items-center border-b pb-2">
                         <h3 class="font-bold text-sm text-blue-900">📚 Rèn Luyện Kỹ Năng (Thi Tự Luận)</h3>
@@ -928,13 +942,24 @@
 
                                 <p class="text-gray-600 leading-relaxed text-xs" x-text="item.content"></p>
 
-                                <!-- HIỂN THỊ QUÁN QUÂN KỸ NĂNG -->
-                                <div class="bg-amber-50 border border-amber-200 rounded-lg p-2 text-[11px] flex items-center justify-between">
-                                    <span class="font-bold text-amber-900 flex items-center gap-1">
-                                        <span>🏆 Quán quân:</span>
-                                        <span x-text="getEssayChampion(item.id).name"></span>
-                                    </span>
-                                    <span class="text-amber-800 font-semibold" x-text="getEssayChampion(item.id).timeStr"></span>
+                                <!-- HIỂN THỊ TOP 3 QUÁN QUÂN, Á QUÂN, HẠNG 3 KỸ NĂNG -->
+                                <div class="space-y-1.5 pt-1">
+                                    <template x-for="(champ, index) in getEssayTop3(item.id)" :key="index">
+                                        <div class="bg-amber-50 border border-amber-200 rounded-lg p-2 text-xs space-y-0.5">
+                                            <div class="font-bold text-amber-900 flex items-center gap-1">
+                                                <span x-text="index === 0 ? '🏆 Quán quân:' : (index === 1 ? '🥈 Á quân:' : '🥉 Hạng 3:')"></span>
+                                                <span x-text="champ.name"></span>
+                                            </div>
+                                            <div class="text-[10px] text-amber-800 font-medium">
+                                                <span x-text="'Thời gian nộp bài đúng: ' + champ.dateTimeStr"></span>
+                                            </div>
+                                        </div>
+                                    </template>
+                                    <template x-if="getEssayTop3(item.id).length === 0">
+                                        <div class="bg-amber-50 border border-amber-200 rounded-lg p-2 text-[11px] text-amber-900 italic">
+                                            Chưa có ai giải đúng câu hỏi này.
+                                        </div>
+                                    </template>
                                 </div>
 
                                 <!-- Khung nhập đáp án người chơi -->
@@ -1639,9 +1664,9 @@
                     this.drawWheelCanvas();
                 },
 
-                // TÍNH QUÁN QUÂN BỘ ĐỀ THI ĐỐ PHẬT PHÁP (THEO 3 TIÊU CHÍ MỚI)
-                getQuizChampion(catId) {
-                    if (!this.quizHistoryAll) return { name: 'Chưa có', details: 'Chưa có lượt thi' };
+                // TÍNH TOP 3 (QUÁN QUÂN, Á QUÂN, HẠNG 3) CHO ĐỐ PHẬT PHÁP
+                getQuizTop3(catId) {
+                    if (!this.quizHistoryAll) return [];
                     let records = [];
 
                     Object.keys(this.quizHistoryAll).forEach(uname => {
@@ -1673,20 +1698,43 @@
                         }
                     });
 
-                    if (records.length === 0) return { name: 'Chưa có', details: 'Chưa có lượt thi' };
+                    if (records.length === 0) return [];
 
-                    // Sắp xếp: 1. Số câu đúng nhiều nhất -> 2. Số lần thi lại ít nhất -> 3. Thời gian nộp bài sớm nhất (timestamp nhỏ nhất)
+                    // Sắp xếp: 1. Số câu đúng nhiều nhất -> 2. Số lần thi lại ít nhất -> 3. Thời gian nộp bài sớm nhất
                     records.sort((a, b) => {
                         if (b.score !== a.score) return b.score - a.score;
                         if (a.retries !== b.retries) return a.retries - b.retries;
                         return a.timestamp - b.timestamp;
                     });
 
-                    const champ = records[0];
-                    return {
-                        name: champ.name,
-                        details: `Đúng: ${champ.score} câu | Thi: ${champ.retries} lần | Nộp lúc: ${champ.dateTimeStr}`
-                    };
+                    return records.slice(0, 3);
+                },
+
+                // TÍNH TOP 3 (QUÁN QUÂN, Á QUÂN, HẠNG 3) CHO KỸ NĂNG TỰ LUẬN
+                getEssayTop3(essayId) {
+                    if (!this.essayHistoryAll || !this.essayHistoryAll[essayId]) return [];
+                    const essayRecords = Object.entries(this.essayHistoryAll[essayId]);
+                    if (essayRecords.length === 0) return [];
+
+                    let records = [];
+                    essayRecords.forEach(([uname, rec]) => {
+                        const acc = this.accounts.find(a => a.username === uname);
+                        let displayName = uname;
+                        if (acc && acc.linkedId) {
+                            const m = this.members.find(mem => mem.id == acc.linkedId);
+                            if (m) displayName = m.name + (m.dhName ? ' (' + m.dhName + ')' : '');
+                        }
+
+                        records.push({
+                            username: uname,
+                            name: displayName,
+                            timestamp: rec.timestamp || 0,
+                            dateTimeStr: rec.dateTime || 'N/A'
+                        });
+                    });
+
+                    records.sort((a, b) => a.timestamp - b.timestamp);
+                    return records.slice(0, 3);
                 },
 
                 // CÁC HÀM XỬ LÝ ĐỐ PHẬT PHÁP
@@ -1893,34 +1941,6 @@
                     } else {
                         alert('❌ Đáp án chưa chính xác. Vui lòng suy nghĩ và thử lại nhé!');
                     }
-                },
-                getEssayChampion(essayId) {
-                    if (!this.essayHistoryAll || !this.essayHistoryAll[essayId]) return { name: 'Chưa có', timeStr: 'Chưa ai giải đúng' };
-                    const essayRecords = Object.entries(this.essayHistoryAll[essayId]);
-                    if (essayRecords.length === 0) return { name: 'Chưa có', timeStr: 'Chưa ai giải đúng' };
-
-                    let winnerAcc = '';
-                    let earliest = Infinity;
-                    let winnerTimeStr = '';
-
-                    essayRecords.forEach(([uname, rec]) => {
-                        if (rec.timestamp && rec.timestamp < earliest) {
-                            earliest = rec.timestamp;
-                            winnerAcc = uname;
-                            winnerTimeStr = rec.dateTime;
-                        }
-                    });
-
-                    if (!winnerAcc) return { name: 'Chưa có', timeStr: 'Chưa ai giải đúng' };
-
-                    const acc = this.accounts.find(a => a.username === winnerAcc);
-                    let displayName = winnerAcc;
-                    if (acc && acc.linkedId) {
-                        const m = this.members.find(mem => mem.id == acc.linkedId);
-                        if (m) displayName = m.name + (m.dhName ? ' (' + m.dhName + ')' : '');
-                    }
-
-                    return { name: displayName, timeStr: 'Nộp đúng: ' + winnerTimeStr };
                 },
 
                 openAddEventModal() {

@@ -147,6 +147,31 @@
                     </template>
                 </div>
 
+                <!-- MỤC CHÚC MỪNG SINH NHẬT TRONG THÁNG -->
+                <div class="bg-white border rounded-xl p-4 shadow-sm space-y-3">
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <h3 class="font-bold text-gray-800 flex items-center gap-1">
+                            <span>🎂 Chúc Mừng Sinh Nhật Trong Tháng</span>
+                        </h3>
+                        <span class="text-[10px] bg-pink-100 text-pink-600 font-semibold px-2 py-0.5 rounded-full" x-text="'Tháng ' + (new Date().getMonth() + 1)"></span>
+                    </div>
+
+                    <div class="space-y-2 max-h-40 overflow-y-auto">
+                        <template x-for="m in currentMonthBirthdays" :key="m.id">
+                            <div class="p-2.5 bg-pink-50/60 border border-pink-100 rounded-lg text-xs flex justify-between items-center">
+                                <div>
+                                    <p class="font-bold text-pink-900" x-text="m.name + (m.dhName ? ' (' + m.dhName + ')' : '')"></p>
+                                    <p class="text-[10px] text-gray-500" x-text="'Ngành/Đoàn: ' + m.group"></p>
+                                </div>
+                                <span class="font-bold text-pink-700 bg-white px-2 py-1 rounded border border-pink-200 text-[11px]" x-text="'🎁 ' + m.dob"></span>
+                            </div>
+                        </template>
+                        <template x-if="!currentMonthBirthdays || currentMonthBirthdays.length === 0">
+                            <p class="text-gray-400 text-center py-2 italic text-[11px]">Không có thành viên nào có sinh nhật trong tháng này.</p>
+                        </template>
+                    </div>
+                </div>
+
                 <!-- 3 Ô MẠNG XÃ HỘI -->
                 <div class="bg-white border rounded-xl p-3 shadow-sm space-y-2 text-xs">
                     <div class="flex justify-between items-center">
@@ -478,14 +503,15 @@
             <div x-show="currentTab === 'leaderboard'" class="space-y-4">
                 <h2 class="font-bold text-lg text-gray-900">🏆 Bảng Xếp Hạng</h2>
                 
-                <div class="flex border-b text-xs font-bold text-center">
-                    <button @click="lbTab = 'attendance'" :class="lbTab === 'attendance' ? 'border-b-2 border-blue-900 text-blue-900' : 'text-gray-400'" class="flex-1 py-2">📅 BXH Chuyên Cần</button>
-                    <button @click="lbTab = 'points'" :class="lbTab === 'points' ? 'border-b-2 border-blue-900 text-blue-900' : 'text-gray-400'" class="flex-1 py-2">⭐ Tích Lũy Điểm</button>
+                <div class="flex border-b text-[11px] font-bold text-center">
+                    <button @click="lbTab = 'attendance_ds'" :class="lbTab === 'attendance_ds' ? 'border-b-2 border-blue-900 text-blue-900' : 'text-gray-400'" class="flex-1 py-2 px-1">📅 Chuyên Cần Đoàn Sinh</button>
+                    <button @click="lbTab = 'attendance_ht'" :class="lbTab === 'attendance_ht' ? 'border-b-2 border-blue-900 text-blue-900' : 'text-gray-400'" class="flex-1 py-2 px-1">📅 Chuyên Cần H.Trưởng</button>
+                    <button @click="lbTab = 'points'" :class="lbTab === 'points' ? 'border-b-2 border-blue-900 text-blue-900' : 'text-gray-400'" class="flex-1 py-2 px-1">⭐ Tích Lũy Điểm</button>
                 </div>
 
-                <div x-show="lbTab === 'attendance'" class="space-y-3 text-xs">
+                <div x-show="lbTab === 'attendance_ds'" class="space-y-3 text-xs">
                     <div class="space-y-2">
-                        <template x-for="(rank, i) in attendanceLeaderboard.slice(0, 20)" :key="i">
+                        <template x-for="(rank, i) in attendanceLeaderboardDS.slice(0, 20)" :key="i">
                             <div class="p-3 rounded-xl border flex items-center justify-between transition-all"
                                 :class="{
                                     'bg-gradient-to-r from-amber-100 to-yellow-50 border-amber-300 shadow-md ring-2 ring-amber-400/50': i === 0,
@@ -505,11 +531,48 @@
                                     </div>
                                     <div>
                                         <p class="font-bold text-gray-900" x-text="rank.name"></p>
-                                        <p class="text-[10px] text-gray-500" x-text="rank.group"></p>
+                                        <p class="text-[10px] text-gray-500" x-text="(rank.dhName ? rank.dhName + ' - ' : '') + rank.group"></p>
                                     </div>
                                 </div>
-                                <span class="font-extrabold text-blue-900 bg-white/80 px-2.5 py-1 rounded-lg border shadow-xs" x-text="countPresentSessions(rank.username || rank.id) + ' buổi có mặt'"></span>
+                                <span class="font-extrabold text-blue-900 bg-white/80 px-2.5 py-1 rounded-lg border shadow-xs" x-text="countPresentSessions(rank.id) + ' buổi có mặt'"></span>
                             </div>
+                        </template>
+                        <template x-if="attendanceLeaderboardDS.length === 0">
+                            <p class="text-gray-400 text-center py-2 italic">Chưa có dữ liệu chuyên cần đoàn sinh.</p>
+                        </template>
+                    </div>
+                </div>
+
+                <div x-show="lbTab === 'attendance_ht'" class="space-y-3 text-xs">
+                    <div class="space-y-2">
+                        <template x-for="(rank, i) in attendanceLeaderboardHT.slice(0, 20)" :key="i">
+                            <div class="p-3 rounded-xl border flex items-center justify-between transition-all"
+                                :class="{
+                                    'bg-gradient-to-r from-amber-100 to-yellow-50 border-amber-300 shadow-md ring-2 ring-amber-400/50': i === 0,
+                                    'bg-gradient-to-r from-slate-100 to-gray-50 border-slate-300 shadow-sm': i === 1,
+                                    'bg-gradient-to-r from-orange-100 to-amber-50 border-orange-300 shadow-sm': i === 2,
+                                    'bg-white border-gray-200': i > 2
+                                }">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full flex items-center justify-center font-extrabold text-sm shadow-sm"
+                                        :class="{
+                                            'bg-amber-400 text-white ring-2 ring-amber-200': i === 0,
+                                            'bg-slate-300 text-slate-800': i === 1,
+                                            'bg-amber-600 text-white': i === 2,
+                                            'bg-gray-100 text-gray-600': i > 2
+                                        }">
+                                        <span x-text="i === 0 ? '👑' : (i + 1)"></span>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-gray-900" x-text="rank.name"></p>
+                                        <p class="text-[10px] text-gray-500" x-text="(rank.dhName ? rank.dhName + ' - ' : '') + rank.group"></p>
+                                    </div>
+                                </div>
+                                <span class="font-extrabold text-blue-900 bg-white/80 px-2.5 py-1 rounded-lg border shadow-xs" x-text="countPresentSessions(rank.id) + ' buổi có mặt'"></span>
+                            </div>
+                        </template>
+                        <template x-if="attendanceLeaderboardHT.length === 0">
+                            <p class="text-gray-400 text-center py-2 italic">Chưa có dữ liệu chuyên cần Huynh trưởng.</p>
                         </template>
                     </div>
                 </div>
@@ -1217,7 +1280,7 @@
                 loginError: '',
                 currentUser: null,
                 currentTab: 'home',
-                lbTab: 'attendance',
+                lbTab: 'attendance_ds',
                 gameSubTab: 'wheel',
                 attendanceTimeFilter: 'ngay',
                 selectedFilterDate: new Date().toISOString().split('T')[0],
@@ -1459,6 +1522,20 @@
                         return m ? (m.tinhTanPoints || 0) : 0;
                     }
                     return 0;
+                },
+
+                // Lọc thành viên có sinh nhật trong tháng hiện tại
+                get currentMonthBirthdays() {
+                    const currentM = new Date().getMonth() + 1;
+                    return this.members.filter(m => {
+                        if (!m.dob) return false;
+                        const parts = m.dob.split(/[\/\-]/);
+                        if (parts.length >= 2) {
+                            const month = parseInt(parts[1], 10);
+                            return month === currentM;
+                        }
+                        return false;
+                    });
                 },
 
                 grantSpinTurns() {
@@ -1892,24 +1969,53 @@
 
                 countPresentSessions(memberIdentifier) {
                     if (!memberIdentifier) return 0;
-                    let histories = this.attendanceHistoryAll[memberIdentifier];
-                    if (!histories) {
-                        const acc = this.accounts.find(a => a.linkedId == memberIdentifier);
-                        if (acc && this.attendanceHistoryAll[acc.username]) {
-                            histories = this.attendanceHistoryAll[acc.username];
+                    let member = this.members.find(m => m.id == memberIdentifier || m.username === memberIdentifier);
+                    if (!member) {
+                        const acc = this.accounts.find(a => a.username === memberIdentifier);
+                        if (acc && acc.linkedId) {
+                            member = this.members.find(m => m.id == acc.linkedId);
                         }
                     }
-                    if (histories) {
-                        const historyArr = Object.values(histories);
-                        return historyArr.filter(h => h.status === 'Có mặt').length;
+                    let count = 0;
+                    const memberId = member ? member.id : memberIdentifier;
+                    
+                    // Quét từ dailyAttendanceData (bao gồm cả điểm danh cá nhân lẫn điểm danh hộ)
+                    if (this.dailyAttendanceData) {
+                        Object.values(this.dailyAttendanceData).forEach(dateRecord => {
+                            if (dateRecord && dateRecord[memberId] === 'Có mặt') {
+                                count++;
+                            }
+                        });
                     }
-                    return 0;
+                    
+                    if (count === 0) {
+                        let histories = this.attendanceHistoryAll[memberIdentifier];
+                        if (!histories) {
+                            const acc = this.accounts.find(a => a.linkedId == memberIdentifier);
+                            if (acc && this.attendanceHistoryAll[acc.username]) {
+                                histories = this.attendanceHistoryAll[acc.username];
+                            }
+                        }
+                        if (histories) {
+                            const historyArr = Object.values(histories);
+                            count = historyArr.filter(h => h.status === 'Có mặt').length;
+                        }
+                    }
+                    return count;
                 },
 
-                get attendanceLeaderboard() { 
-                    return [...this.members].sort((a, b) => {
-                        const countA = this.countPresentSessions(a.username || a.id);
-                        const countB = this.countPresentSessions(b.username || b.id);
+                get attendanceLeaderboardDS() { 
+                    return this.members.filter(m => m.group !== 'Huynh Trưởng').sort((a, b) => {
+                        const countA = this.countPresentSessions(a.id);
+                        const countB = this.countPresentSessions(b.id);
+                        return countB - countA;
+                    }); 
+                },
+
+                get attendanceLeaderboardHT() { 
+                    return this.members.filter(m => m.group === 'Huynh Trưởng').sort((a, b) => {
+                        const countA = this.countPresentSessions(a.id);
+                        const countB = this.countPresentSessions(b.id);
                         return countB - countA;
                     }); 
                 },
